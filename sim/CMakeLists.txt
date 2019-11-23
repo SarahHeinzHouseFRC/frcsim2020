@@ -12,8 +12,9 @@ set(SRCS
         src/main.cpp
         src/RobotModel.cpp
         src/RobotAgent.cpp
-        src/RobotConfig.cpp
+        src/ConfigReader.cpp
         src/Scene.cpp
+        src/Color.cpp
         )
 
 add_executable(robot_sim ${SRCS})

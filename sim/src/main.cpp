@@ -4,15 +4,17 @@
 
 #include <iostream>
 #include "RobotModel.h"
-#include "RobotConfig.h"
+#include "ConfigReader.h"
 #include "RobotAgent.h"
 #include "Scene.h"
 
 
 int main(int argc, char** argv)
 {
+    if (argc != 2) { std::cout << "Usage: ./robot_sim <config>" << std::endl; return 1; }
+
     // Read config file
-    RobotConfig config;
+    ConfigReader config(argv[1]);
 
     // Initialize robot
     RobotModel robot;
@@ -22,4 +24,7 @@ int main(int argc, char** argv)
 
     // Visualize robot model
     Scene scene;
+    scene.render();
+
+    return 0;
 }

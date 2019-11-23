@@ -1,0 +1,20 @@
+# Robot Sim Config
+# Copyright (c) 2019 FRC Team 3260
+
+elevator:
+  belt:
+    radius: 0.02    # Meters
+    width: 0.02     # Meters
+    length: 0.3     # Meters
+  motorShaft:
+    radius: 0.005   # Meters
+    length: 0.03    # Meters
+  motor:
+    radius: 0.015   # Meters
+    length: 0.03    # Meters
+  encoder:
+    radius: 0.01    # Meters
+    length: 0.003   # Meters
+  carriage:
+    lengthX: 0.001; # Meters
+    lengthY: 0.03;  # Meters

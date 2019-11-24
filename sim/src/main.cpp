@@ -23,7 +23,7 @@ int main(int argc, char** argv)
     RobotAgent robotAgent;
 
     // Visualize robot model
-    Scene scene;
+    Scene scene(config);
     scene.render();
 
     return 0;

@@ -16,5 +16,6 @@ elevator:
     radius: 0.01    # Meters
     length: 0.003   # Meters
   carriage:
-    lengthX: 0.001; # Meters
-    lengthY: 0.03;  # Meters
+    lengthX: 0.001  # Meters
+    lengthY: 0.03   # Meters
+    lengthZ: 0.02   # Meters

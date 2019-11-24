@@ -9,7 +9,19 @@
 #include "Scene.h"
 
 
-Scene::Scene()
+Scene::Scene(const ConfigReader& config) :
+        _beltRadius(config.elevator.belt.radius),
+        _beltWidth(config.elevator.belt.width),
+        _beltLength(config.elevator.belt.length),
+        _motorShaftRadius(config.elevator.motorShaft.radius),
+        _motorShaftLength(config.elevator.motorShaft.length),
+        _motorRadius(config.elevator.motor.radius),
+        _motorLength(config.elevator.motor.length),
+        _encoderRadius(config.elevator.encoder.radius),
+        _encoderLength(config.elevator.encoder.length),
+        _carriageLengthX(config.elevator.carriage.lengthX),
+        _carriageLengthY(config.elevator.carriage.lengthY),
+        _carriageLengthZ(config.elevator.carriage.lengthZ)
 {
     _root = new osg::Group;
 

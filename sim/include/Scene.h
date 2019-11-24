@@ -7,6 +7,7 @@
 
 #include <osg/Group>
 #include <osg/PositionAttitudeTransform>
+#include "ConfigReader.h"
 
 
 class Scene
@@ -15,7 +16,7 @@ public:
     /**
      * Constructs the scene
      */
-    Scene();
+    Scene(const ConfigReader& config);
 
     /**
      * Renders the scene
@@ -31,18 +32,18 @@ public:
 private:
     osg::ref_ptr<osg::Group> _root;
     osg::ref_ptr<osg::PositionAttitudeTransform> _carriagePat;
-    float _beltRadius = 0.02;
-    float _beltWidth = 0.02;
-    float _beltLength = 0.3;
-    float _motorShaftRadius = 0.005;
-    float _motorShaftLength = 0.01;
-    float _motorRadius = 0.015;
-    float _motorLength = 0.03;
-    float _encoderRadius = 0.01;
-    float _encoderLength = 0.003;
-    float _carriageLengthX = 0.001;
-    float _carriageLengthY = 0.03;
-    float _carriageLengthZ = _beltWidth;
+    float _beltRadius;
+    float _beltWidth;
+    float _beltLength;
+    float _motorShaftRadius;
+    float _motorShaftLength;
+    float _motorRadius;
+    float _motorLength;
+    float _encoderRadius;
+    float _encoderLength;
+    float _carriageLengthX;
+    float _carriageLengthY;
+    float _carriageLengthZ;
 };
 
 

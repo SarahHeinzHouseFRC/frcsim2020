@@ -1,6 +1,6 @@
-///
-/// Uber, Inc (c) 2019
-///
+/**
+ * Copyright (c) 2019 FRC Team 3260
+ */
 
 #ifndef ROBOT_SIM_COLOR_H
 #define ROBOT_SIM_COLOR_H
@@ -8,6 +8,9 @@
 #include <osg/Vec4>
 
 
+/**
+ * Utility class for quickly defining some default colors.
+ */
 class Color : public osg::Vec4
 {
 public:

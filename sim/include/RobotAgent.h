@@ -6,6 +6,9 @@
 #define SHARP2019_ROBOTAGENT_H
 
 
+/**
+ * Receives commands and transmits robot state over UDP.
+ */
 class RobotAgent
 {
 public:
@@ -15,16 +18,34 @@ public:
     RobotAgent();
 
     /**
-     * Sends the input encoder position to the robot
-     * @param encoder Count from 0-1024
+     * Publishes the robot state
      */
-    void transmitElevatorEncoderPosition(int encoder);
+    void txRobotState();
 
     /**
-     * Receives elevator motor signal from the robot
-     * @return Motor signal from 0-1024
+     * Receives robot commands
      */
-    double receiveElevatorMotorSignal();
+    double rxRobotCommands();
+
+    /**
+     * Simulator tells the agent the encoder position to transmit (0-1024)
+     */
+    void setEncoderPosition(int encoderPosition) { state.elevatorEncoderPosition = encoderPosition; }
+
+    /**
+     * Simulator requests the received motor speed from the agent
+     */
+    int getMotorSpeed() { return commands.elevatorMotorSpeed; }
+
+    struct
+    {
+        int elevatorEncoderPosition; // 0-1023
+    } state;
+
+    struct
+    {
+        int elevatorMotorSpeed; // 0-1023
+    } commands;
 };
 
 

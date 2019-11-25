@@ -9,6 +9,9 @@
 #include <yaml-cpp/yaml.h>
 
 
+/**
+ * Reads and parses the a config file, then provides its values to other classes.
+ */
 class ConfigReader
 {
 public:
@@ -29,8 +32,9 @@ public:
         } motorShaft;
         struct
         {
-            float radius; // Meters
-            float length; // Meters
+            float radius;   // Meters
+            float length;   // Meters
+            float maxSpeed; // RPM
         } motor;
         struct
         {

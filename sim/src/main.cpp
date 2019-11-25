@@ -3,10 +3,13 @@
  */
 
 #include <iostream>
-#include "RobotModel.h"
+#include <RobotAgent.h>
 #include "ConfigReader.h"
-#include "RobotAgent.h"
 #include "Scene.h"
+#include "Visualizer.h"
+#include "Time.h"
+#include "RobotAgent.h"
+#include "RobotModel.h"
 
 
 int main(int argc, char** argv)
@@ -17,14 +20,39 @@ int main(int argc, char** argv)
     ConfigReader config(argv[1]);
 
     // Initialize robot
-    RobotModel robot;
+    double t = Time::now();
+    RobotModel robot(config, t);
 
-    // Initialize robot agent (sends the robot's state)
+    // Initialize robot agent
     RobotAgent robotAgent;
 
     // Visualize robot model
     Scene scene(config);
-    scene.render();
+
+    // Visualize the scene
+    Visualizer vis(scene);
+
+    // Run the simulation
+    while (!vis.done())
+    {
+        // Receive commands
+        robotAgent.rxRobotCommands();
+
+        // Get the current time
+        t = Time::now();
+
+        // Update the robot state
+        robot.update(t, robotAgent.commands.elevatorMotorSpeed);
+
+        // Update the robot visualization
+        scene.update(robot);
+
+        // Transmit robot state
+        robotAgent.txRobotState();
+
+        // Step the visualizer
+        vis.step();
+    }
 
     return 0;
 }

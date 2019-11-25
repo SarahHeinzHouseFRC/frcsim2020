@@ -1,6 +1,6 @@
-///
-/// Uber, Inc (c) 2019
-///
+/**
+ * Copyright (c) 2019 FRC Team 3260
+ */
 
 #include "Color.h"
 

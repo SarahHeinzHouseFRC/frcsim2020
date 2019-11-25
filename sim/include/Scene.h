@@ -8,8 +8,12 @@
 #include <osg/Group>
 #include <osg/PositionAttitudeTransform>
 #include "ConfigReader.h"
+#include "RobotModel.h"
 
 
+/**
+ * Responsible for rendering the robot according to the robot model.
+ */
 class Scene
 {
 public:
@@ -19,9 +23,14 @@ public:
     Scene(const ConfigReader& config);
 
     /**
-     * Renders the scene
+     * Returns the root node of the scene
      */
-    void render();
+    osg::ref_ptr<osg::Group> getRoot() const { return _root; }
+
+    /**
+     * Updates the scene given the robot's current state
+     */
+    void update(const RobotModel& robot);
 
     /**
      * Sets the elevator position where 0 is the bottom

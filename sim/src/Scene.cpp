@@ -2,8 +2,8 @@
  * Copyright (c) 2019 FRC Team 3260
  */
 
-#include <osgViewer/Viewer>
-#include <osgGA/TerrainManipulator>
+#include <osg/Geode>
+#include <osg/Geometry>
 #include <osg/ShapeDrawable>
 #include "Color.h"
 #include "Scene.h"
@@ -121,20 +121,15 @@ Scene::Scene(const ConfigReader& config) :
 
 
 
-void Scene::render()
+void Scene::update(const RobotModel& robot)
 {
-    osgViewer::Viewer viewer;
-    viewer.setSceneData(_root);
-    osg::ref_ptr<osgGA::TerrainManipulator> manip = new osgGA::TerrainManipulator;
-    manip->setAllowThrow(false);
-    viewer.setCameraManipulator(manip);
-    viewer.getCamera()->setClearColor(Color::Black);
-    viewer.run();
+    double elevatorPos = robot.getElevatorCarriagePos();
+    _carriagePat->setPosition(osg::Vec3(elevatorPos, 0, 0));
 }
 
 
 
 void Scene::setElevatorPosition(float pos)
 {
-    _carriagePat->setPosition(osg::Vec3(pos, 0, 0));
+
 }

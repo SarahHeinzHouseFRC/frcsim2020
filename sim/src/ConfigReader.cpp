@@ -46,6 +46,7 @@ void ConfigReader::loadElevatorConfig(const YAML::Node& elevatorConfig)
     {
         elevator.motor.radius = motorConfig["radius"].as<float>();
         elevator.motor.length = motorConfig["length"].as<float>();
+        elevator.motor.maxSpeed = motorConfig["maxSpeed"].as<float>();
     }
 
     // Load encoder

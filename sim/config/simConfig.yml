@@ -12,6 +12,7 @@ elevator:
   motor:
     radius: 0.015   # Meters
     length: 0.03    # Meters
+    maxSpeed: 10    # RPM
   encoder:
     radius: 0.01    # Meters
     length: 0.003   # Meters

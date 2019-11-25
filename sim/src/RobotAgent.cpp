@@ -5,21 +5,21 @@
 #include "RobotAgent.h"
 
 
-RobotAgent::RobotAgent()
+RobotAgent::RobotAgent() : state{0}, commands{0}
 {
 
 }
 
 
 
-void RobotAgent::transmitElevatorEncoderPosition(int encoder)
+void RobotAgent::txRobotState()
 {
 
 }
 
 
 
-double RobotAgent::receiveElevatorMotorSignal()
+double RobotAgent::rxRobotCommands()
 {
-    return 0;
+    return commands.elevatorMotorSpeed;
 }

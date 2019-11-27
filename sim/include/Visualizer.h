@@ -8,6 +8,7 @@
 
 #include <osgViewer/Viewer>
 #include "Scene.h"
+#include "Hud.h"
 
 
 /**
@@ -19,7 +20,7 @@ public:
     /**
      * Constructor
      */
-    Visualizer(const Scene& scene);
+    Visualizer(Scene& scene, Hud& hud);
 
     /**
      * Steps the visualizer forward
@@ -33,6 +34,10 @@ public:
 
 private:
     osgViewer::Viewer _viewer;
+    int _windowWidth;
+    int _windowHeight;
+    Scene& _scene;
+    Hud& _hud;
 };
 
 

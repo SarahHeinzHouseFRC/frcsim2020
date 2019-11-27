@@ -16,16 +16,12 @@
  */
 class Scene
 {
+friend class Visualizer;
 public:
     /**
      * Constructs the scene
      */
     Scene(const ConfigReader& config);
-
-    /**
-     * Returns the root node of the scene
-     */
-    osg::ref_ptr<osg::Group> getRoot() const { return _root; }
 
     /**
      * Updates the scene given the robot's current state
@@ -39,6 +35,11 @@ public:
     void setElevatorPosition(float pos);
 
 private:
+    /**
+     * Returns the root node of the scene
+     */
+    osg::ref_ptr<osg::Group> getRoot() const { return _root; }
+
     osg::ref_ptr<osg::Group> _root;
     osg::ref_ptr<osg::PositionAttitudeTransform> _carriagePat;
     float _beltRadius;

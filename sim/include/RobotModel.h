@@ -21,7 +21,8 @@ public:
 
     /**
      * Updates the robot model to the new time
-     * @param timestamp Current time (sec). This must be greater than _lastTimestamp
+     * @param currTimestamp Current time (sec). This must be greater than _lastTimestamp
+     * @param commandedElevatorMotorSpeed Commanded speed of elevator motor (0-1023)
      */
     void update(double currTimestamp, int commandedElevatorMotorSpeed);
 
@@ -33,8 +34,10 @@ public:
 private:
     /**
      * Moves the carriage up and down based on elevator motor speed
+     * @param elapsedTime Time since last call of update()
+     * @param commandedElevatorMotorSpeed Commanded speed of elevator motor (0-1023)
      */
-    void updateElevator(double elapsedTime);
+    void updateElevator(double elapsedTime, int commandedElevatorMotorSpeed);
 
     /**
      * Wraps the given value to be no lower than min and no higher than max

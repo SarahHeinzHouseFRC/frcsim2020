@@ -26,7 +26,7 @@ void RobotModel::update(double currTimestamp, int commandedElevatorMotorSpeed)
     double elapsedTime = currTimestamp - _prevTimestamp;
 
     // Update the elevator
-    updateElevator(elapsedTime);
+    updateElevator(elapsedTime, commandedElevatorMotorSpeed);
 
     // Update the last timestamp
     _prevTimestamp = currTimestamp;
@@ -34,8 +34,11 @@ void RobotModel::update(double currTimestamp, int commandedElevatorMotorSpeed)
 
 
 
-void RobotModel::updateElevator(double elapsedTime)
+void RobotModel::updateElevator(double elapsedTime, int commandedElevatorMotorSpeed)
 {
+    // Update elevator speed
+    _elevatorMotorSpeed = commandedElevatorMotorSpeed / 256.0;
+
     // Move the carriage up by d = omega * r * t
     double d = _elevatorMotorSpeed * _elevatorMotorRadius * elapsedTime;
     _elevatorCarriagePos += d;

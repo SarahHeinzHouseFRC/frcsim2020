@@ -14,6 +14,7 @@ set(SRCS
         src/RobotAgent.cpp
         src/ConfigReader.cpp
         src/Scene.cpp
+        src/Hud.cpp
         src/Visualizer.cpp
         src/Time.cpp
         src/Color.cpp

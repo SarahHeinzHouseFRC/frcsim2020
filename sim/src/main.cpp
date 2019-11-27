@@ -6,6 +6,7 @@
 #include <RobotAgent.h>
 #include "ConfigReader.h"
 #include "Scene.h"
+#include "Hud.h"
 #include "Visualizer.h"
 #include "Time.h"
 #include "RobotAgent.h"
@@ -28,9 +29,10 @@ int main(int argc, char** argv)
 
     // Visualize robot model
     Scene scene(config);
+    Hud hud(config);
 
     // Visualize the scene
-    Visualizer vis(scene);
+    Visualizer vis(scene, hud);
 
     // Run the simulation
     while (!vis.done())

@@ -18,6 +18,7 @@ set(SRCS
         src/Visualizer.cpp
         src/Time.cpp
         src/Color.cpp
+        src/UdpNode.cpp
         )
 
 add_executable(robot_sim ${SRCS})

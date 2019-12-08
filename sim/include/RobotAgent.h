@@ -5,9 +5,12 @@
 #ifndef SHARP2019_ROBOTAGENT_H
 #define SHARP2019_ROBOTAGENT_H
 
+#include "Types.h"
+#include "UdpNode.h"
+
 
 /**
- * Receives commands and transmits robot state over UDP.
+ * Receives commands and transmits robot state over comms.enc
  */
 class RobotAgent
 {
@@ -18,34 +21,29 @@ public:
     RobotAgent();
 
     /**
-     * Publishes the robot state
+     * Publishes the robot's state
      */
     void txRobotState();
 
     /**
      * Receives robot commands
      */
-    double rxRobotCommands();
+    void rxRobotCommands();
 
     /**
-     * Simulator tells the agent the encoder position to transmit (0-1024)
+     * Get the last command received
      */
-    void setEncoderPosition(int encoderPosition) { state.elevatorEncoderPosition = encoderPosition; }
+    RobotCommands getRobotCommands() { return _commands; }
 
     /**
-     * Simulator requests the received motor speed from the agent
+     * State to be sent
      */
-    int getMotorSpeed() { return commands.elevatorMotorSpeed; }
+    void setRobotState(const RobotState& state) { _state = state; }
 
-    struct
-    {
-        int elevatorEncoderPosition; // 0-1023
-    } state;
-
-    struct
-    {
-        int elevatorMotorSpeed; // 0-1023
-    } commands;
+private:
+    RobotState _state;
+    RobotCommands _commands;
+    UdpNode *_comms;
 };
 
 

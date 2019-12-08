@@ -14,9 +14,23 @@
 
 class Hud
 {
-friend class Visualizer;
 public:
+    /**
+     * Constructor
+     */
     Hud(const ConfigReader& config);
+
+    /**
+     * Returns the HUD's camera
+     */
+    osg::Camera* getCamera() { return _camera; }
+
+    /**
+     * Callback called by the visualizer
+     * @param width New window width (pixels)
+     * @param height New window height (pixels)
+     */
+    void onWindowResize(int width, int height);
 
 private:
     class Label : public osgText::Text
@@ -34,11 +48,8 @@ private:
         osg::Vec3 _desiredPos;
         Alignment _alignment;
     };
-    osg::Camera* getCamera() { return _camera; }
 
     void addLabel(osg::ref_ptr<Label> label);
-
-    void onWindowResize(int width, int height);
 
     osg::Camera* _camera;
     osg::ref_ptr<osg::Group> _root;

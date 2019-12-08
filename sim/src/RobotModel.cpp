@@ -21,12 +21,12 @@ RobotModel::RobotModel(const ConfigReader& config, double startTimestamp) :
 
 
 
-void RobotModel::update(double currTimestamp, int commandedElevatorMotorSpeed)
+void RobotModel::update(double currTimestamp)
 {
     double elapsedTime = currTimestamp - _prevTimestamp;
 
     // Update the elevator
-    updateElevator(elapsedTime, commandedElevatorMotorSpeed);
+    updateElevator(elapsedTime);
 
     // Update the last timestamp
     _prevTimestamp = currTimestamp;
@@ -34,11 +34,25 @@ void RobotModel::update(double currTimestamp, int commandedElevatorMotorSpeed)
 
 
 
-void RobotModel::updateElevator(double elapsedTime, int commandedElevatorMotorSpeed)
+void RobotModel::processCommands(const RobotCommands& commands)
 {
-    // Update elevator speed
-    _elevatorMotorSpeed = commandedElevatorMotorSpeed / 256.0;
+    // Update elevator motor speed
+    _elevatorMotorSpeed = commands.elevatorMotorSpeed / 256.0;
+}
 
+
+
+RobotState RobotModel::getState()
+{
+    RobotState state;
+    state.elevatorEncoderPosition = int (1024 * _elevatorCarriagePos / _elevatorBeltLength);
+    return state;
+}
+
+
+
+void RobotModel::updateElevator(double elapsedTime)
+{
     // Move the carriage up by d = omega * r * t
     double d = _elevatorMotorSpeed * _elevatorMotorRadius * elapsedTime;
     _elevatorCarriagePos += d;

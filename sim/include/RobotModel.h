@@ -6,6 +6,7 @@
 #define ROBOT_SIM_ROBOTMODEL_H
 
 #include "ConfigReader.h"
+#include "Types.h"
 
 
 /**
@@ -13,6 +14,8 @@
  */
 class RobotModel
 {
+friend class Scene;
+friend class Hud;
 public:
     /**
      * Constructor
@@ -22,14 +25,19 @@ public:
     /**
      * Updates the robot model to the new time
      * @param currTimestamp Current time (sec). This must be greater than _lastTimestamp
-     * @param commandedElevatorMotorSpeed Commanded speed of elevator motor (0-1023)
      */
-    void update(double currTimestamp, int commandedElevatorMotorSpeed);
+    void update(double currTimestamp);
 
     /**
-     * Returns the height of the elevator carriage from the belt bottom (meters)
+     * Updates the robot's internal parameters given new commands
+     * @param commands New commands
      */
-    double getElevatorCarriagePos() const { return _elevatorCarriagePos; }
+    void processCommands(const RobotCommands& commands);
+
+    /**
+     * Returns the robot's current state
+     */
+    RobotState getState();
 
 private:
     /**
@@ -37,7 +45,7 @@ private:
      * @param elapsedTime Time since last call of update()
      * @param commandedElevatorMotorSpeed Commanded speed of elevator motor (0-1023)
      */
-    void updateElevator(double elapsedTime, int commandedElevatorMotorSpeed);
+    void updateElevator(double elapsedTime);
 
     /**
      * Wraps the given value to be no lower than min and no higher than max

@@ -123,13 +123,7 @@ Scene::Scene(const ConfigReader& config) :
 
 void Scene::update(const RobotModel& robot)
 {
-    double elevatorPos = robot.getElevatorCarriagePos();
+    // Update elevator position
+    double elevatorPos = robot._elevatorCarriagePos;
     _carriagePat->setPosition(osg::Vec3(elevatorPos, 0, 0));
-}
-
-
-
-void Scene::setElevatorPosition(float pos)
-{
-
 }

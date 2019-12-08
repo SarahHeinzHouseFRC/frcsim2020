@@ -16,7 +16,6 @@
  */
 class Scene
 {
-friend class Visualizer;
 public:
     /**
      * Constructs the scene
@@ -29,17 +28,11 @@ public:
     void update(const RobotModel& robot);
 
     /**
-     * Sets the elevator position where 0 is the bottom
-     * @param pos Height (meters)
-     */
-    void setElevatorPosition(float pos);
-
-private:
-    /**
      * Returns the root node of the scene
      */
     osg::ref_ptr<osg::Group> getRoot() const { return _root; }
 
+private:
     osg::ref_ptr<osg::Group> _root;
     osg::ref_ptr<osg::PositionAttitudeTransform> _carriagePat;
     float _beltRadius;

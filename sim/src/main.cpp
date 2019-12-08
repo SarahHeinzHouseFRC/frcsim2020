@@ -3,7 +3,6 @@
  */
 
 #include <iostream>
-#include <RobotAgent.h>
 #include "ConfigReader.h"
 #include "Scene.h"
 #include "Hud.h"
@@ -39,17 +38,23 @@ int main(int argc, char** argv)
     {
         // Receive commands
         robotAgent.rxRobotCommands();
+        auto rxCommands = robotAgent.getRobotCommands();
 
-        // Get the current time
+        // Update the robot's control surfaces based on the received commands
+        robot.processCommands(rxCommands);
+
+        // Get current time (sec)
         t = Time::now();
 
-        // Update the robot state
-        robot.update(t, robotAgent.commands.elevatorMotorSpeed);
+        // Update the robot state given the received robot commands
+        robot.update(t);
 
         // Update the robot visualization
         scene.update(robot);
 
         // Transmit robot state
+        RobotState state = robot.getState();
+        robotAgent.setRobotState(state);
         robotAgent.txRobotState();
 
         // Step the visualizer

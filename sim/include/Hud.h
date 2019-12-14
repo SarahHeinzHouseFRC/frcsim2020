@@ -40,7 +40,8 @@ private:
         {
             FROM_TOP, FROM_MIDDLE, FROM_BOTTOM
         };
-        Label(const std::string& text, Alignment a, const osg::Vec3& pos);
+
+        Label(const std::string& text, Alignment a, const osg::Vec3& pos, float fontSize=16);
 
         void updatePosition(int windowWidth, int windowHeight);
 
@@ -58,6 +59,7 @@ private:
     osg::ref_ptr<osg::Vec3Array> _vertices;
     int _width;
     std::vector<osg::ref_ptr<Label>> _labels;
+    static constexpr float _leftPadding = 15;
 };
 
 

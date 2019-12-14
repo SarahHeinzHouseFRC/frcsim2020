@@ -7,7 +7,7 @@
 #include "Hud.h"
 
 
-Hud::Hud(const ConfigReader& config) : _width(250)
+Hud::Hud(const ConfigReader& config) : _width(225)
 {
     _camera = new osg::Camera;
 
@@ -39,12 +39,10 @@ Hud::Hud(const ConfigReader& config) : _width(250)
     _geom->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
     _geode->addDrawable(_geom);
 
-    osg::ref_ptr<Label> title = new Label("Robot Sim", Label::FROM_TOP, osg::Vec3(15, -34, 0));
-    title->setCharacterSize(24);
+    auto title = new Label("Robot Sim", Label::FROM_TOP, osg::Vec3(_leftPadding, -34, 0), 24);
     addLabel(title);
 
-    osg::ref_ptr<Label> subtitle = new Label("Team SHARP 3260", Label::FROM_TOP, osg::Vec3(15, -54, 0));
-    subtitle->setCharacterSize(16);
+    auto subtitle = new Label("Team SHARP 3260", Label::FROM_TOP, osg::Vec3(_leftPadding, -54, 0));
     subtitle->setColor(osg::Vec4(0.8, 0.8, 1, 1));
     addLabel(subtitle);
 
@@ -78,12 +76,13 @@ void Hud::onWindowResize(int width, int height)
 
 
 
-Hud::Label::Label(const std::string& text, Alignment a, const osg::Vec3& pos) :
+Hud::Label::Label(const std::string& text, Alignment a, const osg::Vec3& pos, float fontSize) :
         _desiredPos(pos), _alignment(a)
 {
     this->setText(text);
+    this->setCharacterSize(fontSize);
     this->setPosition(pos);
-    this->setFont("/data/fonts/fira-mono.ttf");
+    this->setFont("/data/fonts/helvetica.ttf");
     this->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
     this->getOrCreateStateSet()->setMode(GL_BLEND, osg::StateAttribute::ON);
     this->setDataVariance(osg::Object::DYNAMIC);

@@ -6,6 +6,7 @@
 #define ROBOT_SIM_SCENE_H
 
 #include <osg/Group>
+#include <osg/ShapeDrawable>
 #include <osg/PositionAttitudeTransform>
 #include "ConfigReader.h"
 #include "RobotModel.h"
@@ -33,6 +34,21 @@ public:
     osg::ref_ptr<osg::Group> getRoot() const { return _root; }
 
 private:
+    /**
+     * Utility method for quickly drawing a cylinder
+     */
+    osg::ref_ptr<osg::ShapeDrawable> makeCylinder(const osg::Vec3& pos, float radius, float height, const osg::Vec4& color);
+
+    /**
+     * Utility method for quickly drawing a box
+     */
+    osg::ref_ptr<osg::ShapeDrawable> makeBox(const osg::Vec3& pos, float lengthX, float lengthY, float lengthZ, const osg::Vec4& color);
+
+    /**
+     * Utility method for quickly drawing quads
+     */
+    osg::ref_ptr<osg::Geometry> makeQuads(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);
+
     osg::ref_ptr<osg::Group> _root;
     osg::ref_ptr<osg::PositionAttitudeTransform> _carriagePat;
     float _beltRadius;

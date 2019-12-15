@@ -35,7 +35,7 @@ public:
     void processCommands(const RobotCommands& commands);
 
     /**
-     * Returns the robot's current state
+     * Returns a summarized version of the robot's current state
      */
     RobotState getState();
 
@@ -53,11 +53,14 @@ private:
     double wrap(double val, double min, double max) { if (val < min) val = min; if (val > max) val = max; return val; }
 
     double _elevatorBeltLength; // Need to enforce the carriage to stay bw 0 and this belt length (meters)
-    double _elevatorCarriagePos; // Current height of the elevator carriage (meters)
     double _elevatorMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
-    double _elevatorMotorSpeed; // Current speed of the motor (rads/sec)
     double _elevatorMotorRadius; // Needed to calculate travel of belt per unit time
     double _prevTimestamp; // Needed to calculate how much time has passed since last update()
+    struct
+    {
+        double elevatorMotorSpeed; // 0-maxElevatorMotorSpeed
+        double elevatorCarriagePos; // 0-elevatorBeltLength
+    } _state;
 };
 
 

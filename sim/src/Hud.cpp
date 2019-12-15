@@ -4,7 +4,11 @@
 
 #include <osg/Geode>
 #include <osg/Geometry>
+#include <RobotModel.h>
+#include "Color.h"
 #include "Hud.h"
+
+#define RADS_PER_SEC_TO_RPM 9.5492
 
 
 Hud::Hud(const ConfigReader& config) : _width(225)
@@ -38,23 +42,25 @@ Hud::Hud(const ConfigReader& config) : _width(225)
     _geom->getOrCreateStateSet()->setMode(GL_BLEND, osg::StateAttribute::ON);
     _geom->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
     _geode->addDrawable(_geom);
-
-    auto title = new Label("Robot Sim", Label::FROM_TOP, osg::Vec3(_leftPadding, -34, 0), 24);
-    addLabel(title);
-
-    auto subtitle = new Label("Team SHARP 3260", Label::FROM_TOP, osg::Vec3(_leftPadding, -54, 0));
-    subtitle->setColor(osg::Vec4(0.8, 0.8, 1, 1));
-    addLabel(subtitle);
-
     _root->addChild(_geode);
-}
 
+    // Add labels to _labelsGeode
+    _labelsGeode = new osg::Geode;
+    _root->addChild(_labelsGeode);
+    _connected = new TopLabel("Connected", -94);
+    _connected->setDrawMode(osgText::TextBase::TEXT | osgText::TextBase::FILLEDBOUNDINGBOX);
+    _connected->setBoundingBoxMargin(5);
+    _labelsGeode->addChild(_connected);
 
+    auto title = new TopLabel("Robot Sim", -34, 24);
+    _labelsGeode->addChild(title);
 
-void Hud::addLabel(osg::ref_ptr<Label> label)
-{
-    _geode->addDrawable(label);
-    _labels.push_back(label);
+    auto subtitle = new TopLabel("Team SHARP 3260", -54);
+    subtitle->setColor(osg::Vec4(0.8, 0.8, 1, 1));
+    _labelsGeode->addChild(subtitle);
+
+    _robotState = new TopLabel("", -130);
+    _labelsGeode->addChild(_robotState);
 }
 
 
@@ -68,43 +74,35 @@ void Hud::onWindowResize(int width, int height)
     _vertices->push_back(osg::Vec3(0, height, -1));
     _geom->setVertexArray(_vertices);
 
-    for (auto label : _labels)
+    for (unsigned int i=0; i<_labelsGeode->getNumChildren(); i++)
     {
-        label->updatePosition(width, height);
+        osg::Node* node = _labelsGeode->getChild(i);
+        Label* label = dynamic_cast<Label*>(node);
+        label->onWindowResize(width, height);
     }
 }
 
 
 
-Hud::Label::Label(const std::string& text, Alignment a, const osg::Vec3& pos, float fontSize) :
-        _desiredPos(pos), _alignment(a)
+void Hud::displayConnected(bool isConnected)
 {
-    this->setText(text);
-    this->setCharacterSize(fontSize);
-    this->setPosition(pos);
-    this->setFont("/data/fonts/helvetica.ttf");
-    this->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-    this->getOrCreateStateSet()->setMode(GL_BLEND, osg::StateAttribute::ON);
-    this->setDataVariance(osg::Object::DYNAMIC);
+    if (isConnected)
+    {
+        _connected->setBoundingBoxColor(Color::Green);
+        _connected->setText("Connected");
+    }
+    else
+    {
+        _connected->setBoundingBoxColor(Color::Red);
+        _connected->setText("Disconnected");
+    }
 }
 
 
 
-void Hud::Label::updatePosition(int windowWidth, int windowHeight)
+void Hud::displayRobotState(const RobotModel& robotModel)
 {
-    switch (_alignment)
-    {
-        case FROM_TOP:
-            setPosition(_desiredPos + osg::Vec3(0, windowHeight, 0));
-            break;
-
-        case FROM_MIDDLE:
-            setPosition(_desiredPos + osg::Vec3(0, windowHeight/2, 0));
-            break;
-
-        case FROM_BOTTOM:
-            setPosition(_desiredPos);
-            break;
-
-    }
+    char tmp[1024];
+    sprintf(tmp, "Elevator: \n    Position: %.2f m \n    Motor speed: %.0f RPM", robotModel._state.elevatorCarriagePos, robotModel._state.elevatorMotorSpeed*RADS_PER_SEC_TO_RPM);
+    _robotState->setText(tmp);
 }

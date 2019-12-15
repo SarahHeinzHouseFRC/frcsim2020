@@ -27,8 +27,9 @@ public:
 
     /**
      * Receives robot commands
+     * @return True if successful rx, false otherwise
      */
-    void rxRobotCommands();
+    bool rxRobotCommands();
 
     /**
      * Get the last command received

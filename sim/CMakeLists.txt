@@ -18,6 +18,7 @@ set(SRCS
         src/Visualizer.cpp
         src/Time.cpp
         src/Color.cpp
+        src/Label.cpp
         src/UdpNode.cpp
         )
 

@@ -37,11 +37,14 @@ int main(int argc, char** argv)
     while (!vis.done())
     {
         // Receive commands
-        robotAgent.rxRobotCommands();
-        auto rxCommands = robotAgent.getRobotCommands();
+        bool rx = robotAgent.rxRobotCommands();
 
-        // Update the robot's control surfaces based on the received commands
-        robot.processCommands(rxCommands);
+        if (rx)
+        {
+            // Update the robot's control surfaces based on the received commands
+            auto rxCommands = robotAgent.getRobotCommands();
+            robot.processCommands(rxCommands);
+        }
 
         // Get current time (sec)
         t = Time::now();
@@ -53,9 +56,12 @@ int main(int argc, char** argv)
         scene.update(robot);
 
         // Transmit robot state
-        RobotState state = robot.getState();
-        robotAgent.setRobotState(state);
+        robotAgent.setRobotState(robot.getState());
         robotAgent.txRobotState();
+
+        // Update the hud
+        hud.displayConnected(rx);
+        hud.displayRobotState(robot);
 
         // Step the visualizer
         vis.step();

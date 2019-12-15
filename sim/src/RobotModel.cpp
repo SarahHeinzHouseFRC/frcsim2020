@@ -10,10 +10,9 @@
 
 RobotModel::RobotModel(const ConfigReader& config, double startTimestamp) :
         _elevatorBeltLength(config.elevator.belt.length),
-        _elevatorCarriagePos(0.15),
         _elevatorMotorMaxSpeed(config.elevator.motor.maxSpeed*RPM_TO_RADS_PER_SEC),
         _elevatorMotorRadius(config.elevator.motor.radius),
-        _elevatorMotorSpeed(0),
+        _state{0},
         _prevTimestamp(startTimestamp)
 {
 
@@ -37,15 +36,15 @@ void RobotModel::update(double currTimestamp)
 void RobotModel::processCommands(const RobotCommands& commands)
 {
     // Update elevator motor speed
-    _elevatorMotorSpeed = commands.elevatorMotorSpeed / 256.0;
+    _state.elevatorMotorSpeed = (commands.elevatorMotorSpeed / 1023.0) * _elevatorMotorMaxSpeed;
 }
 
 
 
 RobotState RobotModel::getState()
 {
-    RobotState state;
-    state.elevatorEncoderPosition = int (1024 * _elevatorCarriagePos / _elevatorBeltLength);
+    RobotState state{0};
+    state.elevatorEncoderPosition = int (1023 * _state.elevatorCarriagePos / _elevatorBeltLength);
     return state;
 }
 
@@ -54,7 +53,7 @@ RobotState RobotModel::getState()
 void RobotModel::updateElevator(double elapsedTime)
 {
     // Move the carriage up by d = omega * r * t
-    double d = _elevatorMotorSpeed * _elevatorMotorRadius * elapsedTime;
-    _elevatorCarriagePos += d;
-    _elevatorCarriagePos = wrap(_elevatorCarriagePos, 0, _elevatorBeltLength);
+    double d = _state.elevatorMotorSpeed * _elevatorMotorRadius * elapsedTime;
+    _state.elevatorCarriagePos += d;
+    _state.elevatorCarriagePos = wrap(_state.elevatorCarriagePos, 0, _elevatorBeltLength);
 }

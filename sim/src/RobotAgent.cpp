@@ -25,7 +25,7 @@ void RobotAgent::txRobotState()
 
 
 
-void RobotAgent::rxRobotCommands()
+bool RobotAgent::rxRobotCommands()
 {
     std::string msg = _comms->receive();
     if (msg[0] == '{')
@@ -34,5 +34,10 @@ void RobotAgent::rxRobotCommands()
         _commands.elevatorMotorSpeed = std::stoi(msg.substr(2, 7));
 
         printf("Node 4000: Received command %s -> %d\n", msg.c_str(), _commands.elevatorMotorSpeed);
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }

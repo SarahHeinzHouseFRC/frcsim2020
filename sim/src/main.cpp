@@ -24,7 +24,7 @@ int main(int argc, char** argv)
     RobotModel robot(config, t);
 
     // Initialize robot agent
-    RobotAgent robotAgent;
+    RobotAgent robotAgent(config);
 
     // Visualize robot model
     Scene scene(config);
@@ -60,7 +60,7 @@ int main(int argc, char** argv)
         robotAgent.txRobotState();
 
         // Update the hud
-        hud.displayConnected(rx);
+        hud.displayConnected(robotAgent.isConnected());
         hud.displayRobotState(robot);
 
         // Step the visualizer

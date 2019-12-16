@@ -1,6 +1,14 @@
 # Robot Sim Config
 # Copyright (c) 2019 FRC Team 3260
 
+controller:
+  ip: "127.0.0.1"   # IP address where controller is running
+  port: 8000        # Port where controller is running
+
+sim:
+  ip: "127.0.0.1"   # IP address where sim is running
+  port: 4000        # Port where sim is running
+
 elevator:
   belt:
     radius: 0.02    # Meters

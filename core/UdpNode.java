@@ -4,31 +4,30 @@ import java.net.*;
 public class UdpNode
 {
     private DatagramSocket socket;
-    private InetAddress address;
-    private int txport;
+    private String txIp;
+    private int txPort;
 
-    public UdpNode(int rxport, int txport) throws SocketException, UnknownHostException
+    public UdpNode(int rxPort, String txIp, int txPort) throws SocketException, UnknownHostException
     {
-        this.txport = txport;
-        socket = new DatagramSocket(rxport);
-        address = InetAddress.getByName("localhost");
-        System.out.println("Launched");
+        socket = new DatagramSocket(rxPort);
+        this.txIp = txIp;
+        this.txPort = txPort;
     }
 
     public int send(String msg) throws IOException
     {
         byte[] buf = msg.getBytes();
-        DatagramPacket txpacket = new DatagramPacket(buf, buf.length, address, txport);
-        socket.send(txpacket);
-        return txpacket.getLength();
+        DatagramPacket txPacket = new DatagramPacket(buf, buf.length, InetAddress.getByName(txIp), txPort);
+        socket.send(txPacket);
+        return txPacket.getLength();
     }
 
     public String receive() throws IOException
     {
-        byte[] buf = new byte[256];
-        DatagramPacket rxpacket = new DatagramPacket(buf, buf.length);
-        socket.receive(rxpacket);
-        String msg = new String(rxpacket.getData(), 0, rxpacket.getLength());
+        byte[] buf = new byte[1024];
+        DatagramPacket rxPacket = new DatagramPacket(buf, buf.length);
+        socket.receive(rxPacket);
+        String msg = new String(rxPacket.getData(), 0, rxPacket.getLength());
         return msg;
     }
 

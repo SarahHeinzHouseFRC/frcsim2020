@@ -7,7 +7,7 @@
 #define MAXLINE 1024
 
 
-UdpNode::UdpNode(uint16_t rxport, uint16_t txport) : _rxport(rxport), _txport(txport)
+UdpNode::UdpNode(uint16_t rxPort, const std::string& txIp, uint16_t txPort) : _rxAddr{0}, _txAddr{0}
 {
     // Creating socket file descriptor
     if ((_sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -16,17 +16,21 @@ UdpNode::UdpNode(uint16_t rxport, uint16_t txport) : _rxport(rxport), _txport(tx
         exit(EXIT_FAILURE);
     }
 
-    memset(&_servaddr, 0, sizeof(_servaddr));
-    memset(&_cliaddr, 0, sizeof(_cliaddr));
-
     // Fill out server information
-    _servaddr.sin_family = AF_INET; // IPv4
-    _servaddr.sin_addr.s_addr = INADDR_ANY;
-    _servaddr.sin_port = htons(_rxport);
+    memset(&_rxAddr, 0, sizeof(_rxAddr));
+    _rxAddr.sin_family = AF_INET; // IPv4
+    _rxAddr.sin_addr.s_addr = INADDR_ANY;
+    _rxAddr.sin_port = htons(rxPort);
+
+    // Fill out client information
+    memset(&_txAddr, 0, sizeof(_txAddr));
+    _txAddr.sin_family = AF_INET; // IPv4
+    _txAddr.sin_addr.s_addr = inet_addr(txIp.c_str());
+    _txAddr.sin_port = htons(txPort);
 
     // Bind the socket with the server address
-    if (bind(_sockfd, (const struct sockaddr *)&_servaddr,
-    sizeof(_servaddr)) < 0)
+    if (bind(_sockfd, (const struct sockaddr *)&_rxAddr,
+    sizeof(_rxAddr)) < 0)
     {
         perror("UdpNode: Bind failed");
         exit(EXIT_FAILURE);
@@ -44,15 +48,10 @@ UdpNode::~UdpNode()
 
 void UdpNode::send(std::string msg)
 {
-    _cliaddr.sin_family = AF_INET;
-    _cliaddr.sin_port = htons(_txport);
-    _cliaddr.sin_addr.s_addr = INADDR_ANY;
-
-    int n, len;
     const char *msg_c = msg.c_str();
     sendto(_sockfd, (const char *)msg_c, strlen(msg_c),
-           MSG_CONFIRM, (const struct sockaddr *) &_cliaddr,
-           sizeof(_cliaddr));
+           MSG_CONFIRM, (const struct sockaddr *) &_txAddr,
+           sizeof(_txAddr));
 }
 
 
@@ -64,6 +63,10 @@ std::string UdpNode::receive()
     char buffer[MAXLINE];
     int len, n;
     n = recvfrom(_sockfd, (char *) buffer, MAXLINE, MSG_DONTWAIT, ( struct sockaddr *) &cliaddr, (socklen_t*) &len);
+    if (n > MAXLINE)
+    {
+        printf("UdpNode: Received large message!\n");
+    }
     buffer[n] = '\0';
     return buffer;
 }

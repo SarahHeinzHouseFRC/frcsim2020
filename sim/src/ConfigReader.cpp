@@ -10,6 +10,18 @@ ConfigReader::ConfigReader(const std::string &configFile)
 {
     YAML::Node config = YAML::LoadFile(configFile);
 
+    YAML::Node controllerConfig = config["controller"];
+    if (controllerConfig)
+    {
+        loadControllerConfig(controllerConfig);
+    }
+
+    YAML::Node simConfig = config["sim"];
+    if (simConfig)
+    {
+        loadSimConfig(simConfig);
+    }
+
     YAML::Node elevatorConfig = config["elevator"];
     if (elevatorConfig)
     {
@@ -17,6 +29,22 @@ ConfigReader::ConfigReader(const std::string &configFile)
     }
 
     std::cout << "Successfully loaded config file " << configFile << std::endl;
+}
+
+
+
+void ConfigReader::loadControllerConfig(const YAML::Node& controllerConfig)
+{
+    controller.ip = controllerConfig["ip"].as<std::string>();
+    controller.port = controllerConfig["port"].as<int>();
+}
+
+
+
+void ConfigReader::loadSimConfig(const YAML::Node& simConfig)
+{
+    sim.ip = simConfig["ip"].as<std::string>();
+    sim.port = simConfig["port"].as<int>();
 }
 
 

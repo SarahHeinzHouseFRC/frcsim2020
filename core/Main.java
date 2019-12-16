@@ -6,9 +6,14 @@ public class Main
 {
     public static void main(String[] args)
     {
-        RobotAgent robotAgent = new RobotAgent(8000, 4000);
+        if (args.length < 1)
+        {
+            System.out.println("Usage: java Main <speed 0-1023>");
+            return;
+        }
 
-        System.out.println(args.length);
+        RobotAgent robotAgent = new RobotAgent(8000, "localhost", 4000);
+
         int cmd = Integer.parseInt(args[0]);
         while (true)
         {

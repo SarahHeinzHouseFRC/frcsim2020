@@ -19,6 +19,16 @@ public:
 
     struct
     {
+        std::string ip; // IP address
+        int port;       // Port number
+    } controller;
+    struct
+    {
+        std::string ip; // IP address
+        int port;       // Port number
+    } sim;
+    struct
+    {
         struct
         {
             float radius; // Meters
@@ -50,6 +60,19 @@ public:
     } elevator;
 
 public:
+    /**
+     * Loads controller parameters
+     */
+    void loadControllerConfig(const YAML::Node& controllerConfig);
+
+    /**
+     * Loads sim parameters
+     */
+    void loadSimConfig(const YAML::Node& simConfig);
+
+    /**
+     * Loads elevator parameters
+     */
     void loadElevatorConfig(const YAML::Node& elevatorConfig);
 };
 

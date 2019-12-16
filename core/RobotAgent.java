@@ -7,13 +7,13 @@ public class RobotAgent
     public RobotState state;
     private UdpNode comms;
 
-    public RobotAgent(int rxport, int txport)
+    public RobotAgent(int rxPort, String txIp, int txPort)
     {
         state = new RobotState();
         commands = new RobotCommands();
         try
         {
-            comms = new UdpNode(rxport, txport);
+            comms = new UdpNode(rxPort, txIp, txPort);
         }
         catch (Exception e)
         {
@@ -52,7 +52,7 @@ public class RobotAgent
 
             // Parse received command from JSON to state
             state.fromJson(msg);
-            System.out.println("Node 8000: Received state " + msg + " -> " + state.elevatorEncoderPos);
+            System.out.println("RobotAgent: Received state " + msg + " -> " + state.elevatorEncoderPos);
 
         }
         catch (IOException e)

@@ -22,18 +22,27 @@ public:
     /**
      * Constructor
      */
-    UdpNode(uint16_t rx_port, uint16_t tx_port);
+    UdpNode(uint16_t rxPort, const std::string& txIp, uint16_t txPort);
 
+    /**
+     * Destructor
+     */
     ~UdpNode();
 
+    /**
+     * Send over UDP
+     */
     void send(std::string msg);
 
+    /**
+     * Receive over UDP (max 1024 bytes)
+     * @return
+     */
     std::string receive();
 
 private:
     int _sockfd;
-    int _rxport, _txport;
-    struct sockaddr_in _servaddr, _cliaddr;
+    struct sockaddr_in _rxAddr, _txAddr;
 };
 
 

@@ -37,7 +37,7 @@ void RobotModel::update(double currTimestamp)
 void RobotModel::processCommands(const RobotCommands& commands)
 {
     // Update elevator motor speed
-    _state.elevatorMotorSpeed = (commands.elevatorMotorSpeed / 1023.0) * _elevatorMotorMaxSpeed;
+    _state.elevatorMotorSpeed = (commands.elevatorMotorSpeed / 512.0) * _elevatorMotorMaxSpeed;
 }
 
 

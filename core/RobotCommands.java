@@ -3,8 +3,7 @@
  */
 public class RobotCommands
 {
-    /** Integer from 0-1024 */
-    public int elevatorMotorSpeed;
+    public int elevatorMotorSpeed; // Integer from -511 to 512
 
     public String toJson()
     {

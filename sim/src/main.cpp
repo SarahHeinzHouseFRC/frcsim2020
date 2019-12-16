@@ -14,10 +14,20 @@
 
 int main(int argc, char** argv)
 {
-    if (argc != 2) { std::cout << "Usage: ./robot_sim <config>" << std::endl; return 1; }
+    // Use default or user-specified config
+    std::string configPath = (argc < 2 ? "../../config/robotConfig.yml" : argv[1]);
 
     // Read config file
-    ConfigReader config(argv[1]);
+    ConfigReader config;
+    try
+    {
+        config.parse(configPath);
+    }
+    catch(std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+        return 1;
+    }
 
     // Initialize robot
     double t = Time::now();

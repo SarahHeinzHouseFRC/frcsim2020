@@ -6,26 +6,32 @@
 #include "ConfigReader.h"
 
 
-ConfigReader::ConfigReader(const std::string &configFile)
+ConfigReader::ConfigReader() = default;
+
+
+
+void ConfigReader::parse(const std::string &configFile)
 {
-    YAML::Node config = YAML::LoadFile(configFile);
-
-    YAML::Node controllerConfig = config["controller"];
-    if (controllerConfig)
+    YAML::Node config;
+    try
     {
-        loadControllerConfig(controllerConfig);
+        config = YAML::LoadFile(configFile);
+    }
+    catch(YAML::BadFile& e)
+    {
+        throw std::runtime_error("ConfigReader: File not found: " + configFile);
     }
 
-    YAML::Node simConfig = config["sim"];
-    if (simConfig)
+    YAML::Node controlsConfig = config["controls"];
+    if (controlsConfig)
     {
-        loadSimConfig(simConfig);
+        parseControlsConfig(controlsConfig);
     }
 
-    YAML::Node elevatorConfig = config["elevator"];
-    if (elevatorConfig)
+    YAML::Node vehicleConfig = config["vehicle"];
+    if (vehicleConfig)
     {
-        loadElevatorConfig(elevatorConfig);
+        parseVehicleConfig(vehicleConfig);
     }
 
     std::cout << "Successfully loaded config file " << configFile << std::endl;
@@ -33,64 +39,92 @@ ConfigReader::ConfigReader(const std::string &configFile)
 
 
 
-void ConfigReader::loadControllerConfig(const YAML::Node& controllerConfig)
+void ConfigReader::parseControlsConfig(const YAML::Node& controlsConfig)
 {
-    controller.ip = controllerConfig["ip"].as<std::string>();
-    controller.port = controllerConfig["port"].as<int>();
+    controls.ip = controlsConfig["ip"].as<std::string>();
+    controls.port = controlsConfig["port"].as<int>();
 }
 
 
 
-void ConfigReader::loadSimConfig(const YAML::Node& simConfig)
+void ConfigReader::parseVehicleConfig(const YAML::Node& vehicleConfig)
 {
-    sim.ip = simConfig["ip"].as<std::string>();
-    sim.port = simConfig["port"].as<int>();
+    vehicle.ip = vehicleConfig["ip"].as<std::string>();
+    vehicle.port = vehicleConfig["port"].as<int>();
+    parseVehicleConstantsConfig(vehicleConfig["constants"]);
+    parseVehicleInitialStateConfig(vehicleConfig["initialState"]);
 }
 
 
 
-void ConfigReader::loadElevatorConfig(const YAML::Node& elevatorConfig)
+void ConfigReader::parseVehicleConstantsConfig(const YAML::Node& vehicleConstantsConfig)
 {
-    // Load belt
-    YAML::Node beltConfig = elevatorConfig["belt"];
-    if (beltConfig)
-    {
-        elevator.belt.radius = beltConfig["radius"].as<float>();
-        elevator.belt.width = beltConfig["width"].as<float>();
-        elevator.belt.length = beltConfig["length"].as<float>();
-    }
+    //
+    // Load elevator constant params
+    //
 
-    // Load motor shaft
-    YAML::Node motorShaftConfig = elevatorConfig["motorShaft"];
-    if (beltConfig)
-    {
-        elevator.motorShaft.radius = motorShaftConfig["radius"].as<float>();
-        elevator.motorShaft.length = motorShaftConfig["length"].as<float>();
-    }
+    YAML::Node elevatorConfig = vehicleConstantsConfig["elevator"];
 
-    // Load motor
-    YAML::Node motorConfig = elevatorConfig["motor"];
-    if (motorConfig)
+    if (elevatorConfig)
     {
-        elevator.motor.radius = motorConfig["radius"].as<float>();
-        elevator.motor.length = motorConfig["length"].as<float>();
-        elevator.motor.maxSpeed = motorConfig["maxSpeed"].as<float>();
-    }
+        // Load belt
+        YAML::Node beltConfig = elevatorConfig["belt"];
+        if (beltConfig)
+        {
+            vehicle.constants.elevator.belt.radius = beltConfig["radius"].as<float>();
+            vehicle.constants.elevator.belt.width = beltConfig["width"].as<float>();
+            vehicle.constants.elevator.belt.length = beltConfig["length"].as<float>();
+        }
 
-    // Load encoder
-    YAML::Node encoderConfig = elevatorConfig["encoder"];
-    if (encoderConfig)
-    {
-        elevator.encoder.radius = encoderConfig["radius"].as<float>();
-        elevator.encoder.length = encoderConfig["length"].as<float>();
-    }
+        // Load motor shaft
+        YAML::Node motorShaftConfig = elevatorConfig["motorShaft"];
+        if (beltConfig)
+        {
+            vehicle.constants.elevator.motorShaft.radius = motorShaftConfig["radius"].as<float>();
+            vehicle.constants.elevator.motorShaft.length = motorShaftConfig["length"].as<float>();
+        }
 
-    // Load carriage
-    YAML::Node carriageConfig = elevatorConfig["carriage"];
-    if (carriageConfig)
+        // Load motor
+        YAML::Node motorConfig = elevatorConfig["motor"];
+        if (motorConfig)
+        {
+            vehicle.constants.elevator.motor.radius = motorConfig["radius"].as<float>();
+            vehicle.constants.elevator.motor.length = motorConfig["length"].as<float>();
+            vehicle.constants.elevator.motor.maxSpeed = motorConfig["maxSpeed"].as<float>();
+        }
+
+        // Load encoder
+        YAML::Node encoderConfig = elevatorConfig["encoder"];
+        if (encoderConfig)
+        {
+            vehicle.constants.elevator.encoder.radius = encoderConfig["radius"].as<float>();
+            vehicle.constants.elevator.encoder.length = encoderConfig["length"].as<float>();
+        }
+
+        // Load carriage
+        YAML::Node carriageConfig = elevatorConfig["carriage"];
+        if (carriageConfig)
+        {
+            vehicle.constants.elevator.carriage.lengthX = carriageConfig["lengthX"].as<float>();
+            vehicle.constants.elevator.carriage.lengthY = carriageConfig["lengthY"].as<float>();
+            vehicle.constants.elevator.carriage.lengthZ = carriageConfig["lengthZ"].as<float>();
+        }
+    }
+}
+
+
+
+void ConfigReader::parseVehicleInitialStateConfig(const YAML::Node& vehicleInitialStateConfig)
+{
+    //
+    // Load elevator initial state params
+    //
+
+    YAML::Node elevatorConfig = vehicleInitialStateConfig["elevator"];
+
+    if (elevatorConfig)
     {
-        elevator.carriage.lengthX = carriageConfig["lengthX"].as<float>();
-        elevator.carriage.lengthY = carriageConfig["lengthY"].as<float>();
-        elevator.carriage.lengthZ = carriageConfig["lengthZ"].as<float>();
+        vehicle.initialState.elevator.motorSpeed = elevatorConfig["motorSpeed"].as<float>();
+        vehicle.initialState.elevator.carriagePos = elevatorConfig["carriagePos"].as<float>();
     }
 }

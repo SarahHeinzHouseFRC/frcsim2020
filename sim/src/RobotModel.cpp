@@ -9,13 +9,14 @@
 
 
 RobotModel::RobotModel(const ConfigReader& config, double startTimestamp) :
-        _elevatorBeltLength(config.elevator.belt.length),
-        _elevatorMotorMaxSpeed(config.elevator.motor.maxSpeed*RPM_TO_RADS_PER_SEC),
-        _elevatorMotorRadius(config.elevator.motor.radius),
+        _elevatorBeltLength(config.vehicle.constants.elevator.belt.length),
+        _elevatorMotorMaxSpeed(config.vehicle.constants.elevator.motor.maxSpeed*RPM_TO_RADS_PER_SEC),
+        _elevatorMotorRadius(config.vehicle.constants.elevator.motor.radius),
         _state{0},
         _prevTimestamp(startTimestamp)
 {
-
+    _state.elevatorMotorSpeed = config.vehicle.initialState.elevator.motorSpeed;
+    _state.elevatorCarriagePos = config.vehicle.initialState.elevator.carriagePos;
 }
 
 

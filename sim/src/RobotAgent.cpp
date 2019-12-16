@@ -8,7 +8,7 @@
 
 RobotAgent::RobotAgent(const ConfigReader& config) : _state{0}, _commands{0}, _numDroppedPackets(0)
 {
-    _comms = new UdpNode(config.sim.port, config.controller.ip, config.controller.port);
+    _comms = new UdpNode(config.vehicle.port, config.controls.ip, config.controls.port);
 }
 
 

@@ -15,65 +15,89 @@
 class ConfigReader
 {
 public:
-    ConfigReader(const std::string& configFile);
+    /**
+     * Default constructor
+     */
+    ConfigReader();
+
+    /**
+     * Parses the given config file and stores its values as public fields within this class
+     */
+    void parse(const std::string& configFile);
 
     struct
     {
         std::string ip; // IP address
         int port;       // Port number
-    } controller;
+    } controls;
     struct
     {
         std::string ip; // IP address
         int port;       // Port number
-    } sim;
-    struct
-    {
         struct
         {
-            float radius; // Meters
-            float width;  // Meters
-            float length; // Meters
-        } belt;
+            struct
+            {
+                struct
+                {
+                    float radius; // Meters
+                    float width;  // Meters
+                    float length; // Meters
+                } belt;
+                struct
+                {
+                    float radius; // Meters
+                    float length; // Meters
+                } motorShaft;
+                struct
+                {
+                    float radius;   // Meters
+                    float length;   // Meters
+                    float maxSpeed; // RPM
+                } motor;
+                struct
+                {
+                    float radius; // Meters
+                    float length; // Meters
+                } encoder;
+                struct
+                {
+                    float lengthX; // Meters
+                    float lengthY; // Meters
+                    float lengthZ; // Meters
+                } carriage;
+            } elevator;
+        } constants;
         struct
         {
-            float radius; // Meters
-            float length; // Meters
-        } motorShaft;
-        struct
-        {
-            float radius;   // Meters
-            float length;   // Meters
-            float maxSpeed; // RPM
-        } motor;
-        struct
-        {
-            float radius; // Meters
-            float length; // Meters
-        } encoder;
-        struct
-        {
-            float lengthX; // Meters
-            float lengthY; // Meters
-            float lengthZ; // Meters
-        } carriage;
-    } elevator;
+            struct
+            {
+                float motorSpeed;  // RPM
+                float carriagePos; // Meters
+            } elevator;
+        } initialState;
+    } vehicle;
 
-public:
+private:
     /**
-     * Loads controller parameters
+     * Helper method for loading controls parameters
      */
-    void loadControllerConfig(const YAML::Node& controllerConfig);
+    void parseControlsConfig(const YAML::Node& controlsConfig);
 
     /**
-     * Loads sim parameters
+     * Helper method for loading vehicle parameters
      */
-    void loadSimConfig(const YAML::Node& simConfig);
+    void parseVehicleConfig(const YAML::Node& simConfig);
 
     /**
-     * Loads elevator parameters
+     * Helper method for loading vehicle constant parameters
      */
-    void loadElevatorConfig(const YAML::Node& elevatorConfig);
+    void parseVehicleConstantsConfig(const YAML::Node& vehicleConstantsConfig);
+
+    /**
+     * Helper method for loading vehicle initial state parameters
+     */
+    void parseVehicleInitialStateConfig(const YAML::Node& vehicleInitialStateConfig);
 };
 
 

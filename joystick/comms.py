@@ -58,8 +58,11 @@ class CommsState:
 
 
 class CommsThread(QThread):
+    connection_status = pyqtSignal(object)
+
     def __init__(self, rx_port, tx_ip, tx_port, comms_state, controller_state):
         QThread.__init__(self)
+        self.comms_state = comms_state
         self.controller_state = controller_state
         self.rx_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
         self.rx_socket.bind(("127.0.0.1", rx_port))
@@ -67,7 +70,6 @@ class CommsThread(QThread):
         self.tx_ip = tx_ip
         self.tx_port = tx_port
         self.tx_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
-        self.rx_msg = str()
 
     def run(self):
         while True:
@@ -85,6 +87,8 @@ class CommsThread(QThread):
     def rx(self):
         buffer_size = 1024
         try:
-            self.rx_msg, addr = self.rx_socket.recvfrom(buffer_size)
+            rx_msg, addr = self.rx_socket.recvfrom(buffer_size)
+            if rx_msg == "{}":
+                self.connection_status.emit(True)
         except socket.timeout:
-            pass
+            self.connection_status.emit(False)

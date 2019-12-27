@@ -4,6 +4,7 @@
 
 from controller import *
 from comms import *
+from connected import ConnectedWidget
 
 
 class MainWindow(QMainWindow):
@@ -19,12 +20,15 @@ class MainWindow(QMainWindow):
         self.comms_state = CommsState()
 
         # Launch comms thread in background
-        comms = CommsThread(2000, "127.0.0.1", 4000, self.comms_state, self.controller_state)
-        comms.start()
+        self.comms = CommsThread(2000, "127.0.0.1", 4000, self.comms_state, self.controller_state)
+        self.comms.start()
 
         # Init UI
-        self.controller = ControllerWidget(self.controller_state, self.comms_state)
+        self.connected = ConnectedWidget(parent=self)
+        self.comms.connection_status.connect(self.connected.show_connection_status)
+        self.controller = ControllerWidget(self.controller_state, self.comms_state, parent=self)
         self.setCentralWidget(self.controller)
+
         print self.geometry()
 
     def keyPressEvent(self, event):

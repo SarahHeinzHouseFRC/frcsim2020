@@ -35,6 +35,26 @@ public:
 
 private:
     /**
+     * Builds the visualization of the robot
+     */
+    osg::ref_ptr<osg::PositionAttitudeTransform> makeRobot();
+
+    /**
+     * Builds the visualization of the robot's elevator carriage
+     */
+    osg::ref_ptr<osg::PositionAttitudeTransform> makeRobotCarriage();
+
+    /**
+     * Builds the visualization of the field
+     */
+    osg::ref_ptr<osg::Geode> makeField();
+
+    /**
+     * Utility method for quickly drawing lines. Pairs of vertices are interpreted as single lines
+     */
+    static osg::ref_ptr<osg::Geometry> makeLines(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);
+
+    /**
      * Utility method for quickly drawing a cylinder
      */
     static osg::ref_ptr<osg::ShapeDrawable> makeCylinder(const osg::Vec3& pos, float radius, float height, const osg::Vec4& color);
@@ -50,6 +70,7 @@ private:
     static osg::ref_ptr<osg::Geometry> makeQuads(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);
 
     osg::ref_ptr<osg::Group> _root;
+    osg::ref_ptr<osg::PositionAttitudeTransform> _robotPat;
     osg::ref_ptr<osg::PositionAttitudeTransform> _carriagePat;
     float _beltRadius;
     float _beltWidth;

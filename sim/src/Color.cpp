@@ -16,3 +16,4 @@ Color Color::Gray(127, 127, 127);
 Color Color::Olive(188, 189, 34);
 Color Color::Cyan(23, 190, 207);
 Color Color::Black(0, 0, 0);
+Color Color::White(255, 255, 255);

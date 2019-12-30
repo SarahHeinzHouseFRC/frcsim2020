@@ -23,3 +23,11 @@ Finally, launch the project with the default config file:
 ```sh
 ./robot_sim ../config/simConfig.yml
 ```
+
+## Usage ##
+
+OSG's origin (0, 0, 0) is at the center of the field. The robot follow's OSG's convention and faces in the positive-x
+direction with the z-axis pointing up. Therefore, a positive rotation is to the left of the x-axis.
+
+The robot's CoG can be customized. By default, it is placed at the robot's origin exactly halfway between its two middle
+wheels.

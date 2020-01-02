@@ -37,7 +37,7 @@ private:
     /**
      * Builds the visualization of the robot
      */
-    osg::ref_ptr<osg::PositionAttitudeTransform> makeRobot();
+    osg::ref_ptr<osg::PositionAttitudeTransform> makeRobot(const ConfigReader& config);
 
     /**
      * Builds the visualization of the robot's elevator carriage
@@ -72,6 +72,7 @@ private:
     osg::ref_ptr<osg::Group> _root;
     osg::ref_ptr<osg::PositionAttitudeTransform> _robotPat;
     osg::ref_ptr<osg::PositionAttitudeTransform> _carriagePat;
+    float _wheelRadius;
     float _beltRadius;
     float _beltWidth;
     float _beltLength;

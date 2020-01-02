@@ -7,7 +7,7 @@
 #include "RobotAgent.h"
 
 
-RobotAgent::RobotAgent(const ConfigReader& config) : _state{0}, _commands{0}, _numDroppedPackets(0)
+RobotAgent::RobotAgent(const ConfigReader& config) : _state{0}, _commands{}, _numDroppedPackets(0)
 {
     _comms = new UdpNode(config.vehicle.port, config.core.ip, config.core.vehiclePort);
 }
@@ -17,11 +17,9 @@ RobotAgent::RobotAgent(const ConfigReader& config) : _state{0}, _commands{0}, _n
 void RobotAgent::txRobotState()
 {
     // Transmit state
-    char tmp[1024];
-    sprintf(tmp, "{ %05d }", _state.elevatorEncoderPosition);
-    std::string stateStr = tmp;
+    std::string stateJson = _state.asJson();
 
-    _comms->send(stateStr);
+    _comms->send(stateJson);
 }
 
 
@@ -31,8 +29,8 @@ bool RobotAgent::rxRobotCommands()
     std::string msg = _comms->receive();
     if (msg[0] == '{')
     {
-        // Translate received commands from JSON and store into _commands...
-        _commands.elevatorMotorSpeed = std::stoi(msg.substr(2, 7));
+        // Translate received commands from JSON and store into _commands
+        _commands = RobotCommands(msg);
 
         // Reset dropped packets count
         _numDroppedPackets = 0;

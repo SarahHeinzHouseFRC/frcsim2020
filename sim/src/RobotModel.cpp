@@ -2,19 +2,28 @@
  * Copyright (c) 2019 FRC Team 3260
  */
 
+#include <cmath>
 #include <ConfigReader.h>
 #include "RobotModel.h"
 
 #define RPM_TO_RADS_PER_SEC 0.104719755
+#define IN_TO_M 0.0254
 
 
 RobotModel::RobotModel(const ConfigReader& config, double startTimestamp) :
+        _prevTimestamp(startTimestamp),
+        _state{0},
+        _leftDriveMotorMaxSpeed(config.vehicle.constants.drivetrain.motor.maxSpeed*RPM_TO_RADS_PER_SEC),
+        _rightDriveMotorMaxSpeed(config.vehicle.constants.drivetrain.motor.maxSpeed*RPM_TO_RADS_PER_SEC),
+        _wheelRadius(config.vehicle.constants.drivetrain.wheelRadius*IN_TO_M),
+        _drivetrainWidth(config.vehicle.constants.drivetrain.width*IN_TO_M),
+        _wheelTrack(config.vehicle.constants.drivetrain.wheelTrack*IN_TO_M),
         _elevatorBeltLength(config.vehicle.constants.elevator.belt.length),
         _elevatorMotorMaxSpeed(config.vehicle.constants.elevator.motor.maxSpeed*RPM_TO_RADS_PER_SEC),
-        _elevatorMotorRadius(config.vehicle.constants.elevator.motor.radius),
-        _state{0},
-        _prevTimestamp(startTimestamp)
+        _elevatorMotorRadius(config.vehicle.constants.elevator.motor.radius)
 {
+    _state.pose.x = config.vehicle.initialState.drivetrain.x;
+    _state.pose.y = config.vehicle.initialState.drivetrain.y;
     _state.elevatorMotorSpeed = config.vehicle.initialState.elevator.motorSpeed;
     _state.elevatorCarriagePos = config.vehicle.initialState.elevator.carriagePos;
 }
@@ -25,8 +34,39 @@ void RobotModel::update(double currTimestamp)
 {
     double elapsedTime = currTimestamp - _prevTimestamp;
 
-    // Update the elevator
-    updateElevator(elapsedTime);
+    //
+    // Update elevator position based on elevator motor speed
+    //
+
+    // Move the carriage up by y = omega * r * t
+    double y = _state.elevatorMotorSpeed * _elevatorMotorRadius * elapsedTime;
+    _state.elevatorCarriagePos += y;
+    _state.elevatorCarriagePos = bound(_state.elevatorCarriagePos, 0, _elevatorBeltLength);
+
+    //
+    // Update pose based on drivetrain motor speeds
+    //
+
+    // Increment pose
+    double vLeft = _state.leftDriveMotorSpeed * _wheelRadius;
+    double vRight = _state.rightDriveMotorSpeed * _wheelRadius;
+    if (vLeft == vRight)
+    {
+        double d = vRight * elapsedTime;
+        _state.pose.x += d * cos(_state.pose.theta);
+        _state.pose.y += d * sin(_state.pose.theta);
+    }
+    else
+    {
+        double r = (_wheelTrack * (vRight + vLeft)) / (2 * (vRight - vLeft));
+        double dLeft = vLeft * elapsedTime;
+        double dRight = vRight * elapsedTime;
+        double prevTheta = _state.pose.theta;
+        double currTheta = prevTheta + (dRight - dLeft) / _wheelTrack;
+        _state.pose.x = _state.pose.x + r*sin(currTheta) - r*sin(prevTheta);
+        _state.pose.y = _state.pose.y - r*cos(currTheta) + r*cos(prevTheta);
+        _state.pose.theta = currTheta;
+    }
 
     // Update the last timestamp
     _prevTimestamp = currTimestamp;
@@ -38,6 +78,10 @@ void RobotModel::processCommands(const RobotCommands& commands)
 {
     // Update elevator motor speed
     _state.elevatorMotorSpeed = (commands.elevatorMotorSpeed / 512.0) * _elevatorMotorMaxSpeed;
+
+    // Update drivetrain
+    _state.leftDriveMotorSpeed = (commands.leftDriveMotorSpeed / 512.0) * _leftDriveMotorMaxSpeed;
+    _state.rightDriveMotorSpeed = (commands.rightDriveMotorSpeed / 512.0) * _rightDriveMotorMaxSpeed;
 }
 
 
@@ -47,14 +91,4 @@ RobotState RobotModel::getState()
     RobotState state{0};
     state.elevatorEncoderPosition = int (1023 * _state.elevatorCarriagePos / _elevatorBeltLength);
     return state;
-}
-
-
-
-void RobotModel::updateElevator(double elapsedTime)
-{
-    // Move the carriage up by d = omega * r * t
-    double d = _state.elevatorMotorSpeed * _elevatorMotorRadius * elapsedTime;
-    _state.elevatorCarriagePos += d;
-    _state.elevatorCarriagePos = wrap(_state.elevatorCarriagePos, 0, _elevatorBeltLength);
 }

@@ -41,25 +41,36 @@ public:
 
 private:
     /**
-     * Moves the carriage up and down based on elevator motor speed
-     * @param elapsedTime Time since last call of update()
-     * @param commandedElevatorMotorSpeed Commanded speed of elevator motor (0-1023)
+     * Bounds the given value to be no lower than min and no higher than max
      */
-    void updateElevator(double elapsedTime);
+    double bound(double val, double min, double max) { if (val < min) val = min; if (val > max) val = max; return val; }
 
     /**
-     * Wraps the given value to be no lower than min and no higher than max
+     * Adds or subtracts 2*pi repeatedly to ensure 0 < val < 2*pi
      */
-    double wrap(double val, double min, double max) { if (val < min) val = min; if (val > max) val = max; return val; }
+    double wrapAngle(double val) { while (val > 2*M_PI) { val -= 2*M_PI; } while (val < 0) { val += 2*M_PI; } return val; }
 
     double _elevatorBeltLength; // Need to enforce the carriage to stay bw 0 and this belt length (meters)
     double _elevatorMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
+    double _leftDriveMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
+    double _rightDriveMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
     double _elevatorMotorRadius; // Needed to calculate travel of belt per unit time
+    double _wheelRadius; // Needed to calculate travel of robot per unit time
+    double _wheelTrack; // Needed to calculate arced turns
+    double _drivetrainWidth; // Needed to calculate turning radius
     double _prevTimestamp; // Needed to calculate how much time has passed since last update()
     struct
     {
         double elevatorMotorSpeed; // 0-maxElevatorMotorSpeed
         double elevatorCarriagePos; // 0-elevatorBeltLength
+        double leftDriveMotorSpeed; // 0-maxDriveSpeed
+        double rightDriveMotorSpeed; // 0-maxDriveSpeed
+        struct
+        {
+            double x;     // Meters
+            double y;     // Meters
+            double theta; // Rads
+        } pose;
     } _state;
 };
 

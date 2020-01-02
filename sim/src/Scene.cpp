@@ -5,6 +5,7 @@
 #include <osg/Geode>
 #include <osg/Geometry>
 #include <osg/ShapeDrawable>
+#include <RobotModel.h>
 #include "Color.h"
 #include "Scene.h"
 
@@ -12,6 +13,7 @@
 
 
 Scene::Scene(const ConfigReader& config) :
+        _wheelRadius(config.vehicle.constants.drivetrain.wheelRadius),
         _beltRadius(config.vehicle.constants.elevator.belt.radius),
         _beltWidth(config.vehicle.constants.elevator.belt.width),
         _beltLength(config.vehicle.constants.elevator.belt.length),
@@ -27,7 +29,7 @@ Scene::Scene(const ConfigReader& config) :
 {
     _root = new osg::Group;
 
-    _robotPat = makeRobot();
+    _robotPat = makeRobot(config);
     _carriagePat = makeRobotCarriage();
     _robotPat->addChild(_carriagePat);
     _root->addChild(_robotPat);
@@ -43,11 +45,20 @@ void Scene::update(const RobotModel& robot)
     // Update elevator position
     double elevatorPos = robot._state.elevatorCarriagePos;
     _carriagePat->setPosition(osg::Vec3(0, 0, elevatorPos));
+
+    // Update the position
+    double x = robot._state.pose.x;
+    double y = robot._state.pose.y;
+    double theta = robot._state.pose.theta;
+    _robotPat->setPosition(osg::Vec3(x, y, 0));
+    osg::Matrix mat;
+    mat.makeRotate(theta, osg::Z_AXIS);
+    _robotPat->setAttitude(mat.getRotate());
 }
 
 
 
-osg::ref_ptr<osg::PositionAttitudeTransform> Scene::makeRobot()
+osg::ref_ptr<osg::PositionAttitudeTransform> Scene::makeRobot(const ConfigReader& config)
 {
     osg::ref_ptr<osg::PositionAttitudeTransform> robotPat = new osg::PositionAttitudeTransform;
     osg::ref_ptr<osg::Geode> geodeRobot = new osg::Geode;
@@ -57,39 +68,40 @@ osg::ref_ptr<osg::PositionAttitudeTransform> Scene::makeRobot()
     // Render the robot drivetrain
     //
 
-    float widthChassis = 27.5 * IN_TO_M;
-    float depthChassis = 28.3 * IN_TO_M;
-    float heightChannel = 1 * IN_TO_M;
-    float widthChannel = 0.5 * IN_TO_M;
-    float widthWheel = 1 * IN_TO_M;
-    float radiusWheel = 2 * IN_TO_M;
-    float wheelbase = 18 * IN_TO_M;
+    float widthChassis = config.vehicle.constants.drivetrain.width * IN_TO_M;
+    float depthChassis = config.vehicle.constants.drivetrain.depth * IN_TO_M;
+    float widthChannel = config.vehicle.constants.drivetrain.widthChannel * IN_TO_M;
+    float heightChannel = config.vehicle.constants.drivetrain.heightChannel * IN_TO_M;
+    float wheelWidth = config.vehicle.constants.drivetrain.wheelWidth * IN_TO_M;
+    float wheelRadius = config.vehicle.constants.drivetrain.wheelRadius * IN_TO_M;
+    float wheelBase = config.vehicle.constants.drivetrain.wheelBase * IN_TO_M;
+    float wheelTrack = config.vehicle.constants.drivetrain.wheelTrack * IN_TO_M;
 
     osg::ref_ptr<osg::ShapeDrawable> outerLeftEdge = makeBox(osg::Vec3(0, widthChassis/2 - widthChannel/2, 0), depthChassis, widthChannel, heightChannel, Color::Gray);
     geodeRobot->addDrawable(outerLeftEdge);
-    osg::ref_ptr<osg::ShapeDrawable> innerLeftEdge = makeBox(osg::Vec3(0, widthChassis/2 - 1.5*widthChannel - widthWheel, 0), depthChassis, widthChannel, heightChannel, Color::Gray);
+    osg::ref_ptr<osg::ShapeDrawable> innerLeftEdge = makeBox(osg::Vec3(0, widthChassis/2 - 1.5*widthChannel - wheelWidth, 0), depthChassis, widthChannel, heightChannel, Color::Gray);
     geodeRobot->addDrawable(innerLeftEdge);
     osg::ref_ptr<osg::ShapeDrawable> outerRightEdge = makeBox(osg::Vec3(0, -widthChassis/2 + widthChannel/2, 0), depthChassis, widthChannel, heightChannel, Color::Gray);
     geodeRobot->addDrawable(outerRightEdge);
-    osg::ref_ptr<osg::ShapeDrawable> innerRightEdge = makeBox(osg::Vec3(0, -widthChassis/2 + 1.5*widthChannel + widthWheel, 0), depthChassis, widthChannel, heightChannel, Color::Gray);
+    osg::ref_ptr<osg::ShapeDrawable> innerRightEdge = makeBox(osg::Vec3(0, -widthChassis/2 + 1.5*widthChannel + wheelWidth, 0), depthChassis, widthChannel, heightChannel, Color::Gray);
     geodeRobot->addDrawable(innerRightEdge);
     osg::ref_ptr<osg::ShapeDrawable> frontEdge = makeBox(osg::Vec3(depthChassis/2, 0, 0), widthChannel, widthChassis, heightChannel, Color::Gray);
     geodeRobot->addDrawable(frontEdge);
     osg::ref_ptr<osg::ShapeDrawable> backEdge = makeBox(osg::Vec3(-depthChassis/2, 0, 0), widthChannel, widthChassis, heightChannel, Color::Gray);
     geodeRobot->addDrawable(backEdge);
 
-    float yWheel = widthChassis/2 - widthChannel - widthWheel/2;
-    osg::ref_ptr<osg::ShapeDrawable> frontLeftWheel = makeCylinder(osg::Vec3(wheelbase/2, yWheel, 0), radiusWheel, widthWheel, Color::White);
+    float yWheel = widthChassis/2 - widthChannel - wheelWidth/2;
+    osg::ref_ptr<osg::ShapeDrawable> frontLeftWheel = makeCylinder(osg::Vec3(wheelBase/2, yWheel, 0), wheelRadius, wheelWidth, Color::White);
     geodeRobot->addDrawable(frontLeftWheel);
-    osg::ref_ptr<osg::ShapeDrawable> middleLeftWheel = makeCylinder(osg::Vec3(0, yWheel, 0), radiusWheel, widthWheel, Color::White);
+    osg::ref_ptr<osg::ShapeDrawable> middleLeftWheel = makeCylinder(osg::Vec3(0, yWheel, 0), wheelRadius, wheelWidth, Color::White);
     geodeRobot->addDrawable(middleLeftWheel);
-    osg::ref_ptr<osg::ShapeDrawable> backLeftWheel = makeCylinder(osg::Vec3(-wheelbase/2, yWheel, 0), radiusWheel, widthWheel, Color::White);
+    osg::ref_ptr<osg::ShapeDrawable> backLeftWheel = makeCylinder(osg::Vec3(-wheelBase/2, yWheel, 0), wheelRadius, wheelWidth, Color::White);
     geodeRobot->addDrawable(backLeftWheel);
-    osg::ref_ptr<osg::ShapeDrawable> frontRightWheel = makeCylinder(osg::Vec3(wheelbase/2, -yWheel, 0), radiusWheel, widthWheel, Color::White);
+    osg::ref_ptr<osg::ShapeDrawable> frontRightWheel = makeCylinder(osg::Vec3(wheelBase/2, -yWheel, 0), wheelRadius, wheelWidth, Color::White);
     geodeRobot->addDrawable(frontRightWheel);
-    osg::ref_ptr<osg::ShapeDrawable> middleRightWheel = makeCylinder(osg::Vec3(0, -yWheel, 0), radiusWheel, widthWheel, Color::White);
+    osg::ref_ptr<osg::ShapeDrawable> middleRightWheel = makeCylinder(osg::Vec3(0, -yWheel, 0), wheelRadius, wheelWidth, Color::White);
     geodeRobot->addDrawable(middleRightWheel);
-    osg::ref_ptr<osg::ShapeDrawable> backRightWheel = makeCylinder(osg::Vec3(-wheelbase/2, -yWheel, 0), radiusWheel, widthWheel, Color::White);
+    osg::ref_ptr<osg::ShapeDrawable> backRightWheel = makeCylinder(osg::Vec3(-wheelBase/2, -yWheel, 0), wheelRadius, wheelWidth, Color::White);
     geodeRobot->addDrawable(backRightWheel);
 
     //

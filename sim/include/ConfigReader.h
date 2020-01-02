@@ -39,6 +39,21 @@ public:
         {
             struct
             {
+                float width;         // Inches
+                float depth;         // Inches
+                float widthChannel;  // Inches
+                float heightChannel; // Inches
+                float wheelRadius;   // Inches
+                float wheelWidth;    // Inches
+                float wheelBase;     // Inches
+                float wheelTrack;    // Inches (calculated value)
+                struct
+                {
+                    float maxSpeed; // RPM
+                } motor;
+            } drivetrain;
+            struct
+            {
                 struct
                 {
                     float radius; // Meters
@@ -71,6 +86,11 @@ public:
         } constants;
         struct
         {
+            struct
+            {
+                float x; // Meters
+                float y; // Meters
+            } drivetrain;
             struct
             {
                 float motorSpeed;  // RPM

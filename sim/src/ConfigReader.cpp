@@ -62,6 +62,25 @@ void ConfigReader::parseVehicleConfig(const YAML::Node& vehicleConfig)
 void ConfigReader::parseVehicleConstantsConfig(const YAML::Node& vehicleConstantsConfig)
 {
     //
+    // Load drivetrain constant params
+    //
+
+    YAML::Node drivetrainConfig = vehicleConstantsConfig["drivetrain"];
+
+    if (drivetrainConfig)
+    {
+        vehicle.constants.drivetrain.width = drivetrainConfig["width"].as<float>();
+        vehicle.constants.drivetrain.depth = drivetrainConfig["depth"].as<float>();
+        vehicle.constants.drivetrain.widthChannel = drivetrainConfig["widthChannel"].as<float>();
+        vehicle.constants.drivetrain.heightChannel = drivetrainConfig["heightChannel"].as<float>();
+        vehicle.constants.drivetrain.wheelRadius = drivetrainConfig["wheelRadius"].as<float>();
+        vehicle.constants.drivetrain.wheelWidth = drivetrainConfig["wheelWidth"].as<float>();
+        vehicle.constants.drivetrain.motor.maxSpeed = drivetrainConfig["motor"]["maxSpeed"].as<float>();
+        vehicle.constants.drivetrain.wheelBase = drivetrainConfig["wheelBase"].as<float>();
+        vehicle.constants.drivetrain.wheelTrack = vehicle.constants.drivetrain.width - 2*vehicle.constants.drivetrain.widthChannel - vehicle.constants.drivetrain.wheelWidth;
+    }
+
+    //
     // Load elevator constant params
     //
 
@@ -118,6 +137,18 @@ void ConfigReader::parseVehicleConstantsConfig(const YAML::Node& vehicleConstant
 
 void ConfigReader::parseVehicleInitialStateConfig(const YAML::Node& vehicleInitialStateConfig)
 {
+    //
+    // Load drivetrain initial state params
+    //
+
+    YAML::Node drivetrainConfig = vehicleInitialStateConfig["drivetrain"];
+
+    if (drivetrainConfig)
+    {
+        vehicle.initialState.drivetrain.x = drivetrainConfig["x"].as<float>();
+        vehicle.initialState.drivetrain.y = drivetrainConfig["y"].as<float>();
+    }
+
     //
     // Load elevator initial state params
     //

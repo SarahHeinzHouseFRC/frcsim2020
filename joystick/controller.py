@@ -5,6 +5,7 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.QtSvg import *
+import math
 
 IMG_CONTROLLER = "assets/xbox-controller.svg"
 IMG_CONTROLLER_JOYSTICK = "assets/xbox-joystick.svg"
@@ -31,15 +32,14 @@ IMG_BUMPER_RIGHT_PRESSED = "assets/xbox-bumper-right-pressed.svg"
 
 
 class ControllerWidget(QSvgWidget):
-    def __init__(self, controller_state, comms_state, parent=None):
+    def __init__(self, controller_state, parent=None):
         """
         @param controller_state Pointer to where controller should place its state
-        @param comms_state Pointer to where comms thread puts its state
+        @param parent Parent of this widget
         """
         super(ControllerWidget, self).__init__(parent)
 
         # Save pointers to state variables
-        self.comms_state = comms_state
         self.controller_state = controller_state
 
         # Init UI
@@ -97,20 +97,17 @@ class JoystickWidget(QSvgWidget):
         self.clickY = event.globalPos().y()
 
     def mouseMoveEvent(self, event):
-        if self.clickX is not None:
-            x = event.globalPos().x() - self.clickX
-            if x > self.max_deflection:
-                x = self.max_deflection
-            elif x < -self.max_deflection:
-                x = -self.max_deflection
-            y = event.globalPos().y() - self.clickY
-            if y > self.max_deflection:
-                y = self.max_deflection
-            elif y < -self.max_deflection:
-                y = -self.max_deflection
-            self.move(x + self.x, y + self.y)
-            self.state.x = x * (512 / self.max_deflection)
-            self.state.y = -y * (512 / self.max_deflection)
+        x = event.globalPos().x() - self.clickX
+        y = event.globalPos().y() - self.clickY
+        theta = math.atan2(y, x)
+        r = math.sqrt(x**2 + y**2)
+        if r > self.max_deflection:
+            r = self.max_deflection
+        x = r * math.cos(theta)
+        y = r * math.sin(theta)
+        self.move(x + self.x, y + self.y)
+        self.state.x = x * (512 / self.max_deflection)
+        self.state.y = -y * (512 / self.max_deflection)
 
     def mouseReleaseEvent(self, event):
         self.move(self.x, self.y)
@@ -136,8 +133,6 @@ class ButtonWidget(QSvgWidget):
         self.button_state = button_state
         self.released_img = released_img
         self.pressed_img = pressed_img
-        self.x = x
-        self.y = y
         self.move(x, y)
         self.show_released()
 

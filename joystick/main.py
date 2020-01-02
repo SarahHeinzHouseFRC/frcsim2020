@@ -14,19 +14,19 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Xbox Controller")
         self.setStyleSheet("background-color: gray")
         # self.setFixedSize(640, 480)
+        self.move(1280, 0)
 
         # Create state variables for each thread so they can pass data
         self.controller_state = ControllerState()
-        self.comms_state = CommsState()
 
         # Launch comms thread in background
-        self.comms = CommsThread(2000, "127.0.0.1", 4000, self.comms_state, self.controller_state)
+        self.comms = CommsThread(2000, "127.0.0.1", 4000, self.controller_state)
         self.comms.start()
 
         # Init UI
         self.connected = ConnectedWidget(parent=self)
         self.comms.connection_status.connect(self.connected.show_connection_status)
-        self.controller = ControllerWidget(self.controller_state, self.comms_state, parent=self)
+        self.controller = ControllerWidget(self.controller_state, parent=self)
         self.setCentralWidget(self.controller)
 
         print self.geometry()

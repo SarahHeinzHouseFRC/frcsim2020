@@ -49,20 +49,11 @@ class ButtonState:
         self.pressed = 0
 
 
-class CommsState:
-    """
-    Whether or not controller is connected
-    """
-    def __init__(self):
-        self.connected = False
-
-
 class CommsThread(QThread):
     connection_status = pyqtSignal(object)
 
-    def __init__(self, rx_port, tx_ip, tx_port, comms_state, controller_state):
+    def __init__(self, rx_port, tx_ip, tx_port, controller_state):
         QThread.__init__(self)
-        self.comms_state = comms_state
         self.controller_state = controller_state
         self.rx_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
         self.rx_socket.bind(("127.0.0.1", rx_port))

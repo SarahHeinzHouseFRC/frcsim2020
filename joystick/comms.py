@@ -16,10 +16,7 @@ class ControllerState:
         self.y = ButtonState()  # 0 or 1
         self.a = ButtonState()  # 0 or 1
         self.b = ButtonState()  # 0 or 1
-        self.dpad_up = ButtonState()  # 0 or 1
-        self.dpad_down = ButtonState()  # 0 or 1
-        self.dpad_left = ButtonState()  # 0 or 1
-        self.dpad_right = ButtonState()  # 0 or 1
+        self.dpad = DpadState()  # 4x 0 or 1
         self.bumper_right = ButtonState()  # 0 or 1
         self.bumper_left = ButtonState()  # 0 or 1
         self.left_joystick = JoystickState()  # -511 to 512
@@ -29,7 +26,10 @@ class ControllerState:
         return "{ %05d %05d %05d %05d %01d%01d%01d%01d %01d%01d%01d%01d }" % \
             (self.left_joystick.x, self.left_joystick.y, self.right_joystick.x, self.right_joystick.y,
                 self.a.pressed, self.b.pressed, self.x.pressed, self.y.pressed,
-                self.dpad_up.pressed, self.dpad_down.pressed, self.dpad_left.pressed, self.dpad_right.pressed)
+                self.dpad.up.pressed,
+                self.dpad.down.pressed,
+                self.dpad.left.pressed,
+                self.dpad.right.pressed)
 
 
 class JoystickState:
@@ -39,6 +39,17 @@ class JoystickState:
         """
         self.x = 0
         self.y = 0
+
+
+class DpadState:
+    def __init__(self):
+        """
+        Just four buttons that are 0 or 1
+        """
+        self.up = ButtonState()
+        self.down = ButtonState()
+        self.left = ButtonState()
+        self.right = ButtonState()
 
 
 class ButtonState:

@@ -8,7 +8,16 @@ from PyQt4.QtSvg import *
 import math
 
 IMG_CONTROLLER = "assets/xbox-controller.svg"
-IMG_CONTROLLER_JOYSTICK = "assets/xbox-joystick.svg"
+IMG_JOYSTICK = "assets/xbox-joystick.svg"
+IMG_DPAD = "assets/xbox-dpad.svg"
+IMG_DPAD_UP = "assets/xbox-dpad-up.svg"
+IMG_DPAD_DOWN = "assets/xbox-dpad-down.svg"
+IMG_DPAD_LEFT = "assets/xbox-dpad-left.svg"
+IMG_DPAD_RIGHT = "assets/xbox-dpad-right.svg"
+IMG_DPAD_UP_RIGHT = "assets/xbox-dpad-up-right.svg"
+IMG_DPAD_DOWN_RIGHT = "assets/xbox-dpad-down-right.svg"
+IMG_DPAD_DOWN_LEFT = "assets/xbox-dpad-down-left.svg"
+IMG_DPAD_UP_LEFT = "assets/xbox-dpad-up-left.svg"
 IMG_BUTTON_A_RELEASED = "assets/xbox-button-a-released.svg"
 IMG_BUTTON_A_PRESSED = "assets/xbox-button-a-pressed.svg"
 IMG_BUTTON_B_RELEASED = "assets/xbox-button-b-released.svg"
@@ -17,14 +26,6 @@ IMG_BUTTON_X_RELEASED = "assets/xbox-button-x-released.svg"
 IMG_BUTTON_X_PRESSED = "assets/xbox-button-x-pressed.svg"
 IMG_BUTTON_Y_RELEASED = "assets/xbox-button-y-released.svg"
 IMG_BUTTON_Y_PRESSED = "assets/xbox-button-y-pressed.svg"
-IMG_DPAD_UP_RELEASED = "assets/xbox-dpad-up-released.svg"
-IMG_DPAD_UP_PRESSED = "assets/xbox-dpad-up-pressed.svg"
-IMG_DPAD_DOWN_RELEASED = "assets/xbox-dpad-down-released.svg"
-IMG_DPAD_DOWN_PRESSED = "assets/xbox-dpad-down-pressed.svg"
-IMG_DPAD_LEFT_RELEASED = "assets/xbox-dpad-left-released.svg"
-IMG_DPAD_LEFT_PRESSED = "assets/xbox-dpad-left-pressed.svg"
-IMG_DPAD_RIGHT_RELEASED = "assets/xbox-dpad-right-released.svg"
-IMG_DPAD_RIGHT_PRESSED = "assets/xbox-dpad-right-pressed.svg"
 IMG_BUMPER_LEFT_RELEASED = "assets/xbox-bumper-left-released.svg"
 IMG_BUMPER_LEFT_PRESSED = "assets/xbox-bumper-left-pressed.svg"
 IMG_BUMPER_RIGHT_RELEASED = "assets/xbox-bumper-right-released.svg"
@@ -54,14 +55,7 @@ class ControllerWidget(QSvgWidget):
                                      self.controller_state.x, 436, 158, self)
         self.y_button = ButtonWidget(IMG_BUTTON_Y_RELEASED, IMG_BUTTON_Y_PRESSED,
                                      self.controller_state.y, 477, 117, self)
-        self.dpad_up = ButtonWidget(IMG_DPAD_UP_RELEASED, IMG_DPAD_UP_PRESSED,
-                                    self.controller_state.dpad_up, 247, 224, self)
-        self.dpad_down = ButtonWidget(IMG_DPAD_DOWN_RELEASED, IMG_DPAD_DOWN_PRESSED,
-                                      self.controller_state.dpad_down, 247, 289, self)
-        self.dpad_left = ButtonWidget(IMG_DPAD_LEFT_RELEASED, IMG_DPAD_LEFT_PRESSED,
-                                      self.controller_state.dpad_left, 218, 251, self)
-        self.dpad_right = ButtonWidget(IMG_DPAD_RIGHT_RELEASED, IMG_DPAD_RIGHT_PRESSED,
-                                       self.controller_state.dpad_right, 283, 251, self)
+        self.dpad = DpadWidget(self.controller_state.dpad, 218, 224, self)
         self.bumper_left = ButtonWidget(IMG_BUMPER_LEFT_RELEASED, IMG_BUMPER_LEFT_PRESSED,
                                         self.controller_state.bumper_left, 138, 61, self)
         self.bumper_right = ButtonWidget(IMG_BUMPER_RIGHT_RELEASED, IMG_BUMPER_RIGHT_PRESSED,
@@ -89,7 +83,7 @@ class JoystickWidget(QSvgWidget):
         self.max_deflection = 10
         self.clickX = 0
         self.clickY = 0
-        self.load(IMG_CONTROLLER_JOYSTICK)
+        self.load(IMG_JOYSTICK)
         self.move(x, y)
 
     def mousePressEvent(self, event):
@@ -100,7 +94,7 @@ class JoystickWidget(QSvgWidget):
         x = event.globalPos().x() - self.clickX
         y = event.globalPos().y() - self.clickY
         theta = math.atan2(y, x)
-        r = math.sqrt(x**2 + y**2)
+        r = math.sqrt(x ** 2 + y ** 2)
         if r > self.max_deflection:
             r = self.max_deflection
         x = r * math.cos(theta)
@@ -113,6 +107,81 @@ class JoystickWidget(QSvgWidget):
         self.move(self.x, self.y)
         self.state.x = 0
         self.state.y = 0
+
+
+class DpadWidget(QSvgWidget):
+    """
+    Directional pad consists of four buttons, but also supports dragging to fluidly move between buttons. Each of the
+    four buttons covers a region of 3*pi/4. This allows, e.g. clicking the up and left button simultaneously like a
+    physical dpad. There is a deadzone of 10px in the center which does not count as a press on any button.
+    """
+    def __init__(self, dpad_state, x, y, parent=None):
+        """
+        @param dpad_state Container variable to place state into
+        @param x X-coord to draw dpad
+        @param y Y-coord to draw dpad
+        """
+        super(DpadWidget, self).__init__(parent)
+
+        self.load(IMG_DPAD)
+        self.move(x, y)
+        self.state = dpad_state
+        self.x = x
+        self.y = y
+
+    def reset(self):
+        self.state.up.pressed = 0
+        self.state.down.pressed = 0
+        self.state.left.pressed = 0
+        self.state.right.pressed = 0
+        self.load(IMG_DPAD)
+
+    def update(self, x, y):
+        self.reset()
+        center_x = self.geometry().width() / 2
+        center_y = self.geometry().height() / 2
+        x = x - center_x
+        y = y - center_y
+        theta = math.atan2(y, x)
+        r = math.sqrt(x ** 2 + y ** 2)
+        if r > 10:
+            if math.pi/8 >= theta >= -math.pi/8:
+                self.state.right.pressed = 1
+                self.load(IMG_DPAD_RIGHT)
+            elif -3*math.pi/8 <= theta <= -math.pi/8:
+                self.state.up.pressed = 1
+                self.state.right.pressed = 1
+                self.load(IMG_DPAD_UP_RIGHT)
+            elif -5*math.pi/8 <= theta <= -3*math.pi/8:
+                self.state.up.pressed = 1
+                self.load(IMG_DPAD_UP)
+            elif -7*math.pi/8 <= theta <= -5*math.pi/8:
+                self.state.up.pressed = 1
+                self.state.left.pressed = 1
+                self.load(IMG_DPAD_UP_LEFT)
+            elif -7*math.pi/8 >= theta or theta >= 7*math.pi/8:
+                self.state.left.pressed = 1
+                self.load(IMG_DPAD_LEFT)
+            elif 5*math.pi/8 <= theta <= 7*math.pi/8:
+                self.state.down.pressed = 1
+                self.state.left.pressed = 1
+                self.load(IMG_DPAD_DOWN_LEFT)
+            elif 3*math.pi/8 <= theta <= 5*math.pi/8:
+                self.state.down.pressed = 1
+                self.load(IMG_DPAD_DOWN)
+            elif math.pi/8 <= theta <= 3*math.pi/8:
+                self.state.down.pressed = 1
+                self.state.right.pressed = 1
+                self.load(IMG_DPAD_DOWN_RIGHT)
+
+    def mousePressEvent(self, event):
+        self.update(event.pos().x(), event.pos().y())
+
+    def mouseMoveEvent(self, event):
+        self.update(event.pos().x(), event.pos().y())
+
+    def mouseReleaseEvent(self, event):
+        self.reset()
 
 
 class ButtonWidget(QSvgWidget):

@@ -60,7 +60,7 @@ void RobotModel::update(double currTimestamp)
         double dLeft = vLeft * elapsedTime;
         double dRight = vRight * elapsedTime;
         double prevTheta = _state.pose.theta;
-        double currTheta = prevTheta + (dRight - dLeft) / _wheelTrack;
+        double currTheta = wrapAngle(prevTheta + (dRight - dLeft) / _wheelTrack);
         _state.pose.x = _state.pose.x + r*sin(currTheta) - r*sin(prevTheta);
         _state.pose.y = _state.pose.y - r*cos(currTheta) + r*cos(prevTheta);
         _state.pose.theta = currTheta;

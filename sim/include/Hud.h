@@ -55,7 +55,9 @@ private:
     int _width;
     std::vector<Label*> _labels;
     osg::ref_ptr<Label> _connected;
-    osg::ref_ptr<Label> _robotState;
+    osg::ref_ptr<Label> _vehiclePoseState;
+    osg::ref_ptr<Label> _vehicleElevatorState;
+    osg::ref_ptr<Label> _vehicleDrivetrainState;
 };
 
 

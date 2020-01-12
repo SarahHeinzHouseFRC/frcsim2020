@@ -67,6 +67,50 @@ class ControllerWidget(QSvgWidget):
     def heightForWidth(self, width):
         return width
 
+    def keyPressEvent(self, event):
+        """
+        Handle key press events
+        """
+        if event.key() == Qt.Key_Up:
+            self.right_joystick.set_y(512)
+        if event.key() == Qt.Key_Down:
+            self.right_joystick.set_y(-511)
+        if event.key() == Qt.Key_Left:
+            self.right_joystick.set_x(-511)
+        if event.key() == Qt.Key_Right:
+            self.right_joystick.set_x(512)
+        if event.key() == Qt.Key_W:
+            self.left_joystick.set_y(512)
+        if event.key() == Qt.Key_S:
+            self.left_joystick.set_y(-511)
+        if event.key() == Qt.Key_A:
+            self.left_joystick.set_x(-511)
+        if event.key() == Qt.Key_D:
+            self.left_joystick.set_x(512)
+        event.accept()
+
+    def keyReleaseEvent(self, event):
+        """
+        Handle key release events
+        """
+        if event.key() == Qt.Key_Up:
+            self.right_joystick.set_y(0)
+        if event.key() == Qt.Key_Down:
+            self.right_joystick.set_y(0)
+        if event.key() == Qt.Key_Left:
+            self.right_joystick.set_x(0)
+        if event.key() == Qt.Key_Right:
+            self.right_joystick.set_x(0)
+        if event.key() == Qt.Key_W:
+            self.left_joystick.set_y(0)
+        if event.key() == Qt.Key_S:
+            self.left_joystick.set_y(0)
+        if event.key() == Qt.Key_A:
+            self.left_joystick.set_x(0)
+        if event.key() == Qt.Key_D:
+            self.left_joystick.set_x(0)
+        event.accept()
+
 
 class JoystickWidget(QSvgWidget):
     def __init__(self, joystick_state, x, y, parent=None):
@@ -85,6 +129,28 @@ class JoystickWidget(QSvgWidget):
         self.clickY = 0
         self.load(IMG_JOYSTICK)
         self.move(x, y)
+
+    def set_x(self, x):
+        """
+        Sets the joystick's x-axis state to x and updates the visualization accordingly
+        """
+        if x < -511:
+            x = -511
+        if x > 512:
+            x = 512
+        self.state.x = x
+        self.move(self.x + x / 512 * self.max_deflection, self.geometry().y())
+
+    def set_y(self, y):
+        """
+        Sets the joystick's y-axis state to x and updates the visualization accordingly
+        """
+        if y < -511:
+            y = -511
+        if y > 512:
+            y = 512
+        self.state.y = y
+        self.move(self.geometry().x(), self.y - y / 512 * self.max_deflection)
 
     def mousePressEvent(self, event):
         self.clickX = event.globalPos().x()

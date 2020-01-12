@@ -38,6 +38,12 @@ class MainWindow(QMainWindow):
         if event.key() == Qt.Key_Escape:
             print("Controller: Shutting down")
             self.close()
+        else:
+            self.controller.keyPressEvent(event)
+        event.accept()
+
+    def keyReleaseEvent(self, event):
+        self.controller.keyReleaseEvent(event)
         event.accept()
 
 

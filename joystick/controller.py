@@ -204,8 +204,8 @@ class DpadWidget(QSvgWidget):
 
     def update(self, x, y):
         self.reset()
-        center_x = self.geometry().width() / 2
-        center_y = self.geometry().height() / 2
+        center_x = self.width() / 2
+        center_y = self.height() / 2
         x = x - center_x
         y = y - center_y
         theta = math.atan2(y, x)

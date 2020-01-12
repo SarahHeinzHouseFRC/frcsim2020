@@ -63,14 +63,14 @@ class ButtonState:
 class CommsThread(QThread):
     connection_status = pyqtSignal(object)
 
-    def __init__(self, rx_port, tx_ip, tx_port, controller_state):
+    def __init__(self, comms_config, controller_state):
         QThread.__init__(self)
         self.controller_state = controller_state
         self.rx_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
-        self.rx_socket.bind(("127.0.0.1", rx_port))
+        self.rx_socket.bind((comms_config['rx_ip'], comms_config['rx_port']))
         self.rx_socket.settimeout(0.1)
-        self.tx_ip = tx_ip
-        self.tx_port = tx_port
+        self.tx_ip = comms_config['tx_ip']
+        self.tx_port = comms_config['tx_port']
         self.tx_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
 
     def run(self):

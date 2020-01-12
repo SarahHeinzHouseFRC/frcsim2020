@@ -7,7 +7,7 @@ from PyQt4.QtGui import *
 from PyQt4.QtSvg import *
 import math
 
-IMG_CONTROLLER = "assets/xbox-controller.svg"
+IMG_CONTROLLER = "assets/xbox-controller-white.svg"
 IMG_JOYSTICK = "assets/xbox-joystick.svg"
 IMG_DPAD = "assets/xbox-dpad.svg"
 IMG_DPAD_UP = "assets/xbox-dpad-up.svg"

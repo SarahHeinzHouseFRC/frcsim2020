@@ -69,6 +69,9 @@ Hud::Hud(const ConfigReader& config) : _width(225)
 
     _vehicleDrivetrainState = new TopLabel("", -270);
     _labelsGeode->addChild(_vehicleDrivetrainState);
+
+    _labelsGeode->addChild(new BottomLabel("[1] Top-down view", 40));
+    _labelsGeode->addChild(new BottomLabel("[2] Orbit view", 20));
 }
 
 

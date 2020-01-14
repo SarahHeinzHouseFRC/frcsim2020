@@ -33,11 +33,21 @@ public:
      */
     osg::ref_ptr<osg::Group> getRoot() const { return _root; }
 
+    /**
+     * Returns the vehicle node
+     */
+    osg::ref_ptr<osg::Geode> getVehicleNode() const { return _robotGeode; }
+
+    /**
+     * Returns the position of the vehicle
+     */
+    osg::Vec3d getVehiclePosition() const { return _robotPat->getPosition(); }
+
 private:
     /**
      * Builds the visualization of the robot
      */
-    osg::ref_ptr<osg::PositionAttitudeTransform> makeRobot(const ConfigReader& config);
+    osg::ref_ptr<osg::Geode> makeRobot(const ConfigReader& config);
 
     /**
      * Builds the visualization of the robot's elevator carriage
@@ -71,6 +81,7 @@ private:
 
     osg::ref_ptr<osg::Group> _root;
     osg::ref_ptr<osg::PositionAttitudeTransform> _robotPat;
+    osg::ref_ptr<osg::Geode> _robotGeode;
     osg::ref_ptr<osg::PositionAttitudeTransform> _carriagePat;
     float _wheelRadius;
     float _beltRadius;

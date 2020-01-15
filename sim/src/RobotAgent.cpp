@@ -3,12 +3,13 @@
  */
 
 #include <string>
+#include <ConfigReader.h>
 #include "RobotAgent.h"
 
 
 RobotAgent::RobotAgent(const ConfigReader& config) : _state{0}, _commands{0}, _numDroppedPackets(0)
 {
-    _comms = new UdpNode(config.vehicle.port, config.controls.ip, config.controls.port);
+    _comms = new UdpNode(config.vehicle.port, config.core.ip, config.core.vehiclePort);
 }
 
 

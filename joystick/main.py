@@ -6,11 +6,14 @@ from controller import *
 from comms import *
 from connected import ConnectedWidget
 from help import HelpWidget
+import yaml
+
+CONFIG_FILE = "../config/robotConfig.yml"
 
 
 class MainWindow(QMainWindow):
 
-    def __init__(self, parent=None):
+    def __init__(self, comms_config, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setWindowTitle("Xbox Controller")
         self.setStyleSheet("background-color: gray")
@@ -21,12 +24,7 @@ class MainWindow(QMainWindow):
         self.controller_state = ControllerState()
 
         # Launch comms thread in background
-        comms_config = {
-            "rx_ip": "127.0.0.1",
-            "rx_port": 2000,
-            "tx_ip": "127.0.0.1",
-            "tx_port": 4000
-        }
+
         self.comms = CommsThread(comms_config, self.controller_state)
         self.comms.start()
 
@@ -70,10 +68,19 @@ class MainWindow(QMainWindow):
 
 
 def main():
+    with open(CONFIG_FILE) as f:
+        data = yaml.load(f)
+        comms_config = {
+            "rx_ip": "127.0.0.1",
+            "rx_port": data['joystick']['port'],
+            "tx_ip": data['core']['ip'],
+            "tx_port": data['core']['joystickPort']
+        }
+
     app = QApplication(sys.argv)
 
     # Launch main window
-    window = MainWindow()
+    window = MainWindow(comms_config)
     window.show()
 
     sys.exit(app.exec_())

@@ -5,9 +5,10 @@ joystick:
   ip: "127.0.0.1"      # IP address where joystick is running
   port: 2000           # Port where joystick is running
 
-controls:
-  ip: "127.0.0.1"      # IP address where controls are running
-  port: 6000           # Port where controls are running
+core:
+  ip: "127.0.0.1"      # IP address where core is running
+  joystickPort: 4000   # Port where joystick should send its commands
+  vehiclePort: 6000    # Port where vehicle should send its state
 
 vehicle:
   ip: "127.0.0.1"      # IP address where sim is running

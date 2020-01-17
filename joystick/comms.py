@@ -5,6 +5,30 @@
 from PyQt4.QtCore import *
 import sys
 import socket
+import time
+
+
+class Comms:
+    def __init__(self, comms_config):
+        self.rx_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
+        self.rx_socket.bind((comms_config['rx_ip'], comms_config['rx_port']))
+        self.rx_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.rx_socket.settimeout(0.1)
+        self.tx_ip = comms_config['tx_ip']
+        self.tx_port = comms_config['tx_port']
+        self.tx_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
+
+    def tx(self, msg):
+        time.sleep(0.01)
+        self.tx_socket.sendto(bytes(msg), (self.tx_ip, self.tx_port))
+
+    def rx(self):
+        buffer_size = 1024
+        try:
+            rx_msg, addr = self.rx_socket.recvfrom(buffer_size)
+            return rx_msg
+        except socket.timeout:
+            return None
 
 
 class ControllerState:
@@ -58,39 +82,3 @@ class ButtonState:
         Only one field which is 0 for unpressed and 1 for pressed
         """
         self.pressed = 0
-
-
-class CommsThread(QThread):
-    connection_status = pyqtSignal(object)
-
-    def __init__(self, comms_config, controller_state):
-        QThread.__init__(self)
-        self.controller_state = controller_state
-        self.rx_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
-        self.rx_socket.bind((comms_config['rx_ip'], comms_config['rx_port']))
-        self.rx_socket.settimeout(0.1)
-        self.tx_ip = comms_config['tx_ip']
-        self.tx_port = comms_config['tx_port']
-        self.tx_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
-
-    def run(self):
-        while True:
-            # Send state
-            state = self.controller_state.toJson()
-            # print state
-            self.tx(state)
-
-            # Receive heartbeat
-            self.rx()
-
-    def tx(self, msg):
-        self.tx_socket.sendto(bytes(msg), (self.tx_ip, self.tx_port))
-
-    def rx(self):
-        buffer_size = 1024
-        try:
-            rx_msg, addr = self.rx_socket.recvfrom(buffer_size)
-            if rx_msg == "{}":
-                self.connection_status.emit(True)
-        except socket.timeout:
-            self.connection_status.emit(False)

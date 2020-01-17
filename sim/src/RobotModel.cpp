@@ -6,22 +6,20 @@
 #include <ConfigReader.h>
 #include "RobotModel.h"
 
-#define RPM_TO_RADS_PER_SEC 0.104719755
-#define IN_TO_M 0.0254
-
 
 RobotModel::RobotModel(const ConfigReader& config, double startTimestamp) :
         _prevTimestamp(startTimestamp),
         _state{0},
-        _leftDriveMotorMaxSpeed(config.vehicle.constants.drivetrain.motor.maxSpeed*RPM_TO_RADS_PER_SEC),
-        _rightDriveMotorMaxSpeed(config.vehicle.constants.drivetrain.motor.maxSpeed*RPM_TO_RADS_PER_SEC),
-        _wheelRadius(config.vehicle.constants.drivetrain.wheelRadius*IN_TO_M),
-        _drivetrainWidth(config.vehicle.constants.drivetrain.width*IN_TO_M),
-        _wheelTrack(config.vehicle.constants.drivetrain.wheelTrack*IN_TO_M),
+        _leftDriveMotorMaxSpeed(config.vehicle.constants.drivetrain.motor.maxSpeed),
+        _rightDriveMotorMaxSpeed(config.vehicle.constants.drivetrain.motor.maxSpeed),
+        _wheelRadius(config.vehicle.constants.drivetrain.wheelRadius),
+        _drivetrainWidth(config.vehicle.constants.drivetrain.width),
+        _wheelTrack(config.vehicle.constants.drivetrain.wheelTrack),
         _elevatorBeltLength(config.vehicle.constants.elevator.belt.length),
-        _elevatorMotorMaxSpeed(config.vehicle.constants.elevator.motor.maxSpeed*RPM_TO_RADS_PER_SEC),
+        _elevatorMotorMaxSpeed(config.vehicle.constants.elevator.motor.maxSpeed),
         _elevatorMotorRadius(config.vehicle.constants.elevator.motor.radius)
 {
+    // Set initial state
     _state.pose.x = config.vehicle.initialState.drivetrain.x;
     _state.pose.y = config.vehicle.initialState.drivetrain.y;
     _state.elevatorMotorSpeed = config.vehicle.initialState.elevator.motorSpeed;

@@ -61,10 +61,10 @@ private:
     double _prevTimestamp; // Needed to calculate how much time has passed since last update()
     struct
     {
-        double elevatorMotorSpeed; // 0-maxElevatorMotorSpeed
-        double elevatorCarriagePos; // 0-elevatorBeltLength
-        double leftDriveMotorSpeed; // 0-maxDriveSpeed
-        double rightDriveMotorSpeed; // 0-maxDriveSpeed
+        double elevatorMotorSpeed; // Rads/sec, 0-maxElevatorMotorSpeed
+        double elevatorCarriagePos; // Meters, 0-elevatorBeltLength
+        double leftDriveMotorSpeed; // Rads/sec, 0-maxDriveSpeed
+        double rightDriveMotorSpeed; // Rads/sec, 0-maxDriveSpeed
         struct
         {
             double x;     // Meters

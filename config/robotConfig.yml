@@ -5,9 +5,10 @@ joystick:
   ip: "127.0.0.1"      # IP address where joystick is running
   port: 2000           # Port where joystick is running
 
-controls:
-  ip: "127.0.0.1"      # IP address where controls are running
-  port: 4000           # Port where controls are running
+core:
+  ip: "127.0.0.1"      # IP address where core is running
+  joystickPort: 4000   # Port where joystick should send its commands
+  vehiclePort: 6000    # Port where vehicle should send its state
 
 vehicle:
   ip: "127.0.0.1"      # IP address where sim is running
@@ -24,7 +25,7 @@ vehicle:
       motor:
         radius: 0.015  # Meters
         length: 0.03   # Meters
-        maxSpeed: 10   # RPM
+        maxSpeed: 500  # RPM
       encoder:
         radius: 0.01   # Meters
         length: 0.003  # Meters

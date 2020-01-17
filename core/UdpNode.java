@@ -10,6 +10,7 @@ public class UdpNode
     public UdpNode(int rxPort, String txIp, int txPort) throws SocketException, UnknownHostException
     {
         socket = new DatagramSocket(rxPort);
+        socket.setSoTimeout(10);
         this.txIp = txIp;
         this.txPort = txPort;
     }

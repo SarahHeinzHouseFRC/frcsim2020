@@ -3,8 +3,7 @@
  */
 public class RobotState
 {
-    /** Integer from 0-1024 */
-    public int elevatorEncoderPos;
+    public int elevatorEncoderPos; // Integer from 0-1024
 
     public void fromJson(String str)
     {

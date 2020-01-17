@@ -6,19 +6,23 @@ public class Main
 {
     public static void main(String[] args)
     {
-        if (args.length < 1)
-        {
-            System.out.println("Usage: java Main <speed 0-1023>");
-            return;
-        }
+        int elevatorMotorSpeed = 0;
 
-        RobotAgent robotAgent = new RobotAgent(8000, "localhost", 4000);
+        JoystickAgent joystickAgent = new JoystickAgent(4000, "localhost", 2000);
+        RobotAgent robotAgent = new RobotAgent(6000, "localhost", 8000);
 
-        int cmd = Integer.parseInt(args[0]);
         while (true)
         {
+            // Send joystick heartbeat
+            joystickAgent.txHeartbeat();
+
+            // Receive joystick commands
+            joystickAgent.rxCommands();
+            JoystickCommands commands = joystickAgent.commands;
+            elevatorMotorSpeed = commands.y;
+
             // Send robot commands
-            robotAgent.commands.elevatorMotorSpeed = cmd;
+            robotAgent.commands.elevatorMotorSpeed = elevatorMotorSpeed;
             robotAgent.txRobotCommands();
 
             // Receive robot state

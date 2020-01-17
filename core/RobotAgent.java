@@ -53,11 +53,10 @@ public class RobotAgent
             // Parse received command from JSON to state
             state.fromJson(msg);
             System.out.println("RobotAgent: Received state " + msg + " -> " + state.elevatorEncoderPos);
-
         }
         catch (IOException e)
         {
-            System.out.println("RobotAgent: Failed to rx");
+            // System.out.println("RobotAgent: Failed to rx");
         }
     }
 }

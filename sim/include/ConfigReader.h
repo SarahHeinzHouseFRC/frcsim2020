@@ -27,9 +27,10 @@ public:
 
     struct
     {
-        std::string ip; // IP address
-        int port;       // Port number
-    } controls;
+        std::string ip;   // IP address
+        int joystickPort; // Port number
+        int vehiclePort;  // Port number
+    } core;
     struct
     {
         std::string ip; // IP address
@@ -82,7 +83,7 @@ private:
     /**
      * Helper method for loading controls parameters
      */
-    void parseControlsConfig(const YAML::Node& controlsConfig);
+    void parseCoreConfig(const YAML::Node& coreConfig);
 
     /**
      * Helper method for loading vehicle parameters

@@ -3,6 +3,7 @@
  */
 
 #include <iostream>
+#include <ConfigReader.h>
 #include "ConfigReader.h"
 
 
@@ -22,10 +23,10 @@ void ConfigReader::parse(const std::string &configFile)
         throw std::runtime_error("ConfigReader: File not found: " + configFile);
     }
 
-    YAML::Node controlsConfig = config["controls"];
-    if (controlsConfig)
+    YAML::Node coreConfig = config["core"];
+    if (coreConfig)
     {
-        parseControlsConfig(controlsConfig);
+        parseCoreConfig(coreConfig);
     }
 
     YAML::Node vehicleConfig = config["vehicle"];
@@ -39,10 +40,11 @@ void ConfigReader::parse(const std::string &configFile)
 
 
 
-void ConfigReader::parseControlsConfig(const YAML::Node& controlsConfig)
+void ConfigReader::parseCoreConfig(const YAML::Node& coreConfig)
 {
-    controls.ip = controlsConfig["ip"].as<std::string>();
-    controls.port = controlsConfig["port"].as<int>();
+    core.ip = coreConfig["ip"].as<std::string>();
+    core.joystickPort = coreConfig["joystickPort"].as<int>();
+    core.vehiclePort = coreConfig["vehiclePort"].as<int>();
 }
 
 

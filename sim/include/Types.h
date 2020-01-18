@@ -8,7 +8,7 @@
 #include <string>
 
 
-struct RobotState
+struct SensorState
 {
     int leftDriveEncoderPosition; // 0-1023
     int rightDriveEncoderPosition; // 0-1023
@@ -27,7 +27,7 @@ struct RobotState
 
 
 
-struct RobotCommands
+struct CoreCommands
 {
     int leftDriveMotorSpeed;  // -511 - 512
     int rightDriveMotorSpeed; // -511 - 512
@@ -36,12 +36,12 @@ struct RobotCommands
     /**
      * Default constructor
      */
-    RobotCommands() = default;
+    CoreCommands() = default;
 
     /**
      * Constructor from JSON string
      */
-    explicit RobotCommands(const std::string& json)
+    explicit CoreCommands(const std::string& json)
     {
         leftDriveMotorSpeed = std::stoi(json.substr(2, 7));
         rightDriveMotorSpeed = std::stoi(json.substr(8, 13));

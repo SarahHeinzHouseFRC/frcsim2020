@@ -4,38 +4,38 @@
 
 #include <string>
 #include <ConfigReader.h>
-#include "RobotAgent.h"
+#include "CoreAgent.h"
 
 
-RobotAgent::RobotAgent(const ConfigReader& config) : _state{0}, _commands{}, _numDroppedPackets(0)
+CoreAgent::CoreAgent(const ConfigReader& config) : _sensorState{0}, _coreCommands{}, _numDroppedPackets(0)
 {
     _comms = new UdpNode(config.vehicle.port, config.core.ip, config.core.vehiclePort);
 }
 
 
 
-void RobotAgent::txRobotState()
+void CoreAgent::txSensorState()
 {
     // Transmit state
-    std::string stateJson = _state.asJson();
+    std::string msg = _sensorState.asJson();
 
-    _comms->send(stateJson);
+    _comms->send(msg);
 }
 
 
 
-bool RobotAgent::rxRobotCommands()
+bool CoreAgent::rxCoreCommands()
 {
     std::string msg = _comms->receive();
     if (msg[0] == '{')
     {
-        // Translate received commands from JSON and store into _commands
-        _commands = RobotCommands(msg);
+        // Translate received commands from JSON and store into _coreCommands
+        _coreCommands = CoreCommands(msg);
 
         // Reset dropped packets count
         _numDroppedPackets = 0;
 
-        printf("RobotAgent: Received command %s -> %d\n", msg.c_str(), _commands.elevatorMotorSpeed);
+        printf("CoreAgent: Received command %s\n", msg.c_str());
         return true;
     }
     else
@@ -47,7 +47,7 @@ bool RobotAgent::rxRobotCommands()
 
 
 
-bool RobotAgent::isConnected()
+bool CoreAgent::isConnected()
 {
     // As long as we've heard from the controls <= 10 packets ago, we're still connected
     return _numDroppedPackets < 100;

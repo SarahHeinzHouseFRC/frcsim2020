@@ -9,7 +9,10 @@
 #include <osg/ShapeDrawable>
 #include <osg/PositionAttitudeTransform>
 #include "ConfigReader.h"
-#include "RobotModel.h"
+#include "VehicleView.h"
+#include "VehicleModel.h"
+#include "FieldView.h"
+#include "FieldModel.h"
 
 
 /**
@@ -26,7 +29,7 @@ public:
     /**
      * Updates the scene given the robot's current state
      */
-    void update(const RobotModel& robot);
+    void update(const VehicleModel& vehicleModel, const FieldModel& fieldModel);
 
     /**
      * Returns the root node of the scene
@@ -34,68 +37,19 @@ public:
     osg::ref_ptr<osg::Group> getRoot() const { return _root; }
 
     /**
-     * Returns the vehicle node
+     * Returns a pointer to the vehicle node (for the Visualizer to center its view on the robot
      */
-    osg::ref_ptr<osg::Geode> getVehicleNode() const { return _robotGeode; }
+    osg::ref_ptr<osg::Node> getVehicleNode() const { return _vehicleView->getVehicleNode(); }
 
     /**
-     * Returns the position of the vehicle
+     * Returns the position of the vehicle in the scene
      */
-    osg::Vec3d getVehiclePosition() const { return _robotPat->getPosition(); }
+    osg::Vec3d getVehiclePosition() const { return _vehicleView->getPosition(); }
 
 private:
-    /**
-     * Builds the visualization of the robot
-     */
-    osg::ref_ptr<osg::Geode> makeRobot(const ConfigReader& config);
-
-    /**
-     * Builds the visualization of the robot's elevator carriage
-     */
-    osg::ref_ptr<osg::PositionAttitudeTransform> makeRobotCarriage();
-
-    /**
-     * Builds the visualization of the field
-     */
-    osg::ref_ptr<osg::Geode> makeField();
-
-    /**
-     * Utility method for quickly drawing lines. Pairs of vertices are interpreted as single lines
-     */
-    static osg::ref_ptr<osg::Geometry> makeLines(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);
-
-    /**
-     * Utility method for quickly drawing a cylinder
-     */
-    static osg::ref_ptr<osg::ShapeDrawable> makeCylinder(const osg::Vec3& pos, float radius, float height, const osg::Vec4& color);
-
-    /**
-     * Utility method for quickly drawing a box
-     */
-    static osg::ref_ptr<osg::ShapeDrawable> makeBox(const osg::Vec3& pos, float lengthX, float lengthY, float lengthZ, const osg::Vec4& color);
-
-    /**
-     * Utility method for quickly drawing quads
-     */
-    static osg::ref_ptr<osg::Geometry> makeQuads(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);
-
     osg::ref_ptr<osg::Group> _root;
-    osg::ref_ptr<osg::PositionAttitudeTransform> _robotPat;
-    osg::ref_ptr<osg::Geode> _robotGeode;
-    osg::ref_ptr<osg::PositionAttitudeTransform> _carriagePat;
-    float _wheelRadius;
-    float _beltRadius;
-    float _beltWidth;
-    float _beltLength;
-    float _motorShaftRadius;
-    float _motorShaftLength;
-    float _motorRadius;
-    float _motorLength;
-    float _encoderRadius;
-    float _encoderLength;
-    float _carriageLengthX;
-    float _carriageLengthY;
-    float _carriageLengthZ;
+    osg::ref_ptr<VehicleView> _vehicleView;
+    osg::ref_ptr<FieldView> _fieldView;
 };
 
 

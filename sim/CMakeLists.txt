@@ -10,8 +10,12 @@ include_directories(
 
 set(SRCS
         src/main.cpp
-        src/RobotModel.cpp
-        src/RobotAgent.cpp
+        src/VehicleModel.cpp
+        src/VehicleView.cpp
+        src/FieldModel.cpp
+        src/FieldView.cpp
+        src/ViewUtils.cpp
+        src/CoreAgent.cpp
         src/ConfigReader.cpp
         src/Scene.cpp
         src/Hud.cpp

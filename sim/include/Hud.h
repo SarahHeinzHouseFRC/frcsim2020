@@ -10,7 +10,7 @@
 #include <osg/Camera>
 #include <osgText/Text>
 #include "Label.h"
-#include "RobotModel.h"
+#include "VehicleModel.h"
 #include "ConfigReader.h"
 #include "Types.h"
 
@@ -38,12 +38,12 @@ public:
     /**
      * Displays "connected" or "disconnected"
      */
-    void displayConnected(bool isConnected);
+    void displayConnectionStatus(bool isConnected);
 
     /**
      * Displays robot state
      */
-    void displayRobotState(const RobotModel& robotModel);
+    void displayVehicleState(const VehicleModel& vehicleModel);
 
 private:
     osg::Camera* _camera;

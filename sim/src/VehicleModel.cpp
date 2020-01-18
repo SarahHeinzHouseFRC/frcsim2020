@@ -4,10 +4,10 @@
 
 #include <cmath>
 #include <ConfigReader.h>
-#include "RobotModel.h"
+#include "VehicleModel.h"
 
 
-RobotModel::RobotModel(const ConfigReader& config, double startTimestamp) :
+VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
         _prevTimestamp(startTimestamp),
         _state{0},
         _leftDriveMotorMaxSpeed(config.vehicle.constants.drivetrain.motor.maxSpeed),
@@ -28,7 +28,7 @@ RobotModel::RobotModel(const ConfigReader& config, double startTimestamp) :
 
 
 
-void RobotModel::update(double currTimestamp)
+void VehicleModel::update(double currTimestamp)
 {
     double elapsedTime = currTimestamp - _prevTimestamp;
 
@@ -72,7 +72,7 @@ void RobotModel::update(double currTimestamp)
 
 
 
-void RobotModel::processCommands(const RobotCommands& commands)
+void VehicleModel::processCommands(const CoreCommands& commands)
 {
     // Update elevator motor speed
     _state.elevatorMotorSpeed = (commands.elevatorMotorSpeed / 512.0) * _elevatorMotorMaxSpeed;
@@ -84,9 +84,9 @@ void RobotModel::processCommands(const RobotCommands& commands)
 
 
 
-RobotState RobotModel::getState()
+SensorState VehicleModel::getSensorState()
 {
-    RobotState state{0};
+    SensorState state{0};
     state.elevatorEncoderPosition = int (1023 * _state.elevatorCarriagePos / _elevatorBeltLength);
     return state;
 }

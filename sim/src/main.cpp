@@ -9,8 +9,8 @@
 #include "Hud.h"
 #include "Visualizer.h"
 #include "Time.h"
-#include "RobotAgent.h"
-#include "RobotModel.h"
+#include "CoreAgent.h"
+#include "VehicleModel.h"
 
 
 int main(int argc, char** argv)
@@ -30,14 +30,15 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    // Initialize robot
+    // Initialize vehicle and field models
     double t = Time::now();
-    RobotModel robot(config, t);
+    VehicleModel vehicleModel(config, t);
+    FieldModel fieldModel(config, t);
 
-    // Initialize robot agent
-    RobotAgent robotAgent(config);
+    // Initialize comms with core
+    CoreAgent coreAgent(config);
 
-    // Visualize robot model
+    // Visualize vehicle and field
     Scene scene(config);
     Hud hud(config);
 
@@ -49,13 +50,13 @@ int main(int argc, char** argv)
         while (!vis.done())
         {
             // Receive commands
-            bool rx = robotAgent.rxRobotCommands();
+            bool rx = coreAgent.rxCoreCommands();
 
             if (rx)
             {
-                // Update the robot's control surfaces based on the received commands
-                auto rxCommands = robotAgent.getRobotCommands();
-                robot.processCommands(rxCommands);
+                // Update the vehicle's control surfaces based on the commands from core
+                auto rxCommands = coreAgent.getCoreCommands();
+                vehicleModel.processCommands(rxCommands);
             }
         }
     });
@@ -64,8 +65,8 @@ int main(int argc, char** argv)
     std::thread txThread([&]() {
         while (!vis.done())
         {
-            robotAgent.setRobotState(robot.getState());
-            robotAgent.txRobotState();
+            coreAgent.setSensorState(vehicleModel.getSensorState());
+            coreAgent.txSensorState();
         }
     });
 
@@ -75,15 +76,16 @@ int main(int argc, char** argv)
         // Get current time (sec)
         t = Time::now();
 
-        // Update the robot state given the received robot commands
-        robot.update(t);
+        // Update the vehicle and field models given the current time
+        vehicleModel.update(t);
+        fieldModel.update(t);
 
-        // Update the robot visualization
-        scene.update(robot);
+        // Update the vehicle and field visualizations based on their models
+        scene.update(vehicleModel, fieldModel);
 
         // Update the hud
-        hud.displayConnected(robotAgent.isConnected());
-        hud.displayRobotState(robot);
+        hud.displayConnectionStatus(coreAgent.isConnected());
+        hud.displayVehicleState(vehicleModel);
 
         // Step the visualizer
         vis.step();

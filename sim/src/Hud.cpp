@@ -4,7 +4,7 @@
 
 #include <osg/Geode>
 #include <osg/Geometry>
-#include <RobotModel.h>
+#include <VehicleModel.h>
 #include "Color.h"
 #include "Hud.h"
 
@@ -95,7 +95,7 @@ void Hud::onWindowResize(int width, int height)
 
 
 
-void Hud::displayConnected(bool isConnected)
+void Hud::displayConnectionStatus(bool isConnected)
 {
     if (isConnected)
     {
@@ -111,16 +111,16 @@ void Hud::displayConnected(bool isConnected)
 
 
 
-void Hud::displayRobotState(const RobotModel& robotModel)
+void Hud::displayVehicleState(const VehicleModel& vehicleModel)
 {
     char tmp[1024];
 
-    sprintf(tmp, "Pose: \n    X: %.1f ft \n    Y: %.1f ft \n    Theta: %.0f deg", robotModel._state.pose.x*M_TO_FT, robotModel._state.pose.y*M_TO_FT, robotModel._state.pose.theta*RADS_TO_DEG);
+    sprintf(tmp, "Pose: \n    X: %.1f ft \n    Y: %.1f ft \n    Theta: %.0f deg", vehicleModel._state.pose.x*M_TO_FT, vehicleModel._state.pose.y*M_TO_FT, vehicleModel._state.pose.theta*RADS_TO_DEG);
     _vehiclePoseState->setText(tmp);
 
-    sprintf(tmp, "Elevator: \n    Position: %.2f m \n    Motor: %.0f RPM", robotModel._state.elevatorCarriagePos, robotModel._state.elevatorMotorSpeed*RADS_PER_SEC_TO_RPM);
+    sprintf(tmp, "Elevator: \n    Position: %.2f m \n    Motor: %.0f RPM", vehicleModel._state.elevatorCarriagePos, vehicleModel._state.elevatorMotorSpeed*RADS_PER_SEC_TO_RPM);
     _vehicleElevatorState->setText(tmp);
 
-    sprintf(tmp, "Drivetrain: \n    Left motor: %.0f RPM \n    Right motor: %.0f RPM", robotModel._state.leftDriveMotorSpeed*RADS_PER_SEC_TO_RPM, robotModel._state.rightDriveMotorSpeed*RADS_PER_SEC_TO_RPM);
+    sprintf(tmp, "Drivetrain: \n    Left motor: %.0f RPM \n    Right motor: %.0f RPM", vehicleModel._state.leftDriveMotorSpeed*RADS_PER_SEC_TO_RPM, vehicleModel._state.rightDriveMotorSpeed*RADS_PER_SEC_TO_RPM);
     _vehicleDrivetrainState->setText(tmp);
 }

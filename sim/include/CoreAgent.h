@@ -2,8 +2,8 @@
  * Copyright (c) 2019 FRC Team 3260
  */
 
-#ifndef SHARP2019_ROBOTAGENT_H
-#define SHARP2019_ROBOTAGENT_H
+#ifndef SHARP2019_COREAGENT_H
+#define SHARP2019_COREAGENT_H
 
 #include "ConfigReader.h"
 #include "Types.h"
@@ -13,34 +13,34 @@
 /**
  * Receives commands and transmits robot state over comms.enc
  */
-class RobotAgent
+class CoreAgent
 {
 public:
     /**
      * Constructor
      */
-    RobotAgent(const ConfigReader& config);
+    CoreAgent(const ConfigReader& config);
 
     /**
-     * Publishes the robot's state
+     * Publishes the vehicle's sensors' states
      */
-    void txRobotState();
+    void txSensorState();
 
     /**
      * Receives robot commands
      * @return True if successful rx, false otherwise
      */
-    bool rxRobotCommands();
+    bool rxCoreCommands();
 
     /**
      * Get the last command received
      */
-    RobotCommands getRobotCommands() const { return _commands; }
+    CoreCommands getCoreCommands() const { return _coreCommands; }
 
     /**
      * State to be sent
      */
-    void setRobotState(const RobotState& state) { _state = state; }
+    void setSensorState(const SensorState& state) { _sensorState = state; }
 
     /**
      * Whether or not we're connected to the controls
@@ -48,11 +48,11 @@ public:
     bool isConnected();
 
 private:
-    RobotState _state;
-    RobotCommands _commands;
+    SensorState _sensorState;
+    CoreCommands _coreCommands;
     UdpNode *_comms;
     int _numDroppedPackets; ///< Count of how many packets have been missed
 };
 
 
-#endif //SHARP2019_ROBOTAGENT_H
+#endif //SHARP2019_COREAGENT_H

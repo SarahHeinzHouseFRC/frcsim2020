@@ -4,10 +4,24 @@
 
 #include "FieldModel.h"
 
+using namespace Geometry;
 
-FieldModel::FieldModel(const ConfigReader& config, double startTimestamp)
+
+FieldModel::FieldModel(const ConfigReader& config, double startTimestamp) : _inCollision(false)
 {
+    std::vector<Vertex2d> exteriorVertices;
+//    exteriorVertices.push_back({ 0, 10 });
+//    exteriorVertices.push_back({ 0, -10 });
 
+    exteriorVertices.push_back({ 4.11, 7.33 });
+    exteriorVertices.push_back({ 2.31, 8.00 });
+    exteriorVertices.push_back({ -2.31, 8.00 });
+    exteriorVertices.push_back({ -4.11, 7.33 });
+    exteriorVertices.push_back({ -4.11, -7.33 });
+    exteriorVertices.push_back({ -2.31, -8.00 });
+    exteriorVertices.push_back({ 2.31, -8.00 });
+    exteriorVertices.push_back({ 4.11, -7.33 });
+    _exteriorPolygon = Polygon2d(exteriorVertices);
 }
 
 
@@ -15,4 +29,11 @@ FieldModel::FieldModel(const ConfigReader& config, double startTimestamp)
 void FieldModel::update(double currTimestamp)
 {
 
+}
+
+
+
+void FieldModel::collisionCallback(bool collision)
+{
+    _inCollision = collision;
 }

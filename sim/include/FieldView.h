@@ -29,8 +29,14 @@ private:
      */
     osg::ref_ptr<osg::Geode> makeField(const FieldModel& fieldModel);
 
+    /**
+     * Draws the bounding collision polygon of the field
+     */
+    osg::ref_ptr<osg::Geode> makeFieldBounds(const FieldModel& fieldModel);
+
 private:
     osg::ref_ptr<osg::Node> _fieldNode;
+    osg::ref_ptr<osg::Geode> _fieldBounds;
 };
 
 

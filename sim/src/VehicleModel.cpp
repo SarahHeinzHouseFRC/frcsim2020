@@ -4,7 +4,10 @@
 
 #include <cmath>
 #include <ConfigReader.h>
+#include <VehicleModel.h>
 #include "VehicleModel.h"
+
+using namespace Geometry;
 
 
 VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
@@ -17,13 +20,19 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
         _wheelTrack(config.vehicle.constants.drivetrain.wheelTrack),
         _elevatorBeltLength(config.vehicle.constants.elevator.belt.length),
         _elevatorMotorMaxSpeed(config.vehicle.constants.elevator.motor.maxSpeed),
-        _elevatorMotorRadius(config.vehicle.constants.elevator.motor.radius)
+        _elevatorMotorRadius(config.vehicle.constants.elevator.motor.radius),
+        _inCollision(false)
 {
     // Set initial state
     _state.pose.x = config.vehicle.initialState.drivetrain.x;
     _state.pose.y = config.vehicle.initialState.drivetrain.y;
     _state.elevatorMotorSpeed = config.vehicle.initialState.elevator.motorSpeed;
     _state.elevatorCarriagePos = config.vehicle.initialState.elevator.carriagePos;
+
+    // Make bounding polygon
+    _boundingPolygon = Polygon2d({ { 0.43, 0.31 }, { -0.35, 0.31 }, { -0.35, -0.31 }, { 0.43, -0.31 } });
+//    _boundingPolygon = Polygon2d({ { 0.43, 0.31 }, { -0.35, 0.31 } });
+    _boundingPolygonWorld = _boundingPolygon.transform(_state.pose.x, _state.pose.y, _state.pose.theta);
 }
 
 
@@ -66,6 +75,8 @@ void VehicleModel::update(double currTimestamp)
         _state.pose.theta = currTheta;
     }
 
+    _boundingPolygonWorld = _boundingPolygon.transform(_state.pose.x, _state.pose.y, _state.pose.theta);
+
     // Update the last timestamp
     _prevTimestamp = currTimestamp;
 }
@@ -89,4 +100,11 @@ SensorState VehicleModel::getSensorState()
     SensorState state{0};
     state.elevatorEncoderPosition = int (1023 * _state.elevatorCarriagePos / _elevatorBeltLength);
     return state;
+}
+
+
+
+void VehicleModel::collisionCallback(bool collision)
+{
+    _inCollision = collision;
 }

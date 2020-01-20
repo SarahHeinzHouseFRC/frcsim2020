@@ -36,11 +36,17 @@ private:
     osg::ref_ptr<osg::Geode> makeVehicle(const ConfigReader& config);
 
     /**
+     * Draws the collision boundary of the vehicle
+     */
+    osg::ref_ptr<osg::Geode> makeVehicleBounds(const VehicleModel& vehicleModel);
+
+    /**
      * Helper method to create a robot carriage
      */
     osg::ref_ptr<osg::PositionAttitudeTransform> makeVehicleElevator();
 
     osg::ref_ptr<osg::Node> _vehicleNode;
+    osg::ref_ptr<osg::Geode> _vehicleBounds;
     osg::ref_ptr<osg::PositionAttitudeTransform> _elevatorPat;
     float _wheelRadius;
     float _beltRadius;

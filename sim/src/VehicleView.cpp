@@ -39,6 +39,9 @@ VehicleView::VehicleView(const ConfigReader& config, const VehicleModel& vehicle
         _vehicleNode = osgDB::readNodeFile(DEFAULT_VEHICLE_FILE);
         addChild(_vehicleNode);
     }
+
+    _vehicleBounds = makeVehicleBounds(vehicleModel);
+    addChild(_vehicleBounds);
 }
 
 
@@ -60,6 +63,15 @@ void VehicleView::update(const VehicleModel& vehicleModel)
     osg::Matrix mat;
     mat.makeRotate(theta, osg::Z_AXIS);
     this->setAttitude(mat.getRotate());
+
+    osg::Drawable* drawable = _vehicleBounds->getDrawable(0);
+    osg::Geometry* geom = dynamic_cast<osg::Geometry*>(drawable);
+    osg::Vec4Array* colorArray = dynamic_cast<osg::Vec4Array*>(geom->getColorArray());
+    colorArray->clear();
+    colorArray->push_back(vehicleModel._inCollision ? Color::Red : Color::Green);
+    geom->setColorArray(colorArray);
+    geom->setColorBinding(osg::Geometry::BIND_OVERALL);
+    geom->dirtyBound();
 }
 
 
@@ -174,4 +186,19 @@ osg::ref_ptr<osg::PositionAttitudeTransform> VehicleView::makeVehicleElevator()
     auto elevatorCarriage = ViewUtils::makeBox(osg::Vec3(_beltRadius + _carriageLengthX/2, 0, 0), _carriageLengthX, _carriageLengthY, _carriageLengthZ, Color::Blue);
     carriageGeode->addDrawable(elevatorCarriage);
     return carriagePat;
+}
+
+
+
+osg::ref_ptr<osg::Geode> VehicleView::makeVehicleBounds(const VehicleModel& vehicleModel)
+{
+    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+    for (const auto& vertex : vehicleModel.polygon().vertices())
+    {
+        vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
+    }
+    osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeLineLoop(vertices, (vehicleModel._inCollision ? Color::Red : Color::Green));
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+    geode->addDrawable(boundingPolygon);
+    return geode;
 }

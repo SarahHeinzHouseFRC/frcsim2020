@@ -8,6 +8,7 @@
 #include "Scene.h"
 #include "Hud.h"
 #include "Visualizer.h"
+#include "CollisionDetector.h"
 #include "Time.h"
 #include "CoreAgent.h"
 #include "VehicleModel.h"
@@ -49,6 +50,7 @@ int main(int argc, char** argv)
     double t = Time::now();
     VehicleModel vehicleModel(config, t);
     FieldModel fieldModel(config, t);
+    CollisionDetector collisionController;
 
     // Initialize comms with core
     CoreAgent coreAgent(config);
@@ -94,6 +96,9 @@ int main(int argc, char** argv)
         // Update the vehicle and field models given the current time
         vehicleModel.update(t);
         fieldModel.update(t);
+
+        // Detect collisions
+        collisionController.detectCollisions(fieldModel, vehicleModel);
 
         // Update the vehicle and field visualizations based on their models
         scene.update(vehicleModel, fieldModel);

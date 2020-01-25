@@ -6,14 +6,14 @@
 #include "Scene.h"
 
 
-Scene::Scene(const ConfigReader& config)
+Scene::Scene(const ConfigReader& config, const FieldModel& fieldModel, const VehicleModel& vehicleModel)
 {
     _root = new osg::Group;
 
-    _vehicleView = new VehicleView(config);
+    _vehicleView = new VehicleView(config, vehicleModel);
     _root->addChild(_vehicleView);
 
-    _fieldView = new FieldView(config);
+    _fieldView = new FieldView(config, fieldModel);
     _root->addChild(_fieldView);
 }
 

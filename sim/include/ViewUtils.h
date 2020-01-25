@@ -18,6 +18,11 @@ public:
     static osg::ref_ptr<osg::Geometry> makeLines(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);
 
     /**
+     * Utility method for quickly drawing lines. Pairs of vertices are interpreted as single lines
+     */
+    static osg::ref_ptr<osg::Geometry> makeLineLoop(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);
+
+    /**
      * Utility method for quickly drawing a cylinder
      */
     static osg::ref_ptr<osg::ShapeDrawable> makeCylinder(const osg::Vec3& pos, float radius, float height, const osg::Vec4& color);
@@ -31,6 +36,12 @@ public:
      * Utility method for quickly drawing quads
      */
     static osg::ref_ptr<osg::Geometry> makeQuads(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);
+
+private:
+    /**
+     * Utility method for quickly drawing lines. Pairs of vertices are interpreted as single lines
+     */
+    static osg::ref_ptr<osg::Geometry> makeBaseLine(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color, GLenum primitive);
 };
 
 

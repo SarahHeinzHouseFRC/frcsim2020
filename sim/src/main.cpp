@@ -18,8 +18,23 @@ int main(int argc, char** argv)
     // Use default or user-specified config
     std::string configPath = (argc < 2 ? "../../config/robotConfig.yml" : argv[1]);
 
+    // Configure options
+    bool verbose = false;
+    if (argc > 2 && strcmp(argv[2], "--verbose") == 0)
+    {
+        verbose = true;
+    }
+
+    bool debugView = false;
+    if (argc > 2 && strcmp(argv[2], "--debug-view") == 0)
+    {
+        debugView = true;
+    }
+
     // Read config file
     ConfigReader config;
+    config.verbose = verbose;
+    config.debugView = debugView;
     try
     {
         config.parse(configPath);
@@ -39,7 +54,7 @@ int main(int argc, char** argv)
     CoreAgent coreAgent(config);
 
     // Visualize vehicle and field
-    Scene scene(config);
+    Scene scene(config, fieldModel, vehicleModel);
     Hud hud(config);
 
     // Visualize the scene

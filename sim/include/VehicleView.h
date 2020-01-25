@@ -16,7 +16,7 @@ public:
     /**
      * Constructor
      */
-    VehicleView(const ConfigReader& config);
+    VehicleView(const ConfigReader& config, const VehicleModel& vehicleModel);
 
     /**
      * Updates the vehicle view based on the vehicle model
@@ -34,6 +34,7 @@ private:
      */
 
     osg::ref_ptr<osg::Geode> makeVehicle(const ConfigReader& config);
+
     /**
      * Helper method to create a robot carriage
      */

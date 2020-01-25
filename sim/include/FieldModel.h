@@ -10,6 +10,7 @@
 
 class FieldModel
 {
+friend class FieldView;
 public:
     /**
      * Constructor

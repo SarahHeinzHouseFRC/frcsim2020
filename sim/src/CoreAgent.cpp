@@ -7,7 +7,8 @@
 #include "CoreAgent.h"
 
 
-CoreAgent::CoreAgent(const ConfigReader& config) : _sensorState{0}, _coreCommands{}, _numDroppedPackets(0)
+CoreAgent::CoreAgent(const ConfigReader& config) :
+        _sensorState{0}, _coreCommands{}, _numDroppedPackets(0), _verbose(config.verbose)
 {
     _comms = new UdpNode(config.vehicle.port, config.core.ip, config.core.vehiclePort);
 }
@@ -35,7 +36,10 @@ bool CoreAgent::rxCoreCommands()
         // Reset dropped packets count
         _numDroppedPackets = 0;
 
-        printf("CoreAgent: Received command %s\n", msg.c_str());
+        if (_verbose)
+        {
+            printf("CoreAgent: Received command %s\n", msg.c_str());
+        }
         return true;
     }
     else

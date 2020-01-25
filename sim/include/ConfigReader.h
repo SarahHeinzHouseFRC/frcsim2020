@@ -100,6 +100,8 @@ public:
             } elevator;
         } initialState;
     } vehicle;
+    bool verbose;
+    bool debugView;
 
 private:
     /**

@@ -10,17 +10,16 @@
 #define DEFAULT_FIELD_FILE "/home/psahay/field2020.wrl"
 
 
-FieldView::FieldView(const ConfigReader& config)
+FieldView::FieldView(const ConfigReader& config, const FieldModel& fieldModel)
 {
-    _fieldNode = osgDB::readNodeFile(DEFAULT_FIELD_FILE);
-    if (_fieldNode)
+    if (config.debugView)
     {
+        _fieldNode = makeField(fieldModel);
         addChild(_fieldNode);
     }
     else
     {
-        std::cerr << "File not found: " << DEFAULT_FIELD_FILE << std::endl;
-        _fieldNode = makeField();
+        _fieldNode = osgDB::readNodeFile(DEFAULT_FIELD_FILE);
         addChild(_fieldNode);
     }
 }
@@ -34,7 +33,7 @@ void FieldView::update(const FieldModel& fieldModel)
 
 
 
-osg::ref_ptr<osg::Geode> FieldView::makeField()
+osg::ref_ptr<osg::Geode> FieldView::makeField(const FieldModel& fieldModel)
 {
     float width = 16.49; // 54 ft 1 in
     float depth = 8.10; // 26 ft 7 in
@@ -46,7 +45,7 @@ osg::ref_ptr<osg::Geode> FieldView::makeField()
     vertices->push_back(osg::Vec3(width/2, -depth/2, 0));
     vertices->push_back(osg::Vec3(width/2, depth/2, 0));
     vertices->push_back(osg::Vec3(-width/2, depth/2, 0));
-    osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeQuads(vertices, Color(Color::Red, 32));
+    osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeQuads(vertices, Color(Color::Gray, 32));
     geode->addDrawable(geom);
 
     return geode;

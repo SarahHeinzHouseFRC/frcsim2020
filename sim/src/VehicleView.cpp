@@ -11,7 +11,7 @@
 #define DEFAULT_VEHICLE_FILE "/home/psahay/chassis.wrl"
 
 
-VehicleView::VehicleView(const ConfigReader& config) :
+VehicleView::VehicleView(const ConfigReader& config, const VehicleModel& vehicleModel) :
         _wheelRadius(config.vehicle.constants.drivetrain.wheelRadius),
         _beltRadius(config.vehicle.constants.elevator.belt.radius),
         _beltWidth(config.vehicle.constants.elevator.belt.width),
@@ -26,18 +26,18 @@ VehicleView::VehicleView(const ConfigReader& config) :
         _carriageLengthY(config.vehicle.constants.elevator.carriage.lengthY),
         _carriageLengthZ(config.vehicle.constants.elevator.carriage.lengthZ)
 {
-    _vehicleNode = osgDB::readNodeFile(DEFAULT_VEHICLE_FILE);
-    if (_vehicleNode)
+    if (config.debugView)
     {
+        _vehicleNode = makeVehicle(config);
         addChild(_vehicleNode);
+
+        _elevatorPat = makeVehicleElevator();
+        addChild(_elevatorPat);
     }
     else
     {
-        std::cerr << "File not found: " << DEFAULT_VEHICLE_FILE << std::endl;
-        _vehicleNode = makeVehicle(config);
+        _vehicleNode = osgDB::readNodeFile(DEFAULT_VEHICLE_FILE);
         addChild(_vehicleNode);
-        _elevatorPat = makeVehicleElevator();
-        addChild(_elevatorPat);
     }
 }
 

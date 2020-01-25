@@ -24,7 +24,7 @@ public:
     /**
      * Constructs the scene
      */
-    Scene(const ConfigReader& config);
+    Scene(const ConfigReader& config, const FieldModel& fieldModel, const VehicleModel& vehicleModel);
 
     /**
      * Updates the scene given the robot's current state

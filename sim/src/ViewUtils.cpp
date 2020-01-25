@@ -10,6 +10,20 @@
 
 osg::ref_ptr<osg::Geometry> ViewUtils::makeLines(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color)
 {
+    return makeBaseLine(vertices, color, osg::PrimitiveSet::LINES);
+}
+
+
+
+osg::ref_ptr<osg::Geometry> ViewUtils::makeLineLoop(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color)
+{
+    return makeBaseLine(vertices, color, osg::PrimitiveSet::LINE_LOOP);
+}
+
+
+
+osg::ref_ptr<osg::Geometry> ViewUtils::makeBaseLine(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color, GLenum primitive)
+{
     osg::ref_ptr<osg::Geometry> geom = new osg::Geometry;
     osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
     colors->push_back(color);
@@ -19,7 +33,7 @@ osg::ref_ptr<osg::Geometry> ViewUtils::makeLines(osg::ref_ptr<osg::Vec3Array> ve
     geom->setColorBinding(osg::Geometry::BIND_OVERALL);
     geom->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF); // Turn off lighting
     geom->getOrCreateStateSet()->setMode(GL_BLEND, osg::StateAttribute::ON); // Turn on blending
-    geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, vertices->size())); // Geometry type is QUADS
+    geom->addPrimitiveSet(new osg::DrawArrays(primitive, 0, vertices->size())); // Set geometry type
     return geom;
 }
 

@@ -16,7 +16,7 @@ public:
     /**
      * Constructor
      */
-    FieldView(const ConfigReader& config);
+    FieldView(const ConfigReader& config, const FieldModel& fieldModel);
 
     /**
      * Updates the field view based on the field model
@@ -27,7 +27,7 @@ private:
     /**
      * Builds the visualization of the field
      */
-    osg::ref_ptr<osg::Geode> makeField();
+    osg::ref_ptr<osg::Geode> makeField(const FieldModel& fieldModel);
 
 private:
     osg::ref_ptr<osg::Node> _fieldNode;

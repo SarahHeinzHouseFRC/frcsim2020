@@ -51,6 +51,7 @@ private:
     SensorState _sensorState;
     CoreCommands _coreCommands;
     UdpNode *_comms;
+    bool _verbose;
     int _numDroppedPackets; ///< Count of how many packets have been missed
 };
 

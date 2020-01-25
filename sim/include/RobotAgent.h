@@ -35,7 +35,7 @@ public:
     /**
      * Get the last command received
      */
-    RobotCommands getRobotCommands() { return _commands; }
+    RobotCommands getRobotCommands() const { return _commands; }
 
     /**
      * State to be sent

@@ -20,15 +20,15 @@ vehicle:
       widthChannel: 0.5  # Inches
       heightChannel: 0.5 # Inches
       wheelBase: 18      # Inches, distance between centers of front and rear wheels
-      wheelRadius: 2.0   # Inches
+      wheelRadius: 3.0   # Inches
       wheelWidth: 1.0    # Inches
       motor:
-        maxSpeed: 500    # RPM
+        maxSpeed: 833    # RPM
     elevator:
       belt:
         radius: 0.79     # Inches
         width: 7.87      # Inches
-        length: 39.37    # Inches
+        length: 24       # Inches
       motorShaft:
         radius: 0.2      # Inches
         length: 1.18     # Inches

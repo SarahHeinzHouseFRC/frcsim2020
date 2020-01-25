@@ -5,8 +5,9 @@
 #include <osg/Geode>
 #include <osg/Geometry>
 #include <osg/ShapeDrawable>
-#include <RobotModel.h>
-#include <ConfigReader.h>
+#include <osgDB/ReadFile>
+#include "RobotModel.h"
+#include "ConfigReader.h"
 #include "Color.h"
 #include "Scene.h"
 
@@ -28,14 +29,16 @@ Scene::Scene(const ConfigReader& config) :
 {
     _root = new osg::Group;
 
-    _robotGeode = makeRobot(config);
+    osg::ref_ptr<osg::Node> robot = osgDB::readNodeFile("/home/psahay/chassis.wrl");
+//    _robotGeode = makeRobot(config);
     _robotPat = new osg::PositionAttitudeTransform;
-    _robotPat->addChild(_robotGeode);
+    _robotPat->addChild(robot);
     _carriagePat = makeRobotCarriage();
     _robotPat->addChild(_carriagePat);
     _root->addChild(_robotPat);
 
-    osg::ref_ptr<osg::Geode> field = makeField();
+    osg::ref_ptr<osg::Node> field = osgDB::readNodeFile("/home/psahay/field2020.wrl");
+//    osg::ref_ptr<osg::Geode> field = makeField();
     _root->addChild(field);
 }
 

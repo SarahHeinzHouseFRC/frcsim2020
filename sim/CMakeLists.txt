@@ -27,4 +27,5 @@ add_executable(robot_sim ${SRCS})
 target_link_libraries(robot_sim
         ${OPENSCENEGRAPH_LIBRARIES}
         yaml-cpp
+        pthread
 )

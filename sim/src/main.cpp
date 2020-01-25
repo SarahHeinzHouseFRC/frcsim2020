@@ -3,6 +3,7 @@
  */
 
 #include <iostream>
+#include <thread>
 #include "ConfigReader.h"
 #include "Scene.h"
 #include "Hud.h"
@@ -43,19 +44,34 @@ int main(int argc, char** argv)
     // Visualize the scene
     Visualizer vis(scene, hud);
 
-    // Run the simulation
+    // Launch rx comms in background thread
+    std::thread rxThread([&]() {
+        while (!vis.done())
+        {
+            // Receive commands
+            bool rx = robotAgent.rxRobotCommands();
+
+            if (rx)
+            {
+                // Update the robot's control surfaces based on the received commands
+                auto rxCommands = robotAgent.getRobotCommands();
+                robot.processCommands(rxCommands);
+            }
+        }
+    });
+
+    // Launch tx comms in background thread
+    std::thread txThread([&]() {
+        while (!vis.done())
+        {
+            robotAgent.setRobotState(robot.getState());
+            robotAgent.txRobotState();
+        }
+    });
+
+    // Run the visuals
     while (!vis.done())
     {
-        // Receive commands
-        bool rx = robotAgent.rxRobotCommands();
-
-        if (rx)
-        {
-            // Update the robot's control surfaces based on the received commands
-            auto rxCommands = robotAgent.getRobotCommands();
-            robot.processCommands(rxCommands);
-        }
-
         // Get current time (sec)
         t = Time::now();
 
@@ -65,10 +81,6 @@ int main(int argc, char** argv)
         // Update the robot visualization
         scene.update(robot);
 
-        // Transmit robot state
-        robotAgent.setRobotState(robot.getState());
-        robotAgent.txRobotState();
-
         // Update the hud
         hud.displayConnected(robotAgent.isConnected());
         hud.displayRobotState(robot);
@@ -76,6 +88,9 @@ int main(int argc, char** argv)
         // Step the visualizer
         vis.step();
     }
+
+    rxThread.join();
+    txThread.join();
 
     return 0;
 }

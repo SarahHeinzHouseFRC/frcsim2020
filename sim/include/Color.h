@@ -37,6 +37,7 @@ public:
     static Color Olive;
     static Color Cyan;
     static Color Black;
+    static Color White;
 };
 
 

@@ -10,7 +10,9 @@
 
 
 /**
- * Reads and parses the a config file, then provides its values to other classes.
+ * Parses and converts the values in a config file and allows public access to its fields to other classes. Note that
+ * despite the config file specifying values in Imperial units, the sim uses SI units throughout. Some values provided
+ * by this class are not directly read from the config file, but are calculated from other fields for convenient access.
  */
 class ConfigReader
 {
@@ -39,6 +41,21 @@ public:
         {
             struct
             {
+                float width;         // Meters
+                float depth;         // Meters
+                float widthChannel;  // Meters
+                float heightChannel; // Meters
+                float wheelRadius;   // Meters
+                float wheelWidth;    // Meters
+                float wheelBase;     // Meters
+                float wheelTrack;    // Meters (calculated value)
+                struct
+                {
+                    float maxSpeed; // Rads/sec
+                } motor;
+            } drivetrain;
+            struct
+            {
                 struct
                 {
                     float radius; // Meters
@@ -54,7 +71,7 @@ public:
                 {
                     float radius;   // Meters
                     float length;   // Meters
-                    float maxSpeed; // RPM
+                    float maxSpeed; // Rads/sec
                 } motor;
                 struct
                 {
@@ -73,11 +90,18 @@ public:
         {
             struct
             {
-                float motorSpeed;  // RPM
+                float x; // Meters
+                float y; // Meters
+            } drivetrain;
+            struct
+            {
+                float motorSpeed;  // Rads/sec
                 float carriagePos; // Meters
             } elevator;
         } initialState;
     } vehicle;
+    bool verbose;
+    bool debugView;
 
 private:
     /**

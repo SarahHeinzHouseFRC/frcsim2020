@@ -4,11 +4,13 @@
 
 #include <osg/Geode>
 #include <osg/Geometry>
-#include <RobotModel.h>
+#include <VehicleModel.h>
 #include "Color.h"
 #include "Hud.h"
 
 #define RADS_PER_SEC_TO_RPM 9.5492
+#define RADS_TO_DEG 57.2958
+#define M_TO_FT 3.28084
 
 
 Hud::Hud(const ConfigReader& config) : _width(225)
@@ -35,7 +37,7 @@ Hud::Hud(const ConfigReader& config) : _width(225)
     _vertices->push_back(osg::Vec3(0, 720, -1));
     _geom->setVertexArray(_vertices);
     osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
-    colors->push_back(osg::Vec4(1, 1, 1, 0.1));
+    colors->push_back(osg::Vec4(0.0, 0.0, 0.0, 0.6));
     _geom->setColorArray(colors, osg::Array::BIND_OVERALL);
     _geom->addPrimitiveSet(new osg::DrawArrays(GL_QUADS, 0, 4));
     _geom->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
@@ -59,8 +61,17 @@ Hud::Hud(const ConfigReader& config) : _width(225)
     subtitle->setColor(osg::Vec4(0.8, 0.8, 1, 1));
     _labelsGeode->addChild(subtitle);
 
-    _robotState = new TopLabel("", -130);
-    _labelsGeode->addChild(_robotState);
+    _vehiclePoseState = new TopLabel("", -130);
+    _labelsGeode->addChild(_vehiclePoseState);
+
+    _vehicleElevatorState = new TopLabel("", -210);
+    _labelsGeode->addChild(_vehicleElevatorState);
+
+    _vehicleDrivetrainState = new TopLabel("", -270);
+    _labelsGeode->addChild(_vehicleDrivetrainState);
+
+    _labelsGeode->addChild(new BottomLabel("[1] Top-down view", 40));
+    _labelsGeode->addChild(new BottomLabel("[2] Orbit view", 20));
 }
 
 
@@ -84,7 +95,7 @@ void Hud::onWindowResize(int width, int height)
 
 
 
-void Hud::displayConnected(bool isConnected)
+void Hud::displayConnectionStatus(bool isConnected)
 {
     if (isConnected)
     {
@@ -100,9 +111,16 @@ void Hud::displayConnected(bool isConnected)
 
 
 
-void Hud::displayRobotState(const RobotModel& robotModel)
+void Hud::displayVehicleState(const VehicleModel& vehicleModel)
 {
     char tmp[1024];
-    sprintf(tmp, "Elevator: \n    Position: %.2f m \n    Motor speed: %.0f RPM", robotModel._state.elevatorCarriagePos, robotModel._state.elevatorMotorSpeed*RADS_PER_SEC_TO_RPM);
-    _robotState->setText(tmp);
+
+    sprintf(tmp, "Pose: \n    X: %.1f ft \n    Y: %.1f ft \n    Theta: %.0f deg", vehicleModel._state.pose.x*M_TO_FT, vehicleModel._state.pose.y*M_TO_FT, vehicleModel._state.pose.theta*RADS_TO_DEG);
+    _vehiclePoseState->setText(tmp);
+
+    sprintf(tmp, "Elevator: \n    Position: %.2f m \n    Motor: %.0f RPM", vehicleModel._state.elevatorCarriagePos, vehicleModel._state.elevatorMotorSpeed*RADS_PER_SEC_TO_RPM);
+    _vehicleElevatorState->setText(tmp);
+
+    sprintf(tmp, "Drivetrain: \n    Left motor: %.0f RPM \n    Right motor: %.0f RPM", vehicleModel._state.leftDriveMotorSpeed*RADS_PER_SEC_TO_RPM, vehicleModel._state.rightDriveMotorSpeed*RADS_PER_SEC_TO_RPM);
+    _vehicleDrivetrainState->setText(tmp);
 }

@@ -30,7 +30,7 @@ public:
     /**
      * Returns whether visualizer is done
      */
-    bool done() { return _viewer.done(); }
+    bool done() const { return _viewer.done(); }
 
 private:
     osgViewer::Viewer _viewer;

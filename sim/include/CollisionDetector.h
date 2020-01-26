@@ -7,6 +7,7 @@
 
 #include "VehicleModel.h"
 #include "FieldModel.h"
+#include "GamePieceModel.h"
 #include "Geometry.h"
 
 
@@ -21,7 +22,7 @@ public:
     /**
      * Detects collisions between the field and field actors
      */
-    void detectCollisions(FieldModel& fieldModel, VehicleModel& vehicleModel);
+    void detectCollisions(FieldModel& fieldModel, VehicleModel& vehicleModel, GamePieceModel& gamePieceModel);
 };
 
 

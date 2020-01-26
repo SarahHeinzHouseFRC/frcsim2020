@@ -10,10 +10,13 @@ include_directories(
 
 set(SRCS
         src/main.cpp
-        src/VehicleModel.cpp
-        src/VehicleView.cpp
+        src/WorldModel.cpp
         src/FieldModel.cpp
+        src/VehicleModel.cpp
+        src/GamePieceModel.cpp
         src/FieldView.cpp
+        src/VehicleView.cpp
+        src/GamePieceView.cpp
         src/ViewUtils.cpp
         src/CoreAgent.cpp
         src/ConfigReader.cpp

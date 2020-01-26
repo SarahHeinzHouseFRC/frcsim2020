@@ -13,21 +13,22 @@ using namespace Geometry;
 VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
         _prevTimestamp(startTimestamp),
         _state{0},
-        _leftDriveMotorMaxSpeed(config.vehicle.constants.drivetrain.motor.maxSpeed),
-        _rightDriveMotorMaxSpeed(config.vehicle.constants.drivetrain.motor.maxSpeed),
-        _wheelRadius(config.vehicle.constants.drivetrain.wheelRadius),
-        _drivetrainWidth(config.vehicle.constants.drivetrain.width),
-        _wheelTrack(config.vehicle.constants.drivetrain.wheelTrack),
-        _elevatorBeltLength(config.vehicle.constants.elevator.belt.length),
-        _elevatorMotorMaxSpeed(config.vehicle.constants.elevator.motor.maxSpeed),
-        _elevatorMotorRadius(config.vehicle.constants.elevator.motor.radius),
+        _leftDriveMotorMaxSpeed(config.sim.constants.drivetrain.motor.maxSpeed),
+        _rightDriveMotorMaxSpeed(config.sim.constants.drivetrain.motor.maxSpeed),
+        _wheelRadius(config.sim.constants.drivetrain.wheelRadius),
+        _drivetrainWidth(config.sim.constants.drivetrain.width),
+        _wheelTrack(config.sim.constants.drivetrain.wheelTrack),
+        _elevatorBeltLength(config.sim.constants.elevator.belt.length),
+        _elevatorMotorMaxSpeed(config.sim.constants.elevator.motor.maxSpeed),
+        _elevatorMotorRadius(config.sim.constants.elevator.motor.radius),
         _inCollision(false)
 {
     // Set initial state
-    _state.pose.x = config.vehicle.initialState.drivetrain.x;
-    _state.pose.y = config.vehicle.initialState.drivetrain.y;
-    _state.elevatorMotorSpeed = config.vehicle.initialState.elevator.motorSpeed;
-    _state.elevatorCarriagePos = config.vehicle.initialState.elevator.carriagePos;
+    _state.pose.x = config.sim.initialState.drivetrain.x;
+    _state.pose.y = config.sim.initialState.drivetrain.y;
+    _state.pose.theta = config.sim.initialState.drivetrain.theta;
+    _state.elevatorMotorSpeed = config.sim.initialState.elevator.motorSpeed;
+    _state.elevatorCarriagePos = config.sim.initialState.elevator.carriagePos;
 
     // Make bounding polygon
     _boundingPolygon = Polygon2d({ { 0.43, 0.31 }, { -0.35, 0.31 }, { -0.35, -0.31 }, { 0.43, -0.31 } });

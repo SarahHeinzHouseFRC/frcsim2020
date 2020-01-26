@@ -9,10 +9,10 @@
 #include <osg/ShapeDrawable>
 #include <osg/PositionAttitudeTransform>
 #include "ConfigReader.h"
+#include "WorldModel.h"
 #include "VehicleView.h"
-#include "VehicleModel.h"
 #include "FieldView.h"
-#include "FieldModel.h"
+#include "GamePieceView.h"
 
 
 /**
@@ -24,12 +24,12 @@ public:
     /**
      * Constructs the scene
      */
-    Scene(const ConfigReader& config, const FieldModel& fieldModel, const VehicleModel& vehicleModel);
+    Scene(const ConfigReader& config, const WorldModel& wm);
 
     /**
      * Updates the scene given the robot's current state
      */
-    void update(const VehicleModel& vehicleModel, const FieldModel& fieldModel);
+    void update(const WorldModel& wm);
 
     /**
      * Returns the root node of the scene
@@ -50,6 +50,7 @@ private:
     osg::ref_ptr<osg::Group> _root;
     osg::ref_ptr<VehicleView> _vehicleView;
     osg::ref_ptr<FieldView> _fieldView;
+    osg::ref_ptr<GamePieceView> _gamePieceView;
 };
 
 

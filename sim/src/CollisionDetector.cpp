@@ -14,7 +14,7 @@ CollisionDetector::CollisionDetector()
 
 
 
-void CollisionDetector::detectCollisions(FieldModel& fieldModel, VehicleModel& vehicleModel)
+void CollisionDetector::detectCollisions(FieldModel& fieldModel, VehicleModel& vehicleModel, GamePieceModel& gamePieceModel)
 {
     bool c = collision(fieldModel.exteriorPolygon(), vehicleModel.polygon());
     fieldModel.collisionCallback(c);

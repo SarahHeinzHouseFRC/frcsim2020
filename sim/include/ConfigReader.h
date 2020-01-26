@@ -85,13 +85,18 @@ public:
                     float lengthZ; // Meters
                 } carriage;
             } elevator;
+            struct
+            {
+                float radius; // Meters
+            } gamePiece;
         } constants;
         struct
         {
             struct
             {
-                float x; // Meters
-                float y; // Meters
+                float x;     // Meters
+                float y;     // Meters
+                float theta; // Degrees
             } drivetrain;
             struct
             {
@@ -99,7 +104,7 @@ public:
                 float carriagePos; // Meters
             } elevator;
         } initialState;
-    } vehicle;
+    } sim;
     bool verbose;
     bool debugView;
 
@@ -110,19 +115,19 @@ private:
     void parseCoreConfig(const YAML::Node& coreConfig);
 
     /**
-     * Helper method for loading vehicle parameters
+     * Helper method for loading sim parameters
      */
-    void parseVehicleConfig(const YAML::Node& simConfig);
+    void parseSimConfig(const YAML::Node& simConfig);
 
     /**
-     * Helper method for loading vehicle constant parameters
+     * Helper method for loading sim constant parameters
      */
-    void parseVehicleConstantsConfig(const YAML::Node& vehicleConstantsConfig);
+    void parseSimConstantsConfig(const YAML::Node& simConstantsConfig);
 
     /**
-     * Helper method for loading vehicle initial state parameters
+     * Helper method for loading sim initial state parameters
      */
-    void parseVehicleInitialStateConfig(const YAML::Node& vehicleInitialStateConfig);
+    void parseSimInitialStateConfig(const YAML::Node& simInitialStateConfig);
 };
 
 

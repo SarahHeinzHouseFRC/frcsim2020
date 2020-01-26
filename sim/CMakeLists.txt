@@ -3,6 +3,8 @@ project(robot_sim)
 
 find_package(OpenSceneGraph REQUIRED COMPONENTS osgViewer osgDB osgGA osgText)
 
+add_subdirectory(extern/box2d)
+
 include_directories(
         include
         ${OPENSCENEGRAPH_INCLUDE_DIRS}
@@ -37,4 +39,5 @@ target_link_libraries(robot_sim
         ${OPENSCENEGRAPH_LIBRARIES}
         yaml-cpp
         pthread
+        box2d
 )

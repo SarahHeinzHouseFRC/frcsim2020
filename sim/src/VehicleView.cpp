@@ -63,15 +63,6 @@ void VehicleView::update(const VehicleModel& vehicleModel)
     osg::Matrix mat;
     mat.makeRotate(theta, osg::Z_AXIS);
     this->setAttitude(mat.getRotate());
-
-    osg::Drawable* drawable = _vehicleBounds->getDrawable(0);
-    osg::Geometry* geom = dynamic_cast<osg::Geometry*>(drawable);
-    osg::Vec4Array* colorArray = dynamic_cast<osg::Vec4Array*>(geom->getColorArray());
-    colorArray->clear();
-    colorArray->push_back(vehicleModel._inCollision ? Color::Red : Color::Green);
-    geom->setColorArray(colorArray);
-    geom->setColorBinding(osg::Geometry::BIND_OVERALL);
-    geom->dirtyBound();
 }
 
 
@@ -197,7 +188,7 @@ osg::ref_ptr<osg::Geode> VehicleView::makeVehicleBounds(const VehicleModel& vehi
     {
         vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
     }
-    osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeLineLoop(vertices, (vehicleModel._inCollision ? Color::Red : Color::Green));
+    osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeLineLoop(vertices, Color::Green);
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
     geode->addDrawable(boundingPolygon);
     return geode;

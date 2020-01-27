@@ -88,9 +88,19 @@ public:
     std::vector<Vertex2d> vertices() const { return _vertices; }
 
     /**
+     * Number of vertices
+     */
+    unsigned long int numVertices() const { return _vertices.size(); }
+
+    /**
      * List of edges
      */
     std::vector<Edge2d> edges() const { return _edges; }
+
+    /**
+     * Number of vertices
+     */
+    unsigned long int numEdges() const { return _edges.size(); }
 
     /**
      * Returns a copy of the polygon translated by (x,y) in meters and rotated by theta in radians

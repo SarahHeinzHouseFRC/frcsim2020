@@ -9,12 +9,12 @@
 #include "FieldModel.h"
 #include "VehicleModel.h"
 #include "GamePieceModel.h"
-#include "CollisionDetector.h"
 
 
 class WorldModel
 {
 friend class Scene;
+friend class CollisionDetector;
 public:
     /**
      * Constructor
@@ -26,10 +26,12 @@ public:
      */
     void update(double timestamp);
 
+    /**
+     * Getter for vehicle model
+     */
     VehicleModel& vehicleModel() { return _vehicleModel; }
 
 private:
-    CollisionDetector _collisionDetector;
     FieldModel _fieldModel;
     VehicleModel _vehicleModel;
     GamePieceModel _gamePieceModel;

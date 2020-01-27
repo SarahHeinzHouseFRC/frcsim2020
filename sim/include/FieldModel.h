@@ -33,13 +33,7 @@ public:
      */
     std::vector<Geometry::Polygon2d> interiorPolygons() const { return _interiorPolygons; }
 
-    /**
-     * Called whenever there's a collision
-     */
-    void collisionCallback(bool collision);
-
 private:
-    bool _inCollision;
     Geometry::Polygon2d _exteriorPolygon;
     std::vector<Geometry::Polygon2d> _interiorPolygons;
 };

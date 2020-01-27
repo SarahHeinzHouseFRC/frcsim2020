@@ -31,14 +31,7 @@ FieldView::FieldView(const ConfigReader& config, const FieldModel& fieldModel)
 
 void FieldView::update(const FieldModel& fieldModel)
 {
-    osg::Drawable* drawable = _fieldBounds->getDrawable(0);
-    osg::Geometry* geom = dynamic_cast<osg::Geometry*>(drawable);
-    osg::Vec4Array* colorArray = dynamic_cast<osg::Vec4Array*>(geom->getColorArray());
-    colorArray->clear();
-    colorArray->push_back(fieldModel._inCollision ? Color::Red : Color::Green);
-    geom->setColorArray(colorArray);
-    geom->setColorBinding(osg::Geometry::BIND_OVERALL);
-    geom->dirtyBound();
+
 }
 
 
@@ -68,7 +61,7 @@ osg::ref_ptr<osg::Geode> FieldView::makeFieldBounds(const FieldModel& fieldModel
     {
         vertices->push_back(osg::Vec3(vertex.x, vertex.y, 0.1));
     }
-    osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeLineLoop(vertices, (fieldModel._inCollision ? Color::Red : Color::Green));
+    osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeLineLoop(vertices, Color::Green);
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
     geode->addDrawable(geom);
     return geode;

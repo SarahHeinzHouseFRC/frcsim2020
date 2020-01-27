@@ -30,7 +30,7 @@ GamePieceView::GamePieceView(const ConfigReader& config, const GamePieceModel& g
 
 void GamePieceView::update(const GamePieceModel& gamePieceModel)
 {
-    setPosition(osg::Vec3(gamePieceModel._state.pose.x, gamePieceModel._state.pose.y, 0));
+    setPosition(osg::Vec3(gamePieceModel._state.pose.x, gamePieceModel._state.pose.y, gamePieceModel._radius));
 }
 
 
@@ -38,7 +38,7 @@ void GamePieceView::update(const GamePieceModel& gamePieceModel)
 osg::ref_ptr<osg::Geode> GamePieceView::makeView(const GamePieceModel& gamePieceModel)
 {
     osg::ref_ptr<osg::ShapeDrawable> shape = new osg::ShapeDrawable;
-    osg::ref_ptr<osg::Sphere> sphere = new osg::Sphere(osg::Vec3d(0, 0, gamePieceModel._radius), gamePieceModel._radius);
+    osg::ref_ptr<osg::Sphere> sphere = new osg::Sphere(osg::Vec3d(0, 0, 0), gamePieceModel._radius);
     shape->setShape(sphere);
     shape->setColor(Color::Orange);
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;

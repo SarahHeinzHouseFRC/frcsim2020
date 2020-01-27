@@ -20,8 +20,7 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
         _wheelTrack(config.sim.constants.drivetrain.wheelTrack),
         _elevatorBeltLength(config.sim.constants.elevator.belt.length),
         _elevatorMotorMaxSpeed(config.sim.constants.elevator.motor.maxSpeed),
-        _elevatorMotorRadius(config.sim.constants.elevator.motor.radius),
-        _inCollision(false)
+        _elevatorMotorRadius(config.sim.constants.elevator.motor.radius)
 {
     // Set initial state
     _state.pose.x = config.sim.initialState.drivetrain.x;
@@ -41,6 +40,10 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
 void VehicleModel::update(double currTimestamp)
 {
     double elapsedTime = currTimestamp - _prevTimestamp;
+    if (elapsedTime == 0)
+    {
+        return; // Nothing to update
+    }
 
     //
     // Update elevator position based on elevator motor speed
@@ -61,8 +64,13 @@ void VehicleModel::update(double currTimestamp)
     if (vLeft == vRight)
     {
         double d = vRight * elapsedTime;
-        _state.pose.x += d * cos(_state.pose.theta);
-        _state.pose.y += d * sin(_state.pose.theta);
+        double deltaX = d * cos(_state.pose.theta);
+        double deltaY = d * sin(_state.pose.theta);
+//        _state.pose.x += deltaX;
+//        _state.pose.y += deltaY;
+        _state.pose.vx = deltaX / elapsedTime;
+        _state.pose.vy = deltaY / elapsedTime;
+        _state.pose.omega = 0;
     }
     else
     {
@@ -70,10 +78,15 @@ void VehicleModel::update(double currTimestamp)
         double dLeft = vLeft * elapsedTime;
         double dRight = vRight * elapsedTime;
         double prevTheta = _state.pose.theta;
-        double currTheta = wrapAngle(prevTheta + (dRight - dLeft) / _wheelTrack);
-        _state.pose.x = _state.pose.x + r*sin(currTheta) - r*sin(prevTheta);
-        _state.pose.y = _state.pose.y - r*cos(currTheta) + r*cos(prevTheta);
-        _state.pose.theta = currTheta;
+        double currTheta = prevTheta + (dRight - dLeft) / _wheelTrack;
+        double deltaX = r * sin(currTheta) - r * sin(prevTheta);
+        double deltaY = -r * cos(currTheta) + r * cos(prevTheta);
+//        _state.pose.x += deltaX;
+//        _state.pose.y += deltaY;
+//        _state.pose.theta = currTheta;
+        _state.pose.vx = deltaX / elapsedTime;
+        _state.pose.vy = deltaY / elapsedTime;
+        _state.pose.omega = (currTheta - prevTheta) / elapsedTime;
     }
 
     _boundingPolygonWorld = _boundingPolygon.transform(_state.pose.x, _state.pose.y, _state.pose.theta);
@@ -101,11 +114,4 @@ SensorState VehicleModel::getSensorState()
     SensorState state{0};
     state.elevatorEncoderPosition = int (1023 * _state.elevatorCarriagePos / _elevatorBeltLength);
     return state;
-}
-
-
-
-void VehicleModel::collisionCallback(bool collision)
-{
-    _inCollision = collision;
 }

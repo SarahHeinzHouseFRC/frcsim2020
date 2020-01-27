@@ -7,7 +7,7 @@
 using namespace Geometry;
 
 
-FieldModel::FieldModel(const ConfigReader& config, double startTimestamp) : _inCollision(false)
+FieldModel::FieldModel(const ConfigReader& config, double startTimestamp)
 {
     std::vector<Vertex2d> exteriorVertices;
 //    exteriorVertices.push_back({ 0, 10 });
@@ -29,11 +29,4 @@ FieldModel::FieldModel(const ConfigReader& config, double startTimestamp) : _inC
 void FieldModel::update(double currTimestamp)
 {
 
-}
-
-
-
-void FieldModel::collisionCallback(bool collision)
-{
-    _inCollision = collision;
 }

@@ -17,6 +17,7 @@ class VehicleModel
 {
 friend class VehicleView;
 friend class Hud;
+friend class CollisionDetector;
 public:
     /**
      * Constructor
@@ -45,11 +46,6 @@ public:
      */
     Geometry::Polygon2d polygon() const { return _boundingPolygonWorld; }
 
-    /**
-     * Called whenever there's a collision
-     */
-    void collisionCallback(bool collision);
-
 private:
     /**
      * Bounds the given value to be no lower than min and no higher than max
@@ -72,7 +68,6 @@ private:
     double _wheelTrack; // Needed to calculate arced turns
     double _drivetrainWidth; // Needed to calculate turning radius
     double _prevTimestamp; // Needed to calculate how much time has passed since last update()
-    bool _inCollision; // Whether or not we're currently in a collision
 
     struct VehicleState
     {
@@ -84,6 +79,9 @@ private:
         {
             double x;     // Meters
             double y;     // Meters
+            double vx;    // Meters/sec
+            double vy;    // Meters/sec
+            double omega; // Rads/sec
             double theta; // Rads
         } pose;
     } _state;

@@ -5,6 +5,7 @@
 #include <osgGA/TerrainManipulator>
 #include <osgGA/NodeTrackerManipulator>
 #include <osgGA/KeySwitchMatrixManipulator>
+#include <osgViewer/ViewerEventHandlers>
 #include "Color.h"
 #include "Visualizer.h"
 
@@ -38,6 +39,8 @@ Visualizer::Visualizer(Scene &scene, Hud& hud) : _scene(scene), _hud(hud), _wind
     _viewer.getWindows(windows);
     windows.at(0)->setWindowName("Robot Simulator");
     _viewer.setSceneData(scene.getRoot());
+
+    _viewer.addEventHandler(new osgViewer::StatsHandler);
 
     osg::Camera* camera = _hud.getCamera();
     camera->setViewport(0, 0, _windowWidth, _windowHeight);

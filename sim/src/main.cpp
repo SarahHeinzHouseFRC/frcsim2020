@@ -11,6 +11,7 @@
 #include "Time.h"
 #include "CoreAgent.h"
 #include "WorldModel.h"
+#include "CollisionDetector.h"
 
 
 int main(int argc, char** argv)
@@ -48,6 +49,7 @@ int main(int argc, char** argv)
     // Initialize vehicle and field models
     double t = Time::now();
     WorldModel wm(config, t);
+    CollisionDetector collision(wm, t);
 
     // Initialize comms with core
     CoreAgent coreAgent(config);
@@ -94,6 +96,9 @@ int main(int argc, char** argv)
 
         // Update the world to reflect the current time
         wm.update(t);
+
+        // Apply collisions and constraints
+        collision.detectCollisions(wm, t);
 
         // Update the vehicle and field visualizations based on their models
         scene.update(wm);

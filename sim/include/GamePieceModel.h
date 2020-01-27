@@ -11,12 +11,13 @@
 class GamePieceModel
 {
 friend class GamePieceView;
+friend class CollisionDetector;
 public:
     /**
      * Constructor
      */
-    GamePieceModel(const ConfigReader& configReader, double x, double y) :
-            _radius(configReader.sim.constants.gamePiece.radius), _state({ { x, y, 0, 0 } }) {};
+    GamePieceModel(const ConfigReader& configReader) :
+            _radius(configReader.sim.constants.gamePiece.radius), _state({ { 0, 0, 0, 0 } }) {};
 
     struct
     {

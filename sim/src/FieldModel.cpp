@@ -7,7 +7,7 @@
 using namespace Geometry;
 
 
-FieldModel::FieldModel(const ConfigReader& config, double startTimestamp)
+FieldModel::FieldModel(const ConfigReader& config, double startTimestamp) : _inCollision(false)
 {
     std::vector<Vertex2d> exteriorVertices;
 

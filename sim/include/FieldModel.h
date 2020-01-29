@@ -7,9 +7,10 @@
 
 #include "ConfigReader.h"
 #include "Geometry.h"
+#include "BaseModel.h"
 
 
-class FieldModel
+class FieldModel : public BaseModel
 {
 friend class FieldView;
 public:
@@ -33,7 +34,12 @@ public:
      */
     std::vector<Geometry::Polygon2d> interiorPolygons() const { return _interiorPolygons; }
 
+    virtual ModelType modelType() { return FIELD_MODEL; }
+
+    virtual void hasCollision(bool c) { _inCollision = c; }
+
 private:
+    bool _inCollision;
     Geometry::Polygon2d _exteriorPolygon;
     std::vector<Geometry::Polygon2d> _interiorPolygons;
 };

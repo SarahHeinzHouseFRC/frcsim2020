@@ -8,12 +8,13 @@
 #include "ConfigReader.h"
 #include "Types.h"
 #include "Geometry.h"
+#include "BaseModel.h"
 
 
 /**
  * Models the parameters of the robot. Enforces physics-based constraints on the joints and motors of the robot.
  */
-class VehicleModel
+class VehicleModel : public BaseModel
 {
 friend class VehicleView;
 friend class Hud;
@@ -45,6 +46,10 @@ public:
      * Returns the bounding polygon of the vehicle in world coordinates
      */
     Geometry::Polygon2d polygon() const { return _boundingPolygonWorld; }
+
+    virtual ModelType modelType() { return VEHICLE_MODEL; }
+
+    virtual void hasCollision(bool c) {};
 
 private:
     /**

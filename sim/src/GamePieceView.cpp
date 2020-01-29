@@ -40,7 +40,7 @@ osg::ref_ptr<osg::Geode> GamePieceView::makeView(const GamePieceModel& gamePiece
     osg::ref_ptr<osg::ShapeDrawable> shape = new osg::ShapeDrawable;
     osg::ref_ptr<osg::Sphere> sphere = new osg::Sphere(osg::Vec3d(0, 0, 0), gamePieceModel._radius);
     shape->setShape(sphere);
-    shape->setColor(Color::Orange);
+    shape->setColor(Color::Yellow);
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
     geode->addDrawable(shape);
     return geode;

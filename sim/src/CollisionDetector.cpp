@@ -10,6 +10,7 @@ using namespace Geometry;
 
 CollisionDetector::CollisionDetector(const WorldModel& wm, double timestamp) :
         _prevTimestamp(timestamp),
+        _muGamePiece(0.5),
         _gravity(0.0f, 0.0f),
         _world(_gravity)
 {
@@ -78,23 +79,27 @@ CollisionDetector::CollisionDetector(const WorldModel& wm, double timestamp) :
     }
 
     {
-        // Define the dynamic body. We set its position and call the body factory.
-        b2BodyDef gamePieceBodyDef;
-        gamePieceBodyDef.type = b2_dynamicBody;
-        gamePieceBodyDef.position.Set(0.0f, 5.0f);
-        _gamePieceBody = _world.CreateBody(&gamePieceBodyDef);
+        for (const auto& gamePieceModel : wm._gamePieceModels)
+        {
+            // Define the dynamic body. We set its position and call the body factory.
+            b2BodyDef gamePieceBodyDef;
+            gamePieceBodyDef.type = b2_dynamicBody;
+            gamePieceBodyDef.position.Set(gamePieceModel._state.pose.x, gamePieceModel._state.pose.y);
+            b2Body* gamePieceBody = _world.CreateBody(&gamePieceBodyDef);
 
-        // Define another box shape for our dynamic body.
-        b2CircleShape gamePieceDynamicCircle;
-        gamePieceDynamicCircle.m_radius = wm._gamePieceModel._radius;
+            // Define another box shape for our dynamic body.
+            b2CircleShape gamePieceDynamicCircle;
+            gamePieceDynamicCircle.m_radius = gamePieceModel._radius;
 
-        b2FixtureDef gamePieceFixtureDef;
-        gamePieceFixtureDef.shape = &gamePieceDynamicCircle;
-        gamePieceFixtureDef.restitution = 0.5f;
+            b2FixtureDef gamePieceFixtureDef;
+            gamePieceFixtureDef.shape = &gamePieceDynamicCircle;
+            gamePieceFixtureDef.restitution = 0.5f;
 
-        gamePieceFixtureDef.density = 10.0f;
-        gamePieceFixtureDef.friction = 0.3f;
-        _gamePieceBody->CreateFixture(&gamePieceFixtureDef);
+            gamePieceFixtureDef.density = 10.0f;
+            gamePieceFixtureDef.friction = 0.3f;
+            gamePieceBody->CreateFixture(&gamePieceFixtureDef);
+            _gamePieceBodies.push_back(gamePieceBody);
+        }
     }
 
     // Prepare for simulation. Typically we use a time step of 1/60 of a
@@ -135,14 +140,30 @@ void CollisionDetector::detectCollisions(WorldModel& wm, double currTimestamp)
 //
 //    printf("Current vel = %f, %f | Desired vel = %f, %f | Current omega = %f | Desired omega = %f\n", currentVel.x, currentVel.y, desiredVel.x, desiredVel.y, currentOmega, desiredOmega);
 
+    // Update the vehicle velocities
     _vehicleBody->SetLinearVelocity(b2Vec2(wm._vehicleModel._state.pose.vx, wm._vehicleModel._state.pose.vy));
     _vehicleBody->SetAngularVelocity(wm._vehicleModel._state.pose.omega);
+
+    // Manually apply friction to the game pieces
+    {
+        for (const auto& gamePieceBody : _gamePieceBodies)
+        {
+            b2Vec2 velocity = gamePieceBody->GetLinearVelocity();
+            if (velocity.LengthSquared() > 0)
+            {
+                b2Vec2 frictionForce = -velocity;
+                frictionForce.Normalize();
+                frictionForce *= _muGamePiece;
+                gamePieceBody->ApplyForceToCenter(frictionForce, true);
+            }
+        }
+    }
 
     // Instruct the world to perform a single step of simulation.
     // It is generally best to keep the time step and iterations fixed.
     _world.Step(elapsedTime, _velocityIterations, _positionIterations);
 
-    // Now print the position and angle of the body.
+    // Update the vehicle model
     {
         b2Vec2 position = _vehicleBody->GetPosition();
         float angle = _vehicleBody->GetAngle();
@@ -156,15 +177,19 @@ void CollisionDetector::detectCollisions(WorldModel& wm, double currTimestamp)
 //        printf("Vehicle _vx, _vy, _state.pose.omega = %f, %f, %f | Vel: %f, %f\n", wm._vehicleModel._state.pose.vx, wm._vehicleModel._state.pose.vy, wm._vehicleModel._state.pose.omega, velocity.x, velocity.y);
     }
 
+    // Update the game piece models
     {
-        b2Vec2 position = _gamePieceBody->GetPosition();
-        b2Vec2 velocity = _gamePieceBody->GetLinearVelocity();
-        float angle = _gamePieceBody->GetAngle();
+        for (unsigned int i=0; i<_gamePieceBodies.size(); i++)
+        {
+            b2Vec2 position = _gamePieceBodies[i]->GetPosition();
+            b2Vec2 velocity = _gamePieceBodies[i]->GetLinearVelocity();
+            float angle = _gamePieceBodies[i]->GetAngle();
 
-        wm._gamePieceModel._state.pose.x = position.x;
-        wm._gamePieceModel._state.pose.y = position.y;
-//        wm._gamePieceModel._state.pose.vx = velocity.x;
-//        wm._gamePieceModel._state.pose.vy = velocity.y;
+            wm._gamePieceModels[i]._state.pose.x = position.x;
+            wm._gamePieceModels[i]._state.pose.y = position.y;
+//            wm._gamePieceModel._state.pose.vx = velocity.x;
+//            wm._gamePieceModel._state.pose.vy = velocity.y;
+        }
     }
 
     _prevTimestamp = currTimestamp;

@@ -50,7 +50,7 @@ private:
     osg::ref_ptr<osg::Group> _root;
     osg::ref_ptr<VehicleView> _vehicleView;
     osg::ref_ptr<FieldView> _fieldView;
-    osg::ref_ptr<GamePieceView> _gamePieceView;
+    std::vector<osg::ref_ptr<GamePieceView>> _gamePieceViews;
 };
 
 

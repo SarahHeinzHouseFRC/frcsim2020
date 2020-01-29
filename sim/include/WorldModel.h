@@ -5,6 +5,7 @@
 #ifndef ROBOT_SIM_WORLDMODEL_H
 #define ROBOT_SIM_WORLDMODEL_H
 
+#include <vector>
 #include "ConfigReader.h"
 #include "FieldModel.h"
 #include "VehicleModel.h"
@@ -34,7 +35,7 @@ public:
 private:
     FieldModel _fieldModel;
     VehicleModel _vehicleModel;
-    GamePieceModel _gamePieceModel;
+    std::vector<GamePieceModel> _gamePieceModels;
 };
 
 

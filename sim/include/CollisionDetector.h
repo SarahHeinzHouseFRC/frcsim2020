@@ -27,10 +27,11 @@ private:
     b2Vec2 _gravity;
     b2World _world;
     b2Body* _vehicleBody;
-    b2Body* _gamePieceBody;
+    std::vector<b2Body*> _gamePieceBodies;
     int32 _velocityIterations;
     int32 _positionIterations;
     double _prevTimestamp;
+    float _muGamePiece;
 };
 
 

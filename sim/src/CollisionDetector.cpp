@@ -13,8 +13,13 @@ CollisionDetector::CollisionDetector(const WorldModel& wm, double timestamp) :
         _gravity(0.0f, 0.0f),
         _world(_gravity)
 {
-    Polygon2d fieldBounds = wm._fieldModel.exteriorPolygon();
-    for (const auto& edge : fieldBounds.edges())
+    //
+    // Define the field using edges
+    //
+
+    // Exterior polygon
+    Polygon2d exteriorPolygon = wm._fieldModel.exteriorPolygon();
+    for (const auto& edge : exteriorPolygon.edges())
     {
         b2BodyDef wallDef;
         b2Body* wallBody = _world.CreateBody(&wallDef);
@@ -23,6 +28,21 @@ CollisionDetector::CollisionDetector(const WorldModel& wm, double timestamp) :
         b2EdgeShape wallShape;
         wallShape.Set(v1, v2);
         wallBody->CreateFixture(&wallShape, 0);
+    }
+
+    // Interior polygons
+    for (const auto& interiorPolygon : wm._fieldModel.interiorPolygons())
+    {
+        for (const auto& edge : interiorPolygon.edges())
+        {
+            b2BodyDef wallDef;
+            b2Body* wallBody = _world.CreateBody(&wallDef);
+            b2Vec2 v1(edge.a.x, edge.a.y);
+            b2Vec2 v2(edge.b.x, edge.b.y);
+            b2EdgeShape wallShape;
+            wallShape.Set(v1, v2);
+            wallBody->CreateFixture(&wallShape, 0);
+        }
     }
 
     {

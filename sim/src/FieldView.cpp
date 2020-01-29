@@ -56,13 +56,32 @@ osg::ref_ptr<osg::Geode> FieldView::makeField(const FieldModel& fieldModel)
 
 osg::ref_ptr<osg::Geode> FieldView::makeFieldBounds(const FieldModel& fieldModel)
 {
-    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-    for (const auto& vertex : fieldModel.exteriorPolygon().vertices())
-    {
-        vertices->push_back(osg::Vec3(vertex.x, vertex.y, 0.1));
-    }
-    osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeLineLoop(vertices, Color::Green);
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
-    geode->addDrawable(geom);
+
+    // Draw exterior bounds
+    {
+        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+        for (const auto& vertex : fieldModel.exteriorPolygon().vertices())
+        {
+            vertices->push_back(osg::Vec3(vertex.x, vertex.y, 0.1));
+        }
+        osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeLineLoop(vertices, Color::Green);
+        geode->addDrawable(geom);
+    }
+
+    // Draw interior bounds
+    {
+        for (const auto& polygon: fieldModel.interiorPolygons())
+        {
+            osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+            for (const auto& vertex : polygon.vertices())
+            {
+                vertices->push_back(osg::Vec3(vertex.x, vertex.y, 0.1));
+            }
+            osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeLineLoop(vertices, Color::Green);
+            geode->addDrawable(geom);
+        }
+    }
+
     return geode;
 }

@@ -10,7 +10,7 @@ using namespace Geometry;
 
 CollisionDetector::CollisionDetector(const WorldModel& wm, double timestamp) :
         _prevTimestamp(timestamp),
-        _muGamePiece(0.5),
+        _muGamePiece(0.1),
         _gravity(0.0f, 0.0f),
         _world(_gravity)
 {
@@ -69,7 +69,7 @@ CollisionDetector::CollisionDetector(const WorldModel& wm, double timestamp) :
         vehicleFixtureDef.shape = &vehicleDynamicBox;
 
         // Set the box density to be non-zero, so it will be dynamic.
-        vehicleFixtureDef.density = 1.0f;
+        vehicleFixtureDef.density = 83.91f / 0.53f;
 
         // Override the default friction.
         vehicleFixtureDef.friction = 0.3f;
@@ -95,7 +95,7 @@ CollisionDetector::CollisionDetector(const WorldModel& wm, double timestamp) :
             gamePieceFixtureDef.shape = &gamePieceDynamicCircle;
             gamePieceFixtureDef.restitution = 0.5f;
 
-            gamePieceFixtureDef.density = 10.0f;
+            gamePieceFixtureDef.density = 1.0f;
             gamePieceFixtureDef.friction = 0.3f;
             gamePieceBody->CreateFixture(&gamePieceFixtureDef);
             _gamePieceBodies.push_back(gamePieceBody);

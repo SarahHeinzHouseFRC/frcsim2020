@@ -31,7 +31,6 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
 
     // Make bounding polygon
     _boundingPolygon = Polygon2d({ { 0.43, 0.31 }, { -0.35, 0.31 }, { -0.35, -0.31 }, { 0.43, -0.31 } });
-//    _boundingPolygon = Polygon2d({ { 0.43, 0.31 }, { -0.35, 0.31 } });
     _boundingPolygonWorld = _boundingPolygon.transform(_state.pose.x, _state.pose.y, _state.pose.theta);
 }
 
@@ -66,8 +65,6 @@ void VehicleModel::update(double currTimestamp)
         double d = vRight * elapsedTime;
         double deltaX = d * cos(_state.pose.theta);
         double deltaY = d * sin(_state.pose.theta);
-//        _state.pose.x += deltaX;
-//        _state.pose.y += deltaY;
         _state.pose.vx = deltaX / elapsedTime;
         _state.pose.vy = deltaY / elapsedTime;
         _state.pose.omega = 0;
@@ -81,9 +78,6 @@ void VehicleModel::update(double currTimestamp)
         double currTheta = prevTheta + (dRight - dLeft) / _wheelTrack;
         double deltaX = r * sin(currTheta) - r * sin(prevTheta);
         double deltaY = -r * cos(currTheta) + r * cos(prevTheta);
-//        _state.pose.x += deltaX;
-//        _state.pose.y += deltaY;
-//        _state.pose.theta = currTheta;
         _state.pose.vx = deltaX / elapsedTime;
         _state.pose.vy = deltaY / elapsedTime;
         _state.pose.omega = (currTheta - prevTheta) / elapsedTime;

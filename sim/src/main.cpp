@@ -88,6 +88,22 @@ int main(int argc, char** argv)
         }
     });
 
+    std::thread visThread([&]()
+    {
+        while (!vis.done())
+        {
+            // Update the vehicle and field visualizations based on their models
+            scene.update(wm);
+
+            // Update the hud
+            hud.displayConnectionStatus(coreAgent.isConnected());
+            hud.displayVehicleState(wm.vehicleModel());
+
+            // Step the visualizer
+            vis.step();
+        }
+    });
+
     // Run the sim
     while (!vis.done())
     {
@@ -99,20 +115,11 @@ int main(int argc, char** argv)
 
         // Apply collisions and constraints
         collision.detectCollisions(wm, t);
-
-        // Update the vehicle and field visualizations based on their models
-        scene.update(wm);
-
-        // Update the hud
-        hud.displayConnectionStatus(coreAgent.isConnected());
-        hud.displayVehicleState(wm.vehicleModel());
-
-        // Step the visualizer
-        vis.step();
     }
 
     rxThread.join();
     txThread.join();
+    visThread.join();
 
     return 0;
 }

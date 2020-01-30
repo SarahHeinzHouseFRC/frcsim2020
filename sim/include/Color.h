@@ -28,6 +28,7 @@ public:
 
     static Color Blue;
     static Color Orange;
+    static Color Yellow;
     static Color Green;
     static Color Red;
     static Color Purple;

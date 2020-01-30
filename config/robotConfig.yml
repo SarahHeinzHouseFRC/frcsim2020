@@ -10,7 +10,7 @@ core:
   joystickPort: 4000     # Port where joystick should send its commands
   vehiclePort: 6000      # Port where vehicle should send its state
 
-vehicle:
+sim:
   ip: "127.0.0.1"        # IP address where sim is running
   port: 8000             # Port where vehicle should send its commands
   constants:
@@ -43,10 +43,13 @@ vehicle:
         lengthX: 3.94    # Inches
         lengthY: 7.87    # Inches
         lengthZ: 0.04    # Inches
+    gamePiece:
+      radius: 3.50       # Inches
   initialState:
     drivetrain:
-      x: 0
-      y: 0
+      x: 0               # Inches
+      y: 0               # Inches
+      theta: 0           # Degrees
     elevator:
-      motorSpeed: 0     # RPM (-motor.maxSpeed to +motor.maxSpeed)
-      carriagePos: 0    # Inches (0 to belt.length)
+      motorSpeed: 0      # RPM (-motor.maxSpeed to +motor.maxSpeed)
+      carriagePos: 0     # Inches (0 to belt.length)

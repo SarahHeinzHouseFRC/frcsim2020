@@ -10,7 +10,7 @@
 CoreAgent::CoreAgent(const ConfigReader& config) :
         _sensorState{0}, _coreCommands{}, _numDroppedPackets(0), _verbose(config.verbose)
 {
-    _comms = new UdpNode(config.vehicle.port, config.core.ip, config.core.vehiclePort);
+    _comms = new UdpNode(config.sim.port, config.core.ip, config.core.vehiclePort);
 }
 
 

@@ -7,6 +7,7 @@
 
 Color Color::Blue(31, 119, 180);
 Color Color::Orange(255, 127, 14);
+Color Color::Yellow(255, 255, 14);
 Color Color::Green(44, 160, 44);
 Color Color::Red(214, 39, 40);
 Color Color::Purple(148, 103, 189);

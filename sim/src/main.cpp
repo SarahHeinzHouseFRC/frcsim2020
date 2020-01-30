@@ -10,7 +10,8 @@
 #include "Visualizer.h"
 #include "Time.h"
 #include "CoreAgent.h"
-#include "VehicleModel.h"
+#include "WorldModel.h"
+#include "CollisionDetector.h"
 
 
 int main(int argc, char** argv)
@@ -47,21 +48,22 @@ int main(int argc, char** argv)
 
     // Initialize vehicle and field models
     double t = Time::now();
-    VehicleModel vehicleModel(config, t);
-    FieldModel fieldModel(config, t);
+    WorldModel wm(config, t);
+    CollisionDetector collision(wm, t);
 
     // Initialize comms with core
     CoreAgent coreAgent(config);
 
     // Visualize vehicle and field
-    Scene scene(config, fieldModel, vehicleModel);
+    Scene scene(config, wm);
     Hud hud(config);
 
     // Visualize the scene
     Visualizer vis(scene, hud);
 
     // Launch rx comms in background thread
-    std::thread rxThread([&]() {
+    std::thread rxThread([&]()
+    {
         while (!vis.done())
         {
             // Receive commands
@@ -71,43 +73,53 @@ int main(int argc, char** argv)
             {
                 // Update the vehicle's control surfaces based on the commands from core
                 auto rxCommands = coreAgent.getCoreCommands();
-                vehicleModel.processCommands(rxCommands);
+                wm.vehicleModel().processCommands(rxCommands);
             }
         }
     });
 
     // Launch tx comms in background thread
-    std::thread txThread([&]() {
+    std::thread txThread([&]()
+    {
         while (!vis.done())
         {
-            coreAgent.setSensorState(vehicleModel.getSensorState());
+            coreAgent.setSensorState(wm.vehicleModel().getSensorState());
             coreAgent.txSensorState();
         }
     });
 
-    // Run the visuals
+    std::thread visThread([&]()
+    {
+        while (!vis.done())
+        {
+            // Update the vehicle and field visualizations based on their models
+            scene.update(wm);
+
+            // Update the hud
+            hud.displayConnectionStatus(coreAgent.isConnected());
+            hud.displayVehicleState(wm.vehicleModel());
+
+            // Step the visualizer
+            vis.step();
+        }
+    });
+
+    // Run the sim
     while (!vis.done())
     {
         // Get current time (sec)
         t = Time::now();
 
-        // Update the vehicle and field models given the current time
-        vehicleModel.update(t);
-        fieldModel.update(t);
+        // Update the world to reflect the current time
+        wm.update(t);
 
-        // Update the vehicle and field visualizations based on their models
-        scene.update(vehicleModel, fieldModel);
-
-        // Update the hud
-        hud.displayConnectionStatus(coreAgent.isConnected());
-        hud.displayVehicleState(vehicleModel);
-
-        // Step the visualizer
-        vis.step();
+        // Apply collisions and constraints
+        collision.detectCollisions(wm, t);
     }
 
     rxThread.join();
     txThread.join();
+    visThread.join();
 
     return 0;
 }

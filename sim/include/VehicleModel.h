@@ -7,6 +7,7 @@
 
 #include "ConfigReader.h"
 #include "Types.h"
+#include "Geometry.h"
 
 
 /**
@@ -16,6 +17,7 @@ class VehicleModel
 {
 friend class VehicleView;
 friend class Hud;
+friend class CollisionDetector;
 public:
     /**
      * Constructor
@@ -39,6 +41,11 @@ public:
      */
     SensorState getSensorState();
 
+    /**
+     * Returns the bounding polygon of the vehicle in world coordinates
+     */
+    Geometry::Polygon2d polygon() const { return _boundingPolygonWorld; }
+
 private:
     /**
      * Bounds the given value to be no lower than min and no higher than max
@@ -50,6 +57,8 @@ private:
      */
     static double wrapAngle(double val) { while (val > 2*M_PI) { val -= 2*M_PI; } while (val < 0) { val += 2*M_PI; } return val; }
 
+    Geometry::Polygon2d _boundingPolygon; // Bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonWorld; // Bounding polygon of the vehicle in world frame
     double _elevatorBeltLength; // Need to enforce the carriage to stay bw 0 and this belt length (meters)
     double _elevatorMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
     double _leftDriveMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
@@ -70,6 +79,9 @@ private:
         {
             double x;     // Meters
             double y;     // Meters
+            double vx;    // Meters/sec
+            double vy;    // Meters/sec
+            double omega; // Rads/sec
             double theta; // Rads
         } pose;
     } _state;

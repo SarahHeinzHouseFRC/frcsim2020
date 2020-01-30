@@ -6,6 +6,7 @@
 #define ROBOT_SIM_FIELDMODEL_H
 
 #include "ConfigReader.h"
+#include "Geometry.h"
 
 
 class FieldModel
@@ -21,6 +22,20 @@ public:
      * Updates the field to reflect the current time
      */
     void update(double currTimestamp);
+
+    /**
+     * Returns exterior polygon
+     */
+    Geometry::Polygon2d exteriorPolygon() const { return _exteriorPolygon; }
+
+    /**
+     * Returns interior polygons
+     */
+    std::vector<Geometry::Polygon2d> interiorPolygons() const { return _interiorPolygons; }
+
+private:
+    Geometry::Polygon2d _exteriorPolygon;
+    std::vector<Geometry::Polygon2d> _interiorPolygons;
 };
 
 

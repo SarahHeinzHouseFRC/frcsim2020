@@ -47,9 +47,10 @@ public:
 
     /**
      * Displays the countdown timer
+     * @param running Whether timer is currently counting down or not
      * @param timerValue Current value (sec)
      */
-    void displayTimer(double timerValue);
+    void displayTimerStatus(bool running, double timerValue);
 
     /**
      * Displays number of collisions

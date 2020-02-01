@@ -40,6 +40,8 @@ public:
 
     int getNumCollisions() { return _numCollisions; }
 
+    void reset() { _numCollisions = 0; _inCollision = false; }
+
 private:
     double _currTimestamp;
     double _timeLastCollision;

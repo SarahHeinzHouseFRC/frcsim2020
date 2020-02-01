@@ -46,3 +46,20 @@ void WorldModel::update(double timestamp)
     _fieldModel.update(timestamp);
     _vehicleModel.update(timestamp);
 }
+
+
+
+void WorldModel::reset()
+{
+    // Field
+    _fieldModel.reset();
+
+    // Vehicle
+    _vehicleModel.reset();
+
+    // Game pieces
+    for (auto& gamePiece : _gamePieceModels)
+    {
+        gamePiece.reset();
+    }
+}

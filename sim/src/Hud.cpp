@@ -142,8 +142,24 @@ void Hud::displayVehicleState(const VehicleModel& vehicleModel)
 
 
 
-void Hud::displayTimer(double timerValue)
+void Hud::displayTimerStatus(bool running, double timerValue)
 {
+    if (timerValue <= 0)
+    {
+        _timer->setColor(Color::Red);
+    }
+    else if (timerValue <= 10)
+    {
+        _timer->setColor(Color::Yellow);
+    }
+    else if (!running)
+    {
+        _timer->setColor(Color::Gray);
+    }
+    else
+    {
+        _timer->setColor(Color::White);
+    }
     char tmp[1024];
     sprintf(tmp, "Timer: %d:%02d", (int) timerValue / 60, (int) timerValue % 60);
     _timer->setText(tmp);

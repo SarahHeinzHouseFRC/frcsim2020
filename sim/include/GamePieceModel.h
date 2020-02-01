@@ -13,12 +13,21 @@ class GamePieceModel : public BaseModel
 {
 friend class GamePieceView;
 friend class CollisionDetector;
+friend class WorldModel;
 public:
     /**
      * Constructor
      */
-    GamePieceModel(const ConfigReader& configReader, double x=0, double y=0) :
+    GamePieceModel(const ConfigReader& configReader, double x=0, double y=0) : _initialX(x), _initialY(y),
             _radius(configReader.sim.constants.gamePiece.radius), _state({ { x, y, 0, 0 } }) {};
+
+    /**
+     * Reset
+     */
+    void reset()
+    {
+        _state = { _initialX, _initialY, 0, 0 };
+    }
 
     virtual ModelType modelType() { return GAME_PIECE_MODEL; }
 
@@ -35,6 +44,8 @@ public:
 
 private:
     double _radius;
+    double _initialX;
+    double _initialY;
 };
 
 

@@ -28,6 +28,11 @@ public:
     void update(double timestamp);
 
     /**
+     * Resets the field
+     */
+    void reset();
+
+    /**
      * Getter for vehicle model
      */
     VehicleModel& vehicleModel() { return _vehicleModel; }

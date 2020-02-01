@@ -49,66 +49,10 @@ CollisionDetector::CollisionDetector(const WorldModel& wm, double timestamp) :
     }
 
     // Vehicle dynamic body
-    {
-        // Define the dynamic body. We set its position and call the body factory.
-        b2BodyDef vehicleBodyDef;
-        vehicleBodyDef.type = b2_dynamicBody;
-        vehicleBodyDef.position.Set(wm._vehicleModel._state.pose.x, wm._vehicleModel._state.pose.y);
-        _vehicleBody = _world.CreateBody(&vehicleBodyDef);
-
-        // Define another box shape for our dynamic body.
-        b2PolygonShape vehicleDynamicBox;
-        Polygon2d bounds = wm._vehicleModel._boundingPolygon;
-        b2Vec2 vertices[bounds.numVertices()];
-        for (unsigned int i=0; i<bounds.numVertices(); i++)
-        {
-            Vertex2d v = bounds.vertices().at(i);
-            vertices[i] = b2Vec2(v.x, v.y);
-        }
-        vehicleDynamicBox.Set(vertices, bounds.numVertices());
-
-        // Define the dynamic body fixture.
-        b2FixtureDef vehicleFixtureDef;
-        vehicleFixtureDef.shape = &vehicleDynamicBox;
-
-        // Set the box density to be non-zero, so it will be dynamic.
-        vehicleFixtureDef.density = 83.91f / 0.53f;
-
-        // Override the default friction.
-        vehicleFixtureDef.friction = 0.3f;
-
-        // Add the shape to the body.
-        _vehicleBody->CreateFixture(&vehicleFixtureDef);
-
-        // Add user data
-        _vehicleBody->SetUserData((void*) &wm._vehicleModel);
-    }
+    _vehicleBody = initVehicleBody(wm._vehicleModel);
 
     // Game piece dynamic bodies
-    {
-        for (const auto& gamePieceModel : wm._gamePieceModels)
-        {
-            // Define the dynamic body. We set its position and call the body factory.
-            b2BodyDef gamePieceBodyDef;
-            gamePieceBodyDef.type = b2_dynamicBody;
-            gamePieceBodyDef.position.Set(gamePieceModel._state.pose.x, gamePieceModel._state.pose.y);
-            b2Body* gamePieceBody = _world.CreateBody(&gamePieceBodyDef);
-
-            // Define another box shape for our dynamic body.
-            b2CircleShape gamePieceDynamicCircle;
-            gamePieceDynamicCircle.m_radius = gamePieceModel._radius;
-
-            b2FixtureDef gamePieceFixtureDef;
-            gamePieceFixtureDef.shape = &gamePieceDynamicCircle;
-            gamePieceFixtureDef.restitution = 0.5f;
-
-            gamePieceFixtureDef.density = 1.0f;
-            gamePieceFixtureDef.friction = 0.3f;
-            gamePieceBody->CreateFixture(&gamePieceFixtureDef);
-            gamePieceBody->SetUserData((void*) &gamePieceModel);
-            _gamePieceBodies.push_back(gamePieceBody);
-        }
-    }
+    _gamePieceBodies = initGamePieceBodies(wm._gamePieceModels);
 
     // Prepare for simulation. Typically we use a time step of 1/60 of a
     // second (60Hz) and 10 iterations. This provides a high quality simulation
@@ -119,7 +63,7 @@ CollisionDetector::CollisionDetector(const WorldModel& wm, double timestamp) :
 
 
 
-void CollisionDetector::detectCollisions(WorldModel& wm, double currTimestamp)
+void CollisionDetector::update(WorldModel& wm, double currTimestamp)
 {
     double elapsedTime = currTimestamp - _prevTimestamp;
 
@@ -171,4 +115,93 @@ void CollisionDetector::detectCollisions(WorldModel& wm, double currTimestamp)
     }
 
     _prevTimestamp = currTimestamp;
+}
+
+
+
+void CollisionDetector::reset(WorldModel& wm)
+{
+    // Destroy vehicle and game piece bodies
+    _world.DestroyBody(_vehicleBody);
+    for (int i=0; i<_gamePieceBodies.size(); i++)
+    {
+        b2Body* body = _gamePieceBodies.back();
+        _gamePieceBodies.pop_back();
+        _world.DestroyBody(body);
+    }
+
+    // Re-initialize vehicle and game pieces from their models
+    _vehicleBody = initVehicleBody(wm._vehicleModel);
+    _gamePieceBodies = initGamePieceBodies(wm._gamePieceModels);
+}
+
+
+
+b2Body* CollisionDetector::initVehicleBody(const VehicleModel& vehicleModel)
+{
+    // Define the dynamic body. We set its position and call the body factory.
+    b2BodyDef vehicleBodyDef;
+    vehicleBodyDef.type = b2_dynamicBody;
+    vehicleBodyDef.position.Set(vehicleModel._state.pose.x, vehicleModel._state.pose.y);
+    b2Body* vehicleBody = _world.CreateBody(&vehicleBodyDef);
+
+    // Define another box shape for our dynamic body.
+    b2PolygonShape vehicleDynamicBox;
+    Polygon2d bounds = vehicleModel._boundingPolygon;
+    b2Vec2 vertices[bounds.numVertices()];
+    for (unsigned int i=0; i<bounds.numVertices(); i++)
+    {
+        Vertex2d v = bounds.vertices().at(i);
+        vertices[i] = b2Vec2(v.x, v.y);
+    }
+    vehicleDynamicBox.Set(vertices, bounds.numVertices());
+
+    // Define the dynamic body fixture.
+    b2FixtureDef vehicleFixtureDef;
+    vehicleFixtureDef.shape = &vehicleDynamicBox;
+
+    // Set the box density to be non-zero, so it will be dynamic.
+    vehicleFixtureDef.density = 83.91f / 0.53f;
+
+    // Override the default friction.
+    vehicleFixtureDef.friction = 0.3f;
+
+    // Add the shape to the body.
+    vehicleBody->CreateFixture(&vehicleFixtureDef);
+
+    // Add user data
+    vehicleBody->SetUserData((void*) &vehicleModel);
+
+    return vehicleBody;
+}
+
+
+
+std::vector<b2Body*> CollisionDetector::initGamePieceBodies(const std::vector<GamePieceModel>& gamePieceModels)
+{
+    std::vector<b2Body*> gamePieceBodies;
+    for (const auto& gamePieceModel : gamePieceModels)
+    {
+        // Define the dynamic body. We set its position and call the body factory.
+        b2BodyDef gamePieceBodyDef;
+        gamePieceBodyDef.type = b2_dynamicBody;
+        gamePieceBodyDef.position.Set(gamePieceModel._state.pose.x, gamePieceModel._state.pose.y);
+        b2Body* gamePieceBody = _world.CreateBody(&gamePieceBodyDef);
+
+        // Define another box shape for our dynamic body.
+        b2CircleShape gamePieceDynamicCircle;
+        gamePieceDynamicCircle.m_radius = gamePieceModel._radius;
+
+        b2FixtureDef gamePieceFixtureDef;
+        gamePieceFixtureDef.shape = &gamePieceDynamicCircle;
+        gamePieceFixtureDef.restitution = 0.5f;
+
+        gamePieceFixtureDef.density = 1.0f;
+        gamePieceFixtureDef.friction = 0.3f;
+        gamePieceBody->CreateFixture(&gamePieceFixtureDef);
+        gamePieceBody->SetUserData((void*) &gamePieceModel);
+        gamePieceBodies.push_back(gamePieceBody);
+    }
+
+    return gamePieceBodies;
 }

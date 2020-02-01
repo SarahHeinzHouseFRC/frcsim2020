@@ -50,11 +50,10 @@ int main(int argc, char** argv)
     // Initialize vehicle and field models
     double t = Time::now();
     WorldModel wm(config, t);
-    CollisionDetector collision(wm, t);
+    CollisionDetector collisions(wm, t);
 
     // Initialize a timer to countdown 2m 15s
     Timer timer(t, 135);
-    timer.start();
 
     // Initialize comms with core
     CoreAgent coreAgent(config);
@@ -67,6 +66,7 @@ int main(int argc, char** argv)
     Visualizer vis(scene, hud);
 
     // Launch rx comms in background thread
+    bool reset = false;
     std::thread rxThread([&]()
     {
         while (!vis.done())
@@ -78,6 +78,17 @@ int main(int argc, char** argv)
             {
                 // Update the vehicle's control surfaces based on the commands from core
                 auto rxCommands = coreAgent.getCoreCommands();
+
+                // If the user hits "start" on the joystick, then start/stop the countdown timer
+                timer.processCommand(rxCommands.start, Time::now());
+
+                // If the user hits "guide" on the joystick, then reset the world
+                if (rxCommands.guide)
+                {
+                    reset = true;
+                }
+
+                // If the timer hits zero, stop allowing the controller to update the vehicle
                 if (timer.getValue() <= 0)
                 {
                     rxCommands.reset();
@@ -107,7 +118,7 @@ int main(int argc, char** argv)
             // Update the hud
             hud.displayConnectionStatus(coreAgent.isConnected());
             hud.displayVehicleState(wm.vehicleModel());
-            hud.displayTimer(timer.getValue());
+            hud.displayTimerStatus(timer.isRunning(), timer.getValue());
             hud.displayNumCollisions(wm.fieldModel().getNumCollisions());
 
             // Step the visualizer
@@ -128,7 +139,15 @@ int main(int argc, char** argv)
         wm.update(t);
 
         // Apply collisions and constraints
-        collision.detectCollisions(wm, t);
+        collisions.update(wm, t);
+
+        if (reset)
+        {
+            wm.reset();
+            collisions.reset(wm);
+            timer.reset();
+            reset = false;
+        }
     }
 
     rxThread.join();

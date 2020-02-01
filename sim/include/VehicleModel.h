@@ -43,6 +43,11 @@ public:
     SensorState getSensorState();
 
     /**
+     * Resets back to initial state
+     */
+    void reset() { _state = {0}; }
+
+    /**
      * Returns the bounding polygon of the vehicle in world coordinates
      */
     Geometry::Polygon2d polygon() const { return _boundingPolygonWorld; }

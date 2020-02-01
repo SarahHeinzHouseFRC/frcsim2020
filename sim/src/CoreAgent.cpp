@@ -38,7 +38,7 @@ bool CoreAgent::rxCoreCommands()
 
         if (_verbose)
         {
-            printf("CoreAgent: Received command %s -> %d %d %d\n", msg.c_str(), _coreCommands.back, _coreCommands.guide, _coreCommands.start);
+            printf("CoreAgent: Received command %s\n", msg.c_str());
         }
         return true;
     }

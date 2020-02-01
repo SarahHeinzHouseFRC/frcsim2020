@@ -22,7 +22,12 @@ public:
     /**
      * Detects collisions between the field and field actors
      */
-    void detectCollisions(WorldModel& wm, double currTimestamp);
+    void update(WorldModel& wm, double currTimestamp);
+
+    /**
+     * Deletes all box2d bodies and recreates from them from the models
+     */
+    void reset(WorldModel& wm);
 
 private:
     class CollisionListener : public b2ContactListener
@@ -70,6 +75,16 @@ private:
             static_cast<BaseModel*>(bodyUserDataB)->hasCollision(false);
         }
     };
+
+    /**
+     * Initializes vehicle body from vehicle model
+     */
+    b2Body* initVehicleBody(const VehicleModel& vehicleModel);
+
+    /**
+     * Initializes all game pieces from their models
+     */
+    std::vector<b2Body*> initGamePieceBodies(const std::vector<GamePieceModel>& gamePieceModels);
 
     CollisionListener _collisionListener;
     b2Vec2 _gravity;

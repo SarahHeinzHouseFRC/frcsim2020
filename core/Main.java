@@ -38,6 +38,9 @@ public class Main
             robotAgent.commands.leftDriveMotorSpeed = leftDriveMotorSpeed;
             robotAgent.commands.rightDriveMotorSpeed = rightDriveMotorSpeed;
             robotAgent.commands.elevatorMotorSpeed = elevatorMotorSpeed;
+            robotAgent.commands.back = joystickAgent.commands.back;
+            robotAgent.commands.guide = joystickAgent.commands.guide;
+            robotAgent.commands.start = joystickAgent.commands.start;
 
             // Send robot commands
             robotAgent.txRobotCommands();

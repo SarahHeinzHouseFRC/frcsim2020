@@ -32,6 +32,9 @@ struct CoreCommands
     int leftDriveMotorSpeed;  // -511 - 512
     int rightDriveMotorSpeed; // -511 - 512
     int elevatorMotorSpeed;   // -511 - 512
+    int back;                 // 0 or 1
+    int guide;                // 0 or 1
+    int start;                // 0 or 1
 
     /**
      * Default constructor
@@ -49,6 +52,9 @@ struct CoreCommands
         leftDriveMotorSpeed = std::stoi(json.substr(2, 7));
         rightDriveMotorSpeed = std::stoi(json.substr(8, 13));
         elevatorMotorSpeed = std::stoi(json.substr(14, 19));
+        back = std::stoi(json.substr(20, 1));
+        guide = std::stoi(json.substr(21, 1));
+        start = std::stoi(json.substr(22, 1));
     }
 
     void reset()
@@ -56,6 +62,9 @@ struct CoreCommands
         leftDriveMotorSpeed = 0;
         rightDriveMotorSpeed = 0;
         elevatorMotorSpeed = 0;
+        back = 0;
+        guide = 0;
+        start = 0;
     }
 };
 

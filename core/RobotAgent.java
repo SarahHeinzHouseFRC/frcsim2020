@@ -27,12 +27,12 @@ public class RobotAgent
     public void txRobotCommands()
     {
         // Translate 'commands' to JSON...
-        String commandsStr = commands.toJson();
+        String msg = commands.toJson();
 
         // Send string
         try
         {
-            comms.send(commandsStr);
+            comms.send(msg);
         }
         catch (IOException e)
         {
@@ -52,7 +52,7 @@ public class RobotAgent
 
             // Parse received command from JSON to state
             state.fromJson(msg);
-            System.out.println("RobotAgent: Received state " + msg + " -> " + state.elevatorEncoderPos);
+            System.out.println("RobotAgent: Received " + msg);
         }
         catch (IOException e)
         {

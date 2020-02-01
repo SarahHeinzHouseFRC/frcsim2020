@@ -38,7 +38,7 @@ bool CoreAgent::rxCoreCommands()
 
         if (_verbose)
         {
-            printf("CoreAgent: Received command %s\n", msg.c_str());
+            printf("CoreAgent: Received command %s -> %d %d %d\n", msg.c_str(), _coreCommands.back, _coreCommands.guide, _coreCommands.start);
         }
         return true;
     }
@@ -54,6 +54,6 @@ bool CoreAgent::rxCoreCommands()
 
 bool CoreAgent::isConnected()
 {
-    // As long as we've heard from the controls <= 10 packets ago, we're still connected
+    // As long as we've heard from the controls <= 100 packets ago, we're still connected
     return _numDroppedPackets < 100;
 }

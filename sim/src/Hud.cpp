@@ -54,20 +54,35 @@ Hud::Hud(const ConfigReader& config) : _width(225)
     _connected->setBoundingBoxMargin(5);
     _labelsGeode->addChild(_connected);
 
-    auto title = new TopLabel("Robot Sim", -34, 24);
+    float height = 0;
+
+    height -= 34;
+    auto title = new TopLabel("Robot Sim", height, 24);
     _labelsGeode->addChild(title);
 
-    auto subtitle = new TopLabel("Team SHARP 3260", -54);
+    height -= 20;
+    auto subtitle = new TopLabel("Team SHARP 3260", height);
     subtitle->setColor(osg::Vec4(0.8, 0.8, 1, 1));
     _labelsGeode->addChild(subtitle);
 
-    _vehiclePoseState = new TopLabel("", -130);
+    height -= 100;
+    _timer = new TopLabel("00:00", height, 22);
+    _labelsGeode->addChild(_timer);
+
+    height -= 30;
+    _numCollisions = new TopLabel("Collisions: 0", height, 22);
+    _labelsGeode->addChild(_numCollisions);
+
+    height -= 50;
+    _vehiclePoseState = new TopLabel("", height);
     _labelsGeode->addChild(_vehiclePoseState);
 
-    _vehicleElevatorState = new TopLabel("", -210);
+    height -= 80;
+    _vehicleElevatorState = new TopLabel("", height);
     _labelsGeode->addChild(_vehicleElevatorState);
 
-    _vehicleDrivetrainState = new TopLabel("", -270);
+    height -= 60;
+    _vehicleDrivetrainState = new TopLabel("", height);
     _labelsGeode->addChild(_vehicleDrivetrainState);
 
     _labelsGeode->addChild(new BottomLabel("[1] Top-down view", 40));
@@ -123,4 +138,22 @@ void Hud::displayVehicleState(const VehicleModel& vehicleModel)
 
     sprintf(tmp, "Drivetrain: \n    Left motor: %.0f RPM \n    Right motor: %.0f RPM", vehicleModel._state.leftDriveMotorSpeed*RADS_PER_SEC_TO_RPM, vehicleModel._state.rightDriveMotorSpeed*RADS_PER_SEC_TO_RPM);
     _vehicleDrivetrainState->setText(tmp);
+}
+
+
+
+void Hud::displayTimer(double timerValue)
+{
+    char tmp[1024];
+    sprintf(tmp, "Timer: %d:%02d", (int) timerValue / 60, (int) timerValue % 60);
+    _timer->setText(tmp);
+}
+
+
+
+void Hud::displayNumCollisions(int numCollisions)
+{
+    char tmp[1024];
+    sprintf(tmp, "Collisions: %d", numCollisions);
+    _numCollisions->setText(tmp);
 }

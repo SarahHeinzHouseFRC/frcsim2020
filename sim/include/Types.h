@@ -36,7 +36,10 @@ struct CoreCommands
     /**
      * Default constructor
      */
-    CoreCommands() = default;
+    CoreCommands()
+    {
+        reset();
+    };
 
     /**
      * Constructor from JSON string
@@ -46,6 +49,13 @@ struct CoreCommands
         leftDriveMotorSpeed = std::stoi(json.substr(2, 7));
         rightDriveMotorSpeed = std::stoi(json.substr(8, 13));
         elevatorMotorSpeed = std::stoi(json.substr(14, 19));
+    }
+
+    void reset()
+    {
+        leftDriveMotorSpeed = 0;
+        rightDriveMotorSpeed = 0;
+        elevatorMotorSpeed = 0;
     }
 };
 

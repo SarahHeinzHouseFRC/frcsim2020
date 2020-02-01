@@ -36,10 +36,15 @@ public:
 
     virtual ModelType modelType() { return FIELD_MODEL; }
 
-    virtual void hasCollision(bool c) { _inCollision = c; }
+    virtual void hasCollision(bool c);
+
+    int getNumCollisions() { return _numCollisions; }
 
 private:
+    double _currTimestamp;
+    double _timeLastCollision;
     bool _inCollision;
+    int _numCollisions;
     Geometry::Polygon2d _exteriorPolygon;
     std::vector<Geometry::Polygon2d> _interiorPolygons;
 };

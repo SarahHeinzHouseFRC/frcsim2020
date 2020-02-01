@@ -9,6 +9,7 @@
 #include "Hud.h"
 #include "Visualizer.h"
 #include "Time.h"
+#include "Timer.h"
 #include "CoreAgent.h"
 #include "WorldModel.h"
 #include "CollisionDetector.h"
@@ -51,6 +52,10 @@ int main(int argc, char** argv)
     WorldModel wm(config, t);
     CollisionDetector collision(wm, t);
 
+    // Initialize a timer to countdown 2m 15s
+    Timer timer(t, 135);
+    timer.start();
+
     // Initialize comms with core
     CoreAgent coreAgent(config);
 
@@ -73,6 +78,10 @@ int main(int argc, char** argv)
             {
                 // Update the vehicle's control surfaces based on the commands from core
                 auto rxCommands = coreAgent.getCoreCommands();
+                if (timer.getValue() <= 0)
+                {
+                    rxCommands.reset();
+                }
                 wm.vehicleModel().processCommands(rxCommands);
             }
         }
@@ -98,6 +107,8 @@ int main(int argc, char** argv)
             // Update the hud
             hud.displayConnectionStatus(coreAgent.isConnected());
             hud.displayVehicleState(wm.vehicleModel());
+            hud.displayTimer(timer.getValue());
+            hud.displayNumCollisions(wm.fieldModel().getNumCollisions());
 
             // Step the visualizer
             vis.step();
@@ -109,6 +120,9 @@ int main(int argc, char** argv)
     {
         // Get current time (sec)
         t = Time::now();
+
+        // Update the timer
+        timer.update(t);
 
         // Update the world to reflect the current time
         wm.update(t);

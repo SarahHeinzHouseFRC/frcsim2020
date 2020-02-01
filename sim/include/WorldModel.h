@@ -32,6 +32,11 @@ public:
      */
     VehicleModel& vehicleModel() { return _vehicleModel; }
 
+    /**
+     * Getter for field model
+     */
+    FieldModel& fieldModel() { return _fieldModel; }
+
 private:
     FieldModel _fieldModel;
     VehicleModel _vehicleModel;

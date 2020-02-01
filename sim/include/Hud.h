@@ -45,6 +45,17 @@ public:
      */
     void displayVehicleState(const VehicleModel& vehicleModel);
 
+    /**
+     * Displays the countdown timer
+     * @param timerValue Current value (sec)
+     */
+    void displayTimer(double timerValue);
+
+    /**
+     * Displays number of collisions
+     */
+    void displayNumCollisions(int numCollisions);
+
 private:
     osg::Camera* _camera;
     osg::ref_ptr<osg::Group> _root;
@@ -58,6 +69,8 @@ private:
     osg::ref_ptr<Label> _vehiclePoseState;
     osg::ref_ptr<Label> _vehicleElevatorState;
     osg::ref_ptr<Label> _vehicleDrivetrainState;
+    osg::ref_ptr<Label> _timer;
+    osg::ref_ptr<Label> _numCollisions;
 };
 
 

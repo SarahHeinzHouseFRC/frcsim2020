@@ -9,9 +9,13 @@ public class Main
         int elevatorMotorSpeed = 0;
         int leftDriveMotorSpeed = 0;
         int rightDriveMotorSpeed = 0;
+        int prevSelectButtonState = 0;
+        Boolean isTankDrive = false;
 
         JoystickAgent joystickAgent = new JoystickAgent(4000, "localhost", 2000);
         RobotAgent robotAgent = new RobotAgent(6000, "localhost", 8000);
+
+        System.out.println("Core: Launched");
 
         while (true)
         {
@@ -21,8 +25,6 @@ public class Main
             // Receive joystick commands
             joystickAgent.rxCommands();
             JoystickCommands commands = joystickAgent.commands;
-            leftDriveMotorSpeed = wrap(commands.yLeftJoystick + commands.xRightJoystick/2, -511, 512);
-            rightDriveMotorSpeed = wrap(commands.yLeftJoystick - commands.xRightJoystick/2, -511, 512);
 
             elevatorMotorSpeed = 0;
             if (commands.upDpad == 1)
@@ -34,9 +36,35 @@ public class Main
                 elevatorMotorSpeed = -511;
             }
 
+            // Toggle tank drive
+            int currBackButtonState = joystickAgent.commands.back;
+            if (currBackButtonState == 0 && prevSelectButtonState == 1)
+            {
+                isTankDrive = !isTankDrive;
+                if (isTankDrive)
+                {
+                    System.out.println("Tank drive enabled");
+                }
+                else
+                {
+                    System.out.println("Tank drive disabled");
+                }
+            }
+            prevSelectButtonState = currBackButtonState;
+
             // Construct robot commands
-            robotAgent.commands.leftDriveMotorSpeed = leftDriveMotorSpeed;
-            robotAgent.commands.rightDriveMotorSpeed = rightDriveMotorSpeed;
+            if (isTankDrive)
+            {
+                robotAgent.commands.leftDriveMotorSpeed = commands.yLeftJoystick;
+                robotAgent.commands.rightDriveMotorSpeed = commands.yRightJoystick;
+            }
+            else
+            {
+                leftDriveMotorSpeed = wrap(commands.yLeftJoystick + commands.xRightJoystick/2, -511, 512);
+                rightDriveMotorSpeed = wrap(commands.yLeftJoystick - commands.xRightJoystick/2, -511, 512);
+                robotAgent.commands.leftDriveMotorSpeed = leftDriveMotorSpeed;
+                robotAgent.commands.rightDriveMotorSpeed = rightDriveMotorSpeed;
+            }
             robotAgent.commands.elevatorMotorSpeed = elevatorMotorSpeed;
             robotAgent.commands.back = joystickAgent.commands.back;
             robotAgent.commands.guide = joystickAgent.commands.guide;

@@ -52,7 +52,7 @@ public class RobotAgent
 
             // Parse received command from JSON to state
             state.fromJson(msg);
-            System.out.println("RobotAgent: Received " + msg);
+            // System.out.println("RobotAgent: Received " + msg);
         }
         catch (IOException e)
         {

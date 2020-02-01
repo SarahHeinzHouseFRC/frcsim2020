@@ -143,6 +143,7 @@ b2Body* CollisionDetector::initVehicleBody(const VehicleModel& vehicleModel)
     b2BodyDef vehicleBodyDef;
     vehicleBodyDef.type = b2_dynamicBody;
     vehicleBodyDef.position.Set(vehicleModel._state.pose.x, vehicleModel._state.pose.y);
+    vehicleBodyDef.angle = vehicleModel._state.pose.theta;
     b2Body* vehicleBody = _world.CreateBody(&vehicleBodyDef);
 
     // Define another box shape for our dynamic body.

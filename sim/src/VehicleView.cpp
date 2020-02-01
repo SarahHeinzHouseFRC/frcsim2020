@@ -184,7 +184,7 @@ osg::ref_ptr<osg::PositionAttitudeTransform> VehicleView::makeVehicleElevator()
 osg::ref_ptr<osg::Geode> VehicleView::makeVehicleBounds(const VehicleModel& vehicleModel)
 {
     osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-    for (const auto& vertex : vehicleModel.polygon().vertices())
+    for (const auto& vertex : vehicleModel._boundingPolygon.vertices())
     {
         vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
     }

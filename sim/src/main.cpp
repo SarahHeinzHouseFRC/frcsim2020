@@ -143,8 +143,8 @@ int main(int argc, char** argv)
 
         if (reset)
         {
-            wm.reset();
-            collisions.reset(wm);
+//            wm.reset();
+//            collisions.reset(wm);
             timer.reset();
             reset = false;
         }

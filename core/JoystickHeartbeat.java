@@ -5,7 +5,7 @@ public class JoystickHeartbeat
 {
     public String toJson()
     {
-        String str = "{}";
-        return str;
+        String msg = "{}";
+        return msg;
     }
 }

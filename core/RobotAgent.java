@@ -26,13 +26,14 @@ public class RobotAgent
      */
     public void txRobotCommands()
     {
-        // Translate 'commands' to JSON...
+        // Translate commands to JSON
         String msg = commands.toJson();
 
         // Send string
         try
         {
             comms.send(msg);
+            // System.out.println("RobotAgent: Transmit commands " + msg);
         }
         catch (IOException e)
         {

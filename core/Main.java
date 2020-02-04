@@ -6,32 +6,29 @@ public class Main
 {
     public static void main(String[] args)
     {
+        JoystickAgent joystickAgent = new JoystickAgent(4000, "localhost", 2000);
+        RobotAgent robotAgent = new RobotAgent(6000, "localhost", 8000);
+
+        CommsThread commsThread = new CommsThread(robotAgent, joystickAgent);
+        commsThread.start();
+
+        System.out.println("Core: Launched");
+
         int elevatorMotorSpeed = 0;
         int leftDriveMotorSpeed = 0;
         int rightDriveMotorSpeed = 0;
         int prevSelectButtonState = 0;
         Boolean isTankDrive = false;
 
-        JoystickAgent joystickAgent = new JoystickAgent(4000, "localhost", 2000);
-        RobotAgent robotAgent = new RobotAgent(6000, "localhost", 8000);
-
-        System.out.println("Core: Launched");
-
         while (true)
         {
-            // Send joystick heartbeat
-            joystickAgent.txHeartbeat();
-
-            // Receive joystick commands
-            joystickAgent.rxCommands();
-            JoystickCommands commands = joystickAgent.commands;
-
+            // Construct robot commands
             elevatorMotorSpeed = 0;
-            if (commands.upDpad == 1)
+            if (joystickAgent.commands.upDpad == 1)
             {
                 elevatorMotorSpeed = 512;
             }
-            else if (commands.downDpad == 1)
+            else if (joystickAgent.commands.downDpad == 1)
             {
                 elevatorMotorSpeed = -511;
             }
@@ -55,13 +52,13 @@ public class Main
             // Construct robot commands
             if (isTankDrive)
             {
-                robotAgent.commands.leftDriveMotorSpeed = commands.yLeftJoystick;
-                robotAgent.commands.rightDriveMotorSpeed = commands.yRightJoystick;
+                robotAgent.commands.leftDriveMotorSpeed = joystickAgent.commands.yLeftJoystick;
+                robotAgent.commands.rightDriveMotorSpeed = joystickAgent.commands.yRightJoystick;
             }
             else
             {
-                leftDriveMotorSpeed = wrap(commands.yLeftJoystick + commands.xRightJoystick/2, -511, 512);
-                rightDriveMotorSpeed = wrap(commands.yLeftJoystick - commands.xRightJoystick/2, -511, 512);
+                leftDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick + joystickAgent.commands.xRightJoystick/2, -511, 512);
+                rightDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick - joystickAgent.commands.xRightJoystick/2, -511, 512);
                 robotAgent.commands.leftDriveMotorSpeed = leftDriveMotorSpeed;
                 robotAgent.commands.rightDriveMotorSpeed = rightDriveMotorSpeed;
             }
@@ -70,12 +67,14 @@ public class Main
             robotAgent.commands.guide = joystickAgent.commands.guide;
             robotAgent.commands.start = joystickAgent.commands.start;
 
-            // Send robot commands
-            robotAgent.txRobotCommands();
+            try
+            {
+                Thread.sleep(10);
+            }
+            catch(Exception e)
+            {
 
-            // Receive robot state
-            robotAgent.rxRobotState();
-            RobotState state = robotAgent.state;
+            }
         }
     }
 

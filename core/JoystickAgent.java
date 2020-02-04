@@ -32,6 +32,7 @@ public class JoystickAgent
         try
         {
             comms.send(msg);
+            // System.out.println("JoystickAgent: Transmit state " + msg);
         }
         catch (IOException e)
         {

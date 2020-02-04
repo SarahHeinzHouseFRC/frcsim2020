@@ -30,7 +30,7 @@ class CommsQThread(QThread):
 
             # Receive heartbeat
             rx_msg = self.comms.rx()
-            if rx_msg == "{}":
+            if rx_msg:
                 self.connection_status.emit(True)
             elif rx_msg is None:
                 self.connection_status.emit(False)

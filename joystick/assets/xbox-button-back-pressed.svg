@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="7.7532368mm"
+   height="7.7532368mm"
+   viewBox="0 0 7.7532368 7.7532368"
+   version="1.1"
+   id="svg896"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="xbox-button-back-pressed.svg">
+  <defs
+     id="defs890" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="11.2"
+     inkscape:cx="15.447123"
+     inkscape:cy="12.970109"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="927"
+     inkscape:window-height="1023"
+     inkscape:window-x="993"
+     inkscape:window-y="27"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata893">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-10.486476,-274.98053)">
+    <circle
+       style="opacity:1;vector-effect:none;fill:#c0c0c0;fill-opacity:1;stroke:#000000;stroke-width:0.25450248;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="circle858"
+       cx="14.363094"
+       cy="278.85715"
+       r="3.7493672" />
+    <rect
+       y="277.38068"
+       x="12.479275"
+       height="1.6536459"
+       width="2.3387277"
+       id="rect835"
+       style="opacity:1;vector-effect:none;fill:#c0c0c0;fill-opacity:1;stroke:#000000;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <rect
+       y="278.17444"
+       x="13.273022"
+       height="1.6536459"
+       width="2.3387277"
+       id="rect837"
+       style="opacity:1;vector-effect:none;fill:#c0c0c0;fill-opacity:1;stroke:none;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <rect
+       style="opacity:1;vector-effect:none;fill:#c0c0c0;fill-opacity:1;stroke:#000000;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect833"
+       width="2.3387277"
+       height="1.6536459"
+       x="13.802189"
+       y="278.70358" />
+  </g>
+</svg>

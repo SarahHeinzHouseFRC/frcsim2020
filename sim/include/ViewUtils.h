@@ -37,11 +37,16 @@ public:
      */
     static osg::ref_ptr<osg::Geometry> makeQuads(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);
 
+    /**
+     * Utility method for quickly drawing quads
+     */
+    static osg::ref_ptr<osg::Geometry> makeTriangleFan(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);
+
 private:
     /**
-     * Utility method for quickly drawing lines. Pairs of vertices are interpreted as single lines
+     * Common helper method for quickly drawing geometries
      */
-    static osg::ref_ptr<osg::Geometry> makeBaseLine(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color, GLenum primitive);
+    static osg::ref_ptr<osg::Geometry> makeBaseGeometry(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color, GLenum primitive);
 };
 
 

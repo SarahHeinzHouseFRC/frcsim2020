@@ -15,7 +15,6 @@ set(SRCS
         src/WorldModel.cpp
         src/FieldModel.cpp
         src/VehicleModel.cpp
-        src/GamePieceModel.cpp
         src/FieldView.cpp
         src/VehicleView.cpp
         src/GamePieceView.cpp

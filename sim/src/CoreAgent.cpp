@@ -44,6 +44,7 @@ bool CoreAgent::rxCoreCommands()
     }
     else
     {
+        _coreCommands.reset();
         _numDroppedPackets++;
         return false;
     }
@@ -53,6 +54,6 @@ bool CoreAgent::rxCoreCommands()
 
 bool CoreAgent::isConnected()
 {
-    // As long as we've heard from the controls <= 10 packets ago, we're still connected
+    // As long as we've heard from the controls <= 100 packets ago, we're still connected
     return _numDroppedPackets < 100;
 }

@@ -12,13 +12,13 @@ CollisionDetector::CollisionDetector(const WorldModel& wm, double timestamp) :
         _prevTimestamp(timestamp),
         _muGamePiece(0.1),
         _gravity(0.0f, 0.0f),
-        _world(_gravity)
+        _world(_gravity),
+        _collisionListener()
 {
-    //
-    // Define the field using edges
-    //
+    // Add collision listener
+    _world.SetContactListener(&_collisionListener);
 
-    // Exterior polygon
+    // Field exterior static body
     Polygon2d exteriorPolygon = wm._fieldModel.exteriorPolygon();
     for (const auto& edge : exteriorPolygon.edges())
     {
@@ -29,9 +29,10 @@ CollisionDetector::CollisionDetector(const WorldModel& wm, double timestamp) :
         b2EdgeShape wallShape;
         wallShape.Set(v1, v2);
         wallBody->CreateFixture(&wallShape, 0);
+        wallBody->SetUserData((void*) &wm._fieldModel);
     }
 
-    // Interior polygons
+    // Field interior static bodies
     for (const auto& interiorPolygon : wm._fieldModel.interiorPolygons())
     {
         for (const auto& edge : interiorPolygon.edges())
@@ -43,64 +44,15 @@ CollisionDetector::CollisionDetector(const WorldModel& wm, double timestamp) :
             b2EdgeShape wallShape;
             wallShape.Set(v1, v2);
             wallBody->CreateFixture(&wallShape, 0);
+            wallBody->SetUserData((void*) &wm._fieldModel);
         }
     }
 
-    {
-        // Define the dynamic body. We set its position and call the body factory.
-        b2BodyDef vehicleBodyDef;
-        vehicleBodyDef.type = b2_dynamicBody;
-        vehicleBodyDef.position.Set(wm._vehicleModel._state.pose.x, wm._vehicleModel._state.pose.y);
-        _vehicleBody = _world.CreateBody(&vehicleBodyDef);
+    // Vehicle dynamic body
+    _vehicleBody = initVehicleBody(wm._vehicleModel);
 
-        // Define another box shape for our dynamic body.
-        b2PolygonShape vehicleDynamicBox;
-        Polygon2d bounds = wm._vehicleModel._boundingPolygon;
-        b2Vec2 vertices[bounds.numVertices()];
-        for (unsigned int i=0; i<bounds.numVertices(); i++)
-        {
-            Vertex2d v = bounds.vertices().at(i);
-            vertices[i] = b2Vec2(v.x, v.y);
-        }
-        vehicleDynamicBox.Set(vertices, bounds.numVertices());
-
-        // Define the dynamic body fixture.
-        b2FixtureDef vehicleFixtureDef;
-        vehicleFixtureDef.shape = &vehicleDynamicBox;
-
-        // Set the box density to be non-zero, so it will be dynamic.
-        vehicleFixtureDef.density = 83.91f / 0.53f;
-
-        // Override the default friction.
-        vehicleFixtureDef.friction = 0.3f;
-
-        // Add the shape to the body.
-        _vehicleBody->CreateFixture(&vehicleFixtureDef);
-    }
-
-    {
-        for (const auto& gamePieceModel : wm._gamePieceModels)
-        {
-            // Define the dynamic body. We set its position and call the body factory.
-            b2BodyDef gamePieceBodyDef;
-            gamePieceBodyDef.type = b2_dynamicBody;
-            gamePieceBodyDef.position.Set(gamePieceModel._state.pose.x, gamePieceModel._state.pose.y);
-            b2Body* gamePieceBody = _world.CreateBody(&gamePieceBodyDef);
-
-            // Define another box shape for our dynamic body.
-            b2CircleShape gamePieceDynamicCircle;
-            gamePieceDynamicCircle.m_radius = gamePieceModel._radius;
-
-            b2FixtureDef gamePieceFixtureDef;
-            gamePieceFixtureDef.shape = &gamePieceDynamicCircle;
-            gamePieceFixtureDef.restitution = 0.5f;
-
-            gamePieceFixtureDef.density = 1.0f;
-            gamePieceFixtureDef.friction = 0.3f;
-            gamePieceBody->CreateFixture(&gamePieceFixtureDef);
-            _gamePieceBodies.push_back(gamePieceBody);
-        }
-    }
+    // Game piece dynamic bodies
+    _gamePieceBodies = initGamePieceBodies(wm._gamePieceModels);
 
     // Prepare for simulation. Typically we use a time step of 1/60 of a
     // second (60Hz) and 10 iterations. This provides a high quality simulation
@@ -111,34 +63,9 @@ CollisionDetector::CollisionDetector(const WorldModel& wm, double timestamp) :
 
 
 
-void CollisionDetector::detectCollisions(WorldModel& wm, double currTimestamp)
+void CollisionDetector::update(WorldModel& wm, double currTimestamp)
 {
     double elapsedTime = currTimestamp - _prevTimestamp;
-
-//    float vx = 0, vy = 0, omega = 0;
-//    if (wm._vehicleModel._state.pose.omega > 0) omega = 0.5;
-//    if (wm._vehicleModel._state.pose.omega < 0) omega = -0.5;
-//    if (wm._vehicleModel._state.pose.vx > 0) vx = 0.5 * cos(wm._vehicleModel._state.pose.theta);
-//    if (wm._vehicleModel._state.pose.vx < 0) vx = -0.5 * cos(wm._vehicleModel._state.pose.theta);
-//    if (wm._vehicleModel._state.pose.vy > 0) vy = 0.5 * sin(wm._vehicleModel._state.pose.theta);
-//    if (wm._vehicleModel._state.pose.vy < 0) vy = -0.5 * sin(wm._vehicleModel._state.pose.theta);
-//    _vehicleBody->SetLinearVelocity(b2Vec2(vx, vy));
-//    _vehicleBody->SetAngularVelocity(omega);
-//    b2Vec2 pos = _vehicleBody->GetWorldCenter();
-//    _vehicleBody->ApplyForce({ vx/10, vy/10 }, pos, true);
-//    _vehicleBody->ApplyTorque(omega/100, true);
-//    b2Vec2 currentVel = _vehicleBody->GetLinearVelocity();
-//    b2Vec2 desiredVel = b2Vec2(wm._vehicleModel._state.pose.vx, wm._vehicleModel._state.pose.vy);
-//    b2Vec2 impulse = desiredVel - currentVel;
-//    impulse *= _vehicleBody->GetMass();
-//    _vehicleBody->ApplyLinearImpulse(impulse, _vehicleBody->GetWorldCenter(), true);
-//
-//    float currentOmega = _vehicleBody->GetAngularVelocity();
-//    float desiredOmega = wm._vehicleModel._state.pose.omega;
-//    float rotImpulse = (desiredOmega - currentOmega) * _vehicleBody->GetInertia();
-//    _vehicleBody->ApplyAngularImpulse(rotImpulse, true);
-//
-//    printf("Current vel = %f, %f | Desired vel = %f, %f | Current omega = %f | Desired omega = %f\n", currentVel.x, currentVel.y, desiredVel.x, desiredVel.y, currentOmega, desiredOmega);
 
     // Update the vehicle velocities
     _vehicleBody->SetLinearVelocity(b2Vec2(wm._vehicleModel._state.pose.vx, wm._vehicleModel._state.pose.vy));
@@ -172,9 +99,6 @@ void CollisionDetector::detectCollisions(WorldModel& wm, double currTimestamp)
         wm._vehicleModel._state.pose.x = position.x;
         wm._vehicleModel._state.pose.y = position.y;
         wm._vehicleModel._state.pose.theta = angle;
-//        wm._vehicleModel._state.pose.vx = velocity.x;
-//        wm._vehicleModel._state.pose.vy = velocity.y;
-//        printf("Vehicle _vx, _vy, _state.pose.omega = %f, %f, %f | Vel: %f, %f\n", wm._vehicleModel._state.pose.vx, wm._vehicleModel._state.pose.vy, wm._vehicleModel._state.pose.omega, velocity.x, velocity.y);
     }
 
     // Update the game piece models
@@ -187,10 +111,98 @@ void CollisionDetector::detectCollisions(WorldModel& wm, double currTimestamp)
 
             wm._gamePieceModels[i]._state.pose.x = position.x;
             wm._gamePieceModels[i]._state.pose.y = position.y;
-//            wm._gamePieceModel._state.pose.vx = velocity.x;
-//            wm._gamePieceModel._state.pose.vy = velocity.y;
         }
     }
 
     _prevTimestamp = currTimestamp;
+}
+
+
+
+void CollisionDetector::reset(WorldModel& wm)
+{
+    // Destroy vehicle and game piece bodies
+    _world.DestroyBody(_vehicleBody);
+    for (int i=0; i<_gamePieceBodies.size(); i++)
+    {
+        b2Body* body = _gamePieceBodies.back();
+        _gamePieceBodies.pop_back();
+        _world.DestroyBody(body);
+    }
+
+    // Re-initialize vehicle and game pieces from their models
+    _vehicleBody = initVehicleBody(wm._vehicleModel);
+    _gamePieceBodies = initGamePieceBodies(wm._gamePieceModels);
+}
+
+
+
+b2Body* CollisionDetector::initVehicleBody(const VehicleModel& vehicleModel)
+{
+    // Define the dynamic body. We set its position and call the body factory.
+    b2BodyDef vehicleBodyDef;
+    vehicleBodyDef.type = b2_dynamicBody;
+    vehicleBodyDef.position.Set(vehicleModel._state.pose.x, vehicleModel._state.pose.y);
+    vehicleBodyDef.angle = vehicleModel._state.pose.theta;
+    b2Body* vehicleBody = _world.CreateBody(&vehicleBodyDef);
+
+    // Define another box shape for our dynamic body.
+    b2PolygonShape vehicleDynamicBox;
+    Polygon2d bounds = vehicleModel._boundingPolygon;
+    b2Vec2 vertices[bounds.numVertices()];
+    for (unsigned int i=0; i<bounds.numVertices(); i++)
+    {
+        Vertex2d v = bounds.vertices().at(i);
+        vertices[i] = b2Vec2(v.x, v.y);
+    }
+    vehicleDynamicBox.Set(vertices, bounds.numVertices());
+
+    // Define the dynamic body fixture.
+    b2FixtureDef vehicleFixtureDef;
+    vehicleFixtureDef.shape = &vehicleDynamicBox;
+
+    // Set the box density to be non-zero, so it will be dynamic.
+    vehicleFixtureDef.density = 83.91f / 0.53f;
+
+    // Override the default friction.
+    vehicleFixtureDef.friction = 0.3f;
+
+    // Add the shape to the body.
+    vehicleBody->CreateFixture(&vehicleFixtureDef);
+
+    // Add user data
+    vehicleBody->SetUserData((void*) &vehicleModel);
+
+    return vehicleBody;
+}
+
+
+
+std::vector<b2Body*> CollisionDetector::initGamePieceBodies(const std::vector<GamePieceModel>& gamePieceModels)
+{
+    std::vector<b2Body*> gamePieceBodies;
+    for (const auto& gamePieceModel : gamePieceModels)
+    {
+        // Define the dynamic body. We set its position and call the body factory.
+        b2BodyDef gamePieceBodyDef;
+        gamePieceBodyDef.type = b2_dynamicBody;
+        gamePieceBodyDef.position.Set(gamePieceModel._state.pose.x, gamePieceModel._state.pose.y);
+        b2Body* gamePieceBody = _world.CreateBody(&gamePieceBodyDef);
+
+        // Define another box shape for our dynamic body.
+        b2CircleShape gamePieceDynamicCircle;
+        gamePieceDynamicCircle.m_radius = gamePieceModel._radius;
+
+        b2FixtureDef gamePieceFixtureDef;
+        gamePieceFixtureDef.shape = &gamePieceDynamicCircle;
+        gamePieceFixtureDef.restitution = 0.5f;
+
+        gamePieceFixtureDef.density = 1.0f;
+        gamePieceFixtureDef.friction = 0.3f;
+        gamePieceBody->CreateFixture(&gamePieceFixtureDef);
+        gamePieceBody->SetUserData((void*) &gamePieceModel);
+        gamePieceBodies.push_back(gamePieceBody);
+    }
+
+    return gamePieceBodies;
 }

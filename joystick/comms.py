@@ -45,15 +45,21 @@ class ControllerState:
         self.bumper_left = ButtonState()  # 0 or 1
         self.left_joystick = JoystickState()  # -511 to 512
         self.right_joystick = JoystickState()  # -511 to 512
+        self.back = ButtonState()  # 0 or 1
+        self.guide = ButtonState()  # 0 or 1
+        self.start = ButtonState()  # 0 or 1
 
     def toJson(self):
-        return "{ %05d %05d %05d %05d %01d%01d%01d%01d %01d%01d%01d%01d }" % \
+        return "{ %05d %05d %05d %05d %01d%01d%01d%01d %01d%01d%01d%01d %01d%01d%01d }" % \
             (self.left_joystick.x, self.left_joystick.y, self.right_joystick.x, self.right_joystick.y,
                 self.a.pressed, self.b.pressed, self.x.pressed, self.y.pressed,
                 self.dpad.up.pressed,
                 self.dpad.down.pressed,
                 self.dpad.left.pressed,
-                self.dpad.right.pressed)
+                self.dpad.right.pressed,
+                self.back.pressed,
+                self.guide.pressed,
+                self.start.pressed)
 
 
 class JoystickState:

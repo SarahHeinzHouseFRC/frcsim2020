@@ -7,7 +7,8 @@ from PyQt4.QtGui import *
 from comms import *
 from connected import ConnectedWidget
 from controller import ControllerWidget
-from help import HelpWidget
+from hotkeys import HotkeysWidget
+from info import InfoWidget
 
 
 class CommsQThread(QThread):
@@ -53,15 +54,16 @@ class VirtualXboxController(QMainWindow):
         self.connected = ConnectedWidget(parent=self)
         self.comms.connection_status.connect(self.connected.show_connection_status)
         self.controller = ControllerWidget(self.controller_state, parent=self)
-        self.help = HelpWidget(comms_config, parent=self.controller)
+        self.hotkeys = HotkeysWidget(parent=self.controller)
+        self.info = InfoWidget(comms_config, parent=self.controller)
         self.setCentralWidget(self.controller)
         self.adjustSize()
 
         self.help_text = QLabel(self)
         self.help_text.setAlignment(Qt.AlignCenter)
-        self.help_text.setText("Hold H for help")
+        self.help_text.setText("Hold H for hotkeys\nHold I for info\nPress Esc to quit")
         self.help_text.adjustSize()
-        self.help_text.move(self.width()/2 - self.help_text.width()/2, 500)
+        self.help_text.move(self.width()/2 - self.help_text.width()/2, 475)
         self.help_text.setStyleSheet("background-color: rgba(0,0,0,0); color: white")
         print self.geometry()
 
@@ -74,15 +76,19 @@ class VirtualXboxController(QMainWindow):
         if event.key() == Qt.Key_Escape:
             print("Controller: Shutting down")
             self.close()
-        if event.key() == Qt.Key_H:
-            self.help.show()
+        elif event.key() == Qt.Key_H:
+            self.hotkeys.show()
+        elif event.key() == Qt.Key_I:
+            self.info.show()
         else:
             self.controller.keyPressEvent(event)
         event.accept()
 
     def keyReleaseEvent(self, event):
         if event.key() == Qt.Key_H:
-            self.help.hide()
+            self.hotkeys.hide()
+        elif event.key() == Qt.Key_I:
+            self.info.hide()
         else:
             self.controller.keyReleaseEvent(event)
         event.accept()

@@ -51,7 +51,7 @@ public class JoystickAgent
 
             // Parse received command from JSON to state
             commands.fromJson(msg);
-            System.out.println("JoystickAgent: Received commands " + msg + " -> (" + commands.x + ", " + commands.y + ", " + commands.a + ", " + commands.b + ")");
+            // System.out.println("JoystickAgent: Received " + msg);
 
         }
         catch (IOException e)

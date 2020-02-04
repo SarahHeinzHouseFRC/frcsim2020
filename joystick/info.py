@@ -6,14 +6,10 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.QtSvg import *
 
-IMG_HELP = "assets/xbox-help.svg"
 
-
-class HelpWidget(QSvgWidget):
+class InfoWidget(QWidget):
     def __init__(self, comms_config, parent=None):
-        super(HelpWidget, self).__init__(parent)
-        self.load(IMG_HELP)
-        self.hide()
+        super(InfoWidget, self).__init__(parent)
 
         # Comms label
         self.comms_label = QLabel(self)
@@ -25,3 +21,4 @@ class HelpWidget(QSvgWidget):
                                                                              comms_config['tx_port']))
         self.comms_label.adjustSize()
         self.comms_label.move(687/2-self.comms_label.width()/2, 400)
+        self.hide()

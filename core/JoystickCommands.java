@@ -15,6 +15,9 @@ public class JoystickCommands
     public int downDpad; // Binary value 0 or 1
     public int leftDpad; // Binary value 0 or 1
     public int rightDpad; // Binary value 0 or 1
+    public int back; // Binary value 0 or 1
+    public int guide; // Binary value 0 or 1
+    public int start; // Binary value 0 or 1
 
     public void fromJson(String str)
     {
@@ -30,6 +33,9 @@ public class JoystickCommands
         downDpad = Integer.parseInt(str.substring(32, 33));
         leftDpad = Integer.parseInt(str.substring(33, 34));
         rightDpad = Integer.parseInt(str.substring(34, 35));
+        back = Integer.parseInt(str.substring(36, 37));
+        guide = Integer.parseInt(str.substring(37, 38));
+        start = Integer.parseInt(str.substring(38, 39));
 
         // TODO: Error checking
     }

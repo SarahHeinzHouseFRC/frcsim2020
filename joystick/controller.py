@@ -30,6 +30,12 @@ IMG_BUMPER_LEFT_RELEASED = "assets/xbox-bumper-left-released.svg"
 IMG_BUMPER_LEFT_PRESSED = "assets/xbox-bumper-left-pressed.svg"
 IMG_BUMPER_RIGHT_RELEASED = "assets/xbox-bumper-right-released.svg"
 IMG_BUMPER_RIGHT_PRESSED = "assets/xbox-bumper-right-pressed.svg"
+IMG_BUTTON_BACK_PRESSED = "assets/xbox-button-back-pressed.svg"
+IMG_BUTTON_BACK_RELEASED = "assets/xbox-button-back-released.svg"
+IMG_BUTTON_GUIDE_PRESSED = "assets/xbox-button-guide-pressed.svg"
+IMG_BUTTON_GUIDE_RELEASED = "assets/xbox-button-guide-released.svg"
+IMG_BUTTON_START_PRESSED = "assets/xbox-button-start-pressed.svg"
+IMG_BUTTON_START_RELEASED = "assets/xbox-button-start-released.svg"
 
 
 class ControllerWidget(QSvgWidget):
@@ -60,6 +66,12 @@ class ControllerWidget(QSvgWidget):
                                         self.controller_state.bumper_left, 138, 61, self)
         self.bumper_right = ButtonWidget(IMG_BUMPER_RIGHT_RELEASED, IMG_BUMPER_RIGHT_PRESSED,
                                          self.controller_state.bumper_right, 430, 61, self)
+        self.back = ButtonWidget(IMG_BUTTON_BACK_RELEASED, IMG_BUTTON_BACK_PRESSED,
+                                 self.controller_state.back, 288, 162, self)
+        self.guide = ButtonWidget(IMG_BUTTON_GUIDE_RELEASED, IMG_BUTTON_GUIDE_PRESSED,
+                                 self.controller_state.guide, 321, 92, self)
+        self.start = ButtonWidget(IMG_BUTTON_START_RELEASED, IMG_BUTTON_START_PRESSED,
+                                 self.controller_state.start, 373, 162, self)
         size_policy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         size_policy.setHeightForWidth(True)
         self.setSizePolicy(size_policy)

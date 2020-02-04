@@ -46,14 +46,20 @@ class PhysicalXboxController:
         self.run()
 
     def run(self):
-        while True:
-            (left_joystick_x, left_joystick_y) = self.joystick.leftStick()
-            (right_joystick_x, right_joystick_y) = self.joystick.rightStick()
-            self.controller_state.left_joystick.x = left_joystick_x * 512
-            self.controller_state.left_joystick.y = left_joystick_y * 512
-            self.controller_state.right_joystick.x = right_joystick_x * 512
-            self.controller_state.right_joystick.y = right_joystick_y * 512
-            self.controller_state.dpad.up.pressed = self.joystick.dpadUp()
-            self.controller_state.dpad.down.pressed = self.joystick.dpadDown()
-            self.controller_state.dpad.left.pressed = self.joystick.dpadLeft()
-            self.controller_state.dpad.right.pressed = self.joystick.dpadRight()
+        try:
+            while True:
+                (left_joystick_x, left_joystick_y) = self.joystick.leftStick()
+                (right_joystick_x, right_joystick_y) = self.joystick.rightStick()
+                self.controller_state.left_joystick.x = left_joystick_x * 512
+                self.controller_state.left_joystick.y = left_joystick_y * 512
+                self.controller_state.right_joystick.x = right_joystick_x * 512
+                self.controller_state.right_joystick.y = right_joystick_y * 512
+                self.controller_state.dpad.up.pressed = self.joystick.dpadUp()
+                self.controller_state.dpad.down.pressed = self.joystick.dpadDown()
+                self.controller_state.dpad.left.pressed = self.joystick.dpadLeft()
+                self.controller_state.dpad.right.pressed = self.joystick.dpadRight()
+                self.controller_state.start.pressed = self.joystick.Start()
+                self.controller_state.guide.pressed = self.joystick.Guide()
+                self.controller_state.back.pressed = self.joystick.Back()
+        except KeyboardInterrupt:
+            self.joystick.close()

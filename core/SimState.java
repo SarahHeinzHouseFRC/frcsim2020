@@ -1,7 +1,7 @@
 /**
- * Storage class for holding parameters to be received from the robot
+ * Storage class for holding parameters to be received from the sim
  */
-public class RobotState
+public class SimState
 {
     public int leftDriveEncoderPosition; // Integer from 0-1024
     public int rightDriveEncoderPosition; // Integer from 0-1024

@@ -1,11 +1,11 @@
 public class CommsThread extends Thread
 {
-    public RobotAgent robotAgent;
+    public SimAgent simAgent;
     public JoystickAgent joystickAgent;
 
-    public CommsThread(RobotAgent robotAgent, JoystickAgent joystickAgent)
+    public CommsThread(SimAgent simAgent, JoystickAgent joystickAgent)
     {
-        this.robotAgent = robotAgent;
+        this.simAgent = simAgent;
         this.joystickAgent = joystickAgent;
     }
 
@@ -13,11 +13,11 @@ public class CommsThread extends Thread
     {
         while (true)
         {
-            // Receive robot state
-            robotAgent.rxRobotState();
+            // Receive sim state
+            simAgent.rxSimState();
 
-            // Send robot commands
-            robotAgent.txRobotCommands();
+            // Send sim commands
+            simAgent.txSimCommands();
 
             // Send joystick heartbeat
             joystickAgent.txHeartbeat();

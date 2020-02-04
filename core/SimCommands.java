@@ -1,7 +1,7 @@
 /**
- * Storage class for holding parameters to be sent to the robot
+ * Storage class for holding parameters to be sent to the sim
  */
-public class RobotCommands
+public class SimCommands
 {
     public int elevatorMotorSpeed; // Integer from -511 to 512
     public int leftDriveMotorSpeed; // Integer from -511 to 512

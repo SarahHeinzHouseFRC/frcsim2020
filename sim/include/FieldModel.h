@@ -34,19 +34,31 @@ public:
      */
     std::vector<Geometry::Polygon2d> interiorPolygons() const { return _interiorPolygons; }
 
+    /**
+     * Retuuns the model type
+     */
     virtual ModelType modelType() { return FIELD_MODEL; }
 
-    virtual void hasCollision(bool c);
+    /**
+     * Collision callback
+     */
+    virtual void isInCollision(bool c);
 
-    int getNumCollisions() { return _numCollisions; }
+    /**
+     * Returns the collision count
+     */
+    int getCollisionCount() { return _collisionCount; }
 
-    void reset() { _numCollisions = 0; _inCollision = false; }
+    /**
+     * Resets the collision count
+     */
+    void reset() { _collisionCount = 0; _inCollision = false; }
 
 private:
     double _currTimestamp;
     double _timeLastCollision;
     bool _inCollision;
-    int _numCollisions;
+    int _collisionCount;
     Geometry::Polygon2d _exteriorPolygon;
     std::vector<Geometry::Polygon2d> _interiorPolygons;
 };

@@ -2,57 +2,36 @@
  * Copyright (c) 2019 FRC Team 3260
  */
 
-#include <VehicleModel.h>
+#include "Geometry.h"
 #include "PhysicsEngine.h"
 
 using namespace Geometry;
 
+/** Coefficient of friction of the game pieces */
+#define MU_GAME_PIECE 0.1
 
-PhysicsEngine::PhysicsEngine(const WorldModel& wm, double timestamp) :
+
+PhysicsEngine::PhysicsEngine(const FieldModel& fieldModel,
+                             const VehicleModel& vehicleModel,
+                             const std::vector<GamePieceModel>& gamePieceModels,
+                             double timestamp) :
         _prevTimestamp(timestamp),
-        _muGamePiece(0.1),
         _gravity(0.0f, 0.0f),
-        _world(_gravity),
-        _collisionListener()
+        _muGamePiece(MU_GAME_PIECE)
 {
+    _world = std::make_unique<b2World>(_gravity);
+
     // Add collision listener
-    _world.SetContactListener(&_collisionListener);
+    _world->SetContactListener(new CollisionListener);
 
-    // Field exterior static body
-    Polygon2d exteriorPolygon = wm._fieldModel.exteriorPolygon();
-    for (const auto& edge : exteriorPolygon.edges())
-    {
-        b2BodyDef wallDef;
-        b2Body* wallBody = _world.CreateBody(&wallDef);
-        b2Vec2 v1(edge.a.x, edge.a.y);
-        b2Vec2 v2(edge.b.x, edge.b.y);
-        b2EdgeShape wallShape;
-        wallShape.Set(v1, v2);
-        wallBody->CreateFixture(&wallShape, 0);
-        wallBody->SetUserData((void*) &wm._fieldModel);
-    }
-
-    // Field interior static bodies
-    for (const auto& interiorPolygon : wm._fieldModel.interiorPolygons())
-    {
-        for (const auto& edge : interiorPolygon.edges())
-        {
-            b2BodyDef wallDef;
-            b2Body* wallBody = _world.CreateBody(&wallDef);
-            b2Vec2 v1(edge.a.x, edge.a.y);
-            b2Vec2 v2(edge.b.x, edge.b.y);
-            b2EdgeShape wallShape;
-            wallShape.Set(v1, v2);
-            wallBody->CreateFixture(&wallShape, 0);
-            wallBody->SetUserData((void*) &wm._fieldModel);
-        }
-    }
+    // Field static bodies
+    initFieldBodies(_world.get(), fieldModel);
 
     // Vehicle dynamic body
-    _vehicleBody = initVehicleBody(wm._vehicleModel);
+    _vehicleBody = initVehicleBody(_world.get(), vehicleModel);
 
     // Game piece dynamic bodies
-    _gamePieceBodies = initGamePieceBodies(wm._gamePieceModels);
+    _gamePieceBodies = initGamePieceBodies(_world.get(), gamePieceModels);
 
     // Prepare for simulation. Typically we use a time step of 1/60 of a
     // second (60Hz) and 10 iterations. This provides a high quality simulation
@@ -63,13 +42,14 @@ PhysicsEngine::PhysicsEngine(const WorldModel& wm, double timestamp) :
 
 
 
-void PhysicsEngine::update(WorldModel& wm, double currTimestamp)
+void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, std::vector<GamePieceModel>& gamePieceModels, double currTimestamp)
 {
     double elapsedTime = currTimestamp - _prevTimestamp;
+    if (elapsedTime == 0) { return; }
 
     // Update the vehicle velocities
-    _vehicleBody->SetLinearVelocity(b2Vec2(wm._vehicleModel._state.pose.vx, wm._vehicleModel._state.pose.vy));
-    _vehicleBody->SetAngularVelocity(wm._vehicleModel._state.pose.omega);
+    _vehicleBody->SetLinearVelocity(b2Vec2(vehicleModel._state.pose.vx, vehicleModel._state.pose.vy));
+    _vehicleBody->SetAngularVelocity(vehicleModel._state.pose.omega);
 
     // Manually apply friction to the game pieces
     {
@@ -88,7 +68,7 @@ void PhysicsEngine::update(WorldModel& wm, double currTimestamp)
 
     // Instruct the world to perform a single step of simulation.
     // It is generally best to keep the time step and iterations fixed.
-    _world.Step(elapsedTime, _velocityIterations, _positionIterations);
+    _world->Step(elapsedTime, _velocityIterations, _positionIterations);
 
     // Update the vehicle model
     {
@@ -96,9 +76,9 @@ void PhysicsEngine::update(WorldModel& wm, double currTimestamp)
         float angle = _vehicleBody->GetAngle();
         b2Vec2 velocity = _vehicleBody->GetLinearVelocity();
 
-        wm._vehicleModel._state.pose.x = position.x;
-        wm._vehicleModel._state.pose.y = position.y;
-        wm._vehicleModel._state.pose.theta = angle;
+        vehicleModel._state.pose.x = position.x;
+        vehicleModel._state.pose.y = position.y;
+        vehicleModel._state.pose.theta = angle;
     }
 
     // Update the game piece models
@@ -109,8 +89,8 @@ void PhysicsEngine::update(WorldModel& wm, double currTimestamp)
             b2Vec2 velocity = _gamePieceBodies[i]->GetLinearVelocity();
             float angle = _gamePieceBodies[i]->GetAngle();
 
-            wm._gamePieceModels[i]._state.pose.x = position.x;
-            wm._gamePieceModels[i]._state.pose.y = position.y;
+            gamePieceModels[i]._state.pose.x = position.x;
+            gamePieceModels[i]._state.pose.y = position.y;
         }
     }
 
@@ -119,32 +99,67 @@ void PhysicsEngine::update(WorldModel& wm, double currTimestamp)
 
 
 
-void PhysicsEngine::reset(WorldModel& wm)
+void PhysicsEngine::reset(FieldModel& fieldModel, VehicleModel& vehicleModel, std::vector<GamePieceModel>& gamePieceModels)
 {
     // Destroy vehicle and game piece bodies
-    _world.DestroyBody(_vehicleBody);
+    _world->DestroyBody(_vehicleBody);
     for (int i=0; i<_gamePieceBodies.size(); i++)
     {
         b2Body* body = _gamePieceBodies.back();
         _gamePieceBodies.pop_back();
-        _world.DestroyBody(body);
+        _world->DestroyBody(body);
     }
 
     // Re-initialize vehicle and game pieces from their models
-    _vehicleBody = initVehicleBody(wm._vehicleModel);
-    _gamePieceBodies = initGamePieceBodies(wm._gamePieceModels);
+    _vehicleBody = initVehicleBody(_world.get(), vehicleModel);
+    _gamePieceBodies = initGamePieceBodies(_world.get(), gamePieceModels);
 }
 
 
 
-b2Body* PhysicsEngine::initVehicleBody(const VehicleModel& vehicleModel)
+void PhysicsEngine::initFieldBodies(b2World* world, const FieldModel& fieldModel)
+{
+    // Field exterior static body
+    Polygon2d exteriorPolygon = fieldModel.exteriorPolygon();
+    for (const auto& edge : exteriorPolygon.edges())
+    {
+        b2BodyDef wallDef;
+        b2Body* wallBody = world->CreateBody(&wallDef);
+        b2Vec2 v1(edge.a.x, edge.a.y);
+        b2Vec2 v2(edge.b.x, edge.b.y);
+        b2EdgeShape wallShape;
+        wallShape.Set(v1, v2);
+        wallBody->CreateFixture(&wallShape, 0);
+        wallBody->SetUserData((void*) &fieldModel);
+    }
+
+    // Field interior static bodies
+    for (const auto& interiorPolygon : fieldModel.interiorPolygons())
+    {
+        for (const auto& edge : interiorPolygon.edges())
+        {
+            b2BodyDef wallDef;
+            b2Body* wallBody = world->CreateBody(&wallDef);
+            b2Vec2 v1(edge.a.x, edge.a.y);
+            b2Vec2 v2(edge.b.x, edge.b.y);
+            b2EdgeShape wallShape;
+            wallShape.Set(v1, v2);
+            wallBody->CreateFixture(&wallShape, 0);
+            wallBody->SetUserData((void*) &fieldModel);
+        }
+    }
+}
+
+
+
+b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehicleModel)
 {
     // Define the dynamic body. We set its position and call the body factory.
     b2BodyDef vehicleBodyDef;
     vehicleBodyDef.type = b2_dynamicBody;
     vehicleBodyDef.position.Set(vehicleModel._state.pose.x, vehicleModel._state.pose.y);
     vehicleBodyDef.angle = vehicleModel._state.pose.theta;
-    b2Body* vehicleBody = _world.CreateBody(&vehicleBodyDef);
+    b2Body* vehicleBody = world->CreateBody(&vehicleBodyDef);
 
     // Define another box shape for our dynamic body.
     b2PolygonShape vehicleDynamicBox;
@@ -178,7 +193,7 @@ b2Body* PhysicsEngine::initVehicleBody(const VehicleModel& vehicleModel)
 
 
 
-std::vector<b2Body*> PhysicsEngine::initGamePieceBodies(const std::vector<GamePieceModel>& gamePieceModels)
+std::vector<b2Body*> PhysicsEngine::initGamePieceBodies(b2World* world, const std::vector<GamePieceModel>& gamePieceModels)
 {
     std::vector<b2Body*> gamePieceBodies;
     for (const auto& gamePieceModel : gamePieceModels)
@@ -187,7 +202,7 @@ std::vector<b2Body*> PhysicsEngine::initGamePieceBodies(const std::vector<GamePi
         b2BodyDef gamePieceBodyDef;
         gamePieceBodyDef.type = b2_dynamicBody;
         gamePieceBodyDef.position.Set(gamePieceModel._state.pose.x, gamePieceModel._state.pose.y);
-        b2Body* gamePieceBody = _world.CreateBody(&gamePieceBodyDef);
+        b2Body* gamePieceBody = world->CreateBody(&gamePieceBodyDef);
 
         // Define another box shape for our dynamic body.
         b2CircleShape gamePieceDynamicCircle;

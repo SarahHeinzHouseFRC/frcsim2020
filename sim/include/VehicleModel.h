@@ -52,9 +52,15 @@ public:
      */
     Geometry::Polygon2d polygon() const { return _boundingPolygonWorld; }
 
+    /**
+     * Returns the model type
+     */
     virtual ModelType modelType() { return VEHICLE_MODEL; }
 
-    virtual void hasCollision(bool c) {};
+    /**
+     * Collision callback
+     */
+    virtual void isInCollision(bool c) {};
 
 private:
     /**

@@ -6,28 +6,33 @@
 #define ROBOT_SIM_PHYSICSENGINE_H
 
 #include "box2d/box2d.h"
-#include "Geometry.h"
-#include "WorldModel.h"
-#include "BaseModel.h"
+#include "FieldModel.h"
+#include "VehicleModel.h"
+#include "GamePieceModel.h"
 
 
 class PhysicsEngine
 {
 public:
     /**
+     * Default constructor
+     */
+    PhysicsEngine() = default;
+
+    /**
      * Constructor
      */
-    PhysicsEngine(const WorldModel& wm, double timestamp);
+    PhysicsEngine(const FieldModel& fieldModel, const VehicleModel& vehicleModel, const std::vector<GamePieceModel>& gamePieceModels, double timestamp);
 
     /**
      * Detects collisions between the field and field actors
      */
-    void update(WorldModel& wm, double currTimestamp);
+    void update(FieldModel& fieldModel, VehicleModel& vehicleModel, std::vector<GamePieceModel>& gamePieceModels, double currTimestamp);
 
     /**
      * Deletes all box2d bodies and recreates from them from the models
      */
-    void reset(WorldModel& wm);
+    void reset(FieldModel& fieldModel, VehicleModel& vehicleModel, std::vector<GamePieceModel>& gamePieceModels);
 
 private:
     class CollisionListener : public b2ContactListener
@@ -36,31 +41,25 @@ private:
         /**
          * Constructor
          */
-        CollisionListener() {};
+        CollisionListener() = default;
 
         /**
          * Called when two fixtures begin to touch
          */
         virtual void BeginContact(b2Contact* contact)
         {
-            BaseModel::ModelType typeA = BaseModel::NONE_MODEL, typeB = BaseModel::NONE_MODEL;
-            void* bodyUserDataA = contact->GetFixtureA()->GetBody()->GetUserData();
-            if (bodyUserDataA)
-            {
-                typeA = static_cast<BaseModel*>(bodyUserDataA)->modelType();
-            }
-            void* bodyUserDataB = contact->GetFixtureB()->GetBody()->GetUserData();
-            if (bodyUserDataB)
-            {
-                typeB = static_cast<BaseModel*>(bodyUserDataB)->modelType();
-            }
+            // Call the FieldModel's collision callback iff the vehicle collided with the field
+            auto bodyUserDataA = static_cast<BaseModel*>(contact->GetFixtureA()->GetBody()->GetUserData());
+            BaseModel::ModelType typeA = static_cast<BaseModel*>(bodyUserDataA)->modelType();
+            auto bodyUserDataB = static_cast<BaseModel*>(contact->GetFixtureB()->GetBody()->GetUserData());
+            BaseModel::ModelType typeB = static_cast<BaseModel*>(bodyUserDataB)->modelType();
             if (typeA == BaseModel::VEHICLE_MODEL && typeB == BaseModel::FIELD_MODEL)
             {
-                static_cast<BaseModel*>(bodyUserDataB)->hasCollision(true);
+                bodyUserDataB->isInCollision(true);
             }
             else if (typeA == BaseModel::FIELD_MODEL && typeB == BaseModel::VEHICLE_MODEL)
             {
-                static_cast<BaseModel*>(bodyUserDataA)->hasCollision(true);
+                bodyUserDataA->isInCollision(true);
             }
         }
 
@@ -69,26 +68,39 @@ private:
          */
         virtual void EndContact(b2Contact* contact)
         {
-            void* bodyUserDataA = contact->GetFixtureA()->GetBody()->GetUserData();
-            static_cast<BaseModel*>(bodyUserDataA)->hasCollision(false);
-            void* bodyUserDataB = contact->GetFixtureB()->GetBody()->GetUserData();
-            static_cast<BaseModel*>(bodyUserDataB)->hasCollision(false);
+            // Call the FieldModel's collision callback iff the vehicle collided with the field
+            auto bodyUserDataA = static_cast<BaseModel*>(contact->GetFixtureA()->GetBody()->GetUserData());
+            BaseModel::ModelType typeA = static_cast<BaseModel*>(bodyUserDataA)->modelType();
+            auto bodyUserDataB = static_cast<BaseModel*>(contact->GetFixtureB()->GetBody()->GetUserData());
+            BaseModel::ModelType typeB = static_cast<BaseModel*>(bodyUserDataB)->modelType();
+            if (typeA == BaseModel::VEHICLE_MODEL && typeB == BaseModel::FIELD_MODEL)
+            {
+                bodyUserDataB->isInCollision(false);
+            }
+            else if (typeA == BaseModel::FIELD_MODEL && typeB == BaseModel::VEHICLE_MODEL)
+            {
+                bodyUserDataA->isInCollision(false);
+            }
         }
     };
 
     /**
+     * Initializes field body from field model
+     */
+    void initFieldBodies(b2World* world, const FieldModel& fieldModel);
+
+    /**
      * Initializes vehicle body from vehicle model
      */
-    b2Body* initVehicleBody(const VehicleModel& vehicleModel);
+    b2Body* initVehicleBody(b2World* world, const VehicleModel& vehicleModel);
 
     /**
      * Initializes all game pieces from their models
      */
-    std::vector<b2Body*> initGamePieceBodies(const std::vector<GamePieceModel>& gamePieceModels);
+    std::vector<b2Body*> initGamePieceBodies(b2World* world, const std::vector<GamePieceModel>& gamePieceModels);
 
-    CollisionListener _collisionListener;
     b2Vec2 _gravity;
-    b2World _world;
+    std::unique_ptr<b2World> _world;
     b2Body* _vehicleBody;
     std::vector<b2Body*> _gamePieceBodies;
     int32 _velocityIterations;

@@ -13,7 +13,6 @@ class GamePieceModel : public BaseModel
 {
 friend class GamePieceView;
 friend class PhysicsEngine;
-friend class WorldModel;
 public:
     /**
      * Constructor
@@ -29,9 +28,20 @@ public:
         _state = { _initialX, _initialY, 0, 0 };
     }
 
+    /**
+     * Return the model type
+     */
     virtual ModelType modelType() { return GAME_PIECE_MODEL; }
 
-    virtual void hasCollision(bool c) {};
+    /**
+     * Collision callback
+     */
+    virtual void isInCollision(bool c) {};
+
+private:
+    double _radius;
+    double _initialX;
+    double _initialY;
 
     struct
     {
@@ -41,11 +51,6 @@ public:
             double vx, vy;
         } pose;
     } _state;
-
-private:
-    double _radius;
-    double _initialX;
-    double _initialY;
 };
 
 

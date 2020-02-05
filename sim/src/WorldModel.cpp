@@ -36,6 +36,8 @@ WorldModel::WorldModel(const ConfigReader& configReader, double timestamp) :
     _gamePieceModels.push_back({ configReader, -3.40, -0.00 });
     _gamePieceModels.push_back({ configReader, -3.40, -0.91 });
     _gamePieceModels.push_back({ configReader, -3.40, -1.83 });
+
+    _physicsEngine = PhysicsEngine(_fieldModel, _vehicleModel, _gamePieceModels, timestamp);
 }
 
 
@@ -45,6 +47,9 @@ void WorldModel::update(double timestamp)
     // Update external forces on field and vehicle
     _fieldModel.update(timestamp);
     _vehicleModel.update(timestamp);
+
+    // Apply collisions and constraints
+    _physicsEngine.update(_fieldModel, _vehicleModel, _gamePieceModels, timestamp);
 }
 
 

@@ -8,7 +8,7 @@ using namespace Geometry;
 
 
 FieldModel::FieldModel(const ConfigReader& config, double startTimestamp) :
-        _inCollision(false), _numCollisions(0), _currTimestamp(startTimestamp), _timeLastCollision(startTimestamp)
+        _inCollision(false), _collisionCount(0), _currTimestamp(startTimestamp), _timeLastCollision(startTimestamp)
 {
     std::vector<Vertex2d> exteriorVertices;
 
@@ -105,14 +105,14 @@ void FieldModel::update(double currTimestamp)
 
 
 
-void FieldModel::hasCollision(bool c)
+void FieldModel::isInCollision(bool c)
 {
     _inCollision = c;
 
     // Only count collisions after 1s
     if (_currTimestamp - _timeLastCollision > 1.0)
     {
-        _numCollisions++;
+        _collisionCount++;
         _timeLastCollision = _currTimestamp;
     }
 }

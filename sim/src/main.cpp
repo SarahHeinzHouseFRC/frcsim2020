@@ -12,7 +12,6 @@
 #include "Timer.h"
 #include "CoreAgent.h"
 #include "WorldModel.h"
-#include "PhysicsEngine.h"
 
 
 int main(int argc, char** argv)
@@ -50,7 +49,6 @@ int main(int argc, char** argv)
     // Initialize vehicle and field models
     double t = Time::now();
     WorldModel wm(config, t);
-    PhysicsEngine physicsEngine(wm, t);
 
     // Initialize a timer to countdown 2m 15s
     Timer timer(t, 135);
@@ -119,7 +117,7 @@ int main(int argc, char** argv)
             hud.displayConnectionStatus(coreAgent.isConnected());
             hud.displayVehicleState(wm.vehicleModel());
             hud.displayTimerStatus(timer.isRunning(), timer.getValue());
-            hud.displayNumCollisions(wm.fieldModel().getNumCollisions());
+            hud.displayNumCollisions(wm.fieldModel().getCollisionCount());
 
             // Step the visualizer
             vis.step();
@@ -137,9 +135,6 @@ int main(int argc, char** argv)
 
         // Update the world to reflect the current time
         wm.update(t);
-
-        // Apply collisions and constraints
-        physicsEngine.update(wm, t);
 
         if (reset)
         {

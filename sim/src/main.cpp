@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <thread>
+#include "ArgumentParser.h"
 #include "ConfigReader.h"
 #include "Scene.h"
 #include "Hud.h"
@@ -13,23 +14,26 @@
 #include "CoreAgent.h"
 #include "WorldModel.h"
 
+#define DEFAULT_CONFIG_FILE "../../config/robotConfig.yml"
+
 
 int main(int argc, char** argv)
 {
-    // Use default or user-specified config
-    std::string configPath = (argc < 2 ? "../../config/robotConfig.yml" : argv[1]);
-
-    // Configure options
-    bool verbose = false;
-    if (argc > 2 && strcmp(argv[2], "--verbose") == 0)
+    // Configure from command line arguments
+    ArgumentParser args(argc, argv);
+    std::string configPath = (args.contains("--config") ? args.getValue("--config") : DEFAULT_CONFIG_FILE);
+    bool verbose = args.contains("--verbose") || args.contains("-v");
+    bool debugView = args.contains("--debug-view");
+    if (args.contains("--help") || args.contains("-h"))
     {
-        verbose = true;
-    }
-
-    bool debugView = false;
-    if (argc > 2 && strcmp(argv[2], "--debug-view") == 0)
-    {
-        debugView = true;
+        std::cout << "\nUsage: ./robot_sim [flags]\n"
+                     "\n"
+                     "Optional arguments:\n"
+                     "  -h, --help               Show this help message and exit\n"
+                     "  --config <config_file>   Use the given config file instead of the default\n"
+                     "  --verbose                Increase output verbosity\n"
+                     "  --debug-view             Launch with a lightweight view\n";
+        return 0;
     }
 
     // Read config file
@@ -139,7 +143,6 @@ int main(int argc, char** argv)
         if (reset)
         {
 //            wm.reset();
-//            collisions.reset(wm);
             timer.reset();
             reset = false;
         }

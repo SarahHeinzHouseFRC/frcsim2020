@@ -30,6 +30,7 @@ set(SRCS
         src/UdpNode.cpp
         src/PhysicsEngine.cpp
         src/Geometry.cpp
+        src/ArgumentParser.cpp
         )
 
 add_executable(robot_sim ${SRCS})

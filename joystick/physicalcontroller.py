@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2019 FRC Team 3260
+# Copyright (c) 2020 FRC Team 3260
 #
 
 from thirdParty.frc4564_xbox_python.frc4564_xbox_python import Joystick

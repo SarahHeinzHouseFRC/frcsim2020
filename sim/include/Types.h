@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019 FRC Team 3260
+ * Copyright (c) 2020 FRC Team 3260
  */
 
 #ifndef ROBOT_SIM_TYPES_H

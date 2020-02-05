@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 #
-# Copyright (c) 2019 FRC Team 3260
+# Copyright (c) 2020 FRC Team 3260
 #
 
 import sys

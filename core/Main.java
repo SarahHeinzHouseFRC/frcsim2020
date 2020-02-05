@@ -1,7 +1,10 @@
 /**
- * Entry point
+ * Copyright (c) 2020 Team 3260
  */
 
+/**
+ * Entry point
+ */
 public class Main
 {
     public static void main(String[] args)

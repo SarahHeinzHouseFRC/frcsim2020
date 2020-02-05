@@ -1,4 +1,8 @@
 /**
+ * Copyright (c) 2020 Team 3260
+ */
+
+/**
  * Storage class for holding parameters to be sent to the sim
  */
 public class SimCommands

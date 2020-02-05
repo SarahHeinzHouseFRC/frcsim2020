@@ -1,6 +1,14 @@
+/**
+ * Copyright (c) 2020 Team 3260
+ */
+
 import java.io.*;
 import java.net.*;
 
+/**
+ * Comms agent responsible for communicating with the sim. Continuously sends commands to the sim to update the vehicle
+ * and continuously listens for vehicle state back from the sim.
+ */
 public class SimAgent
 {
     public SimCommands commands;

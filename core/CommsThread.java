@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2020 Team 3260
+ */
+
+/**
+ * Background thread for handling rx/tx with the joystick and sim
+ */
 public class CommsThread extends Thread
 {
     public SimAgent simAgent;

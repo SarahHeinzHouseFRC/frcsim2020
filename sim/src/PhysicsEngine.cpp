@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019 FRC Team 3260
+ * Copyright (c) 2020 Team 3260
  */
 
 #include "Geometry.h"

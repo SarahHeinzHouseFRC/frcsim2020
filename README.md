@@ -1,24 +1,41 @@
-# SHARP Team 3260 FRC Software #
-Consists of robot code, a mock joystick controller, and a simulator.
+# SHARP Team 3260 FRC Simulator #
+This project consists of core robot code (Java), a mock joystick controller (Python), and a vehicle simulator (C++)
+which communicate over fast UDP using JSON strings. This code was tested and runs in Ubuntu 18.04.
 
-## Interface Control Document (ICD) ##
+Among other benefits, this software allows the software team to rapidly develop and test their software independently of
+the hardware team, status of the robot, and availability of physical joysticks; game strategy development; driver
+tryouts; and more. The hope is to keep adding more functionality to this software, including log playback to allow log
+playback for debugging, races against your own "phantom" from a previous run, and multiplayer support.
+
+For details on each of the three components included, please see the specific documentation for each:
+  - [Joystick](joystick/README.md)
+  - [Core](core/README.md)
+  - [Sim](sim/README.md)
 
 ```
       +----------------+      Commands      +----------------+     Commands       +----------------+
       |                | -----------------> |                | -----------------> |                |
-      |   Joystick     |                    |    Controls    |                    |     Vehicle    |
+      |   Joystick     |                    |      Core      |                    |     Vehicle    |
       |                | <----------------- |                | <----------------- |                |
       +----------------+     Heartbeat      +----------------+       State        +----------------+
 ```
 
-### Joystick -> Controls ###
-The joystick sends the user's commands to the robot controls logic as JSON over UDP. In the default configuration, these
-commmands are sent to localhost:4000. A sample of this JSON string follows:
+## Configuration File ##
+This project can be configured using the YAML config file located at `config/robotConfig.yml`. Options for changing the
+IPs and ports are available, as well as some configuration options for the vehicle dynamics.
+
+
+## Interface Control Document (ICD) ##
+Feel free to develop more components that plug into this simulator. The interface is open and explained in detail below.
+
+### Joystick -> Core ###
+The joystick sends the user's commands to the robot's core logic as JSON over UDP. In the default configuration, these
+commands are sent to localhost:4000. A sample of this JSON string follows:
 ```
 { 00000 00000 00000 00000 0000 0000 }
 ```
 
-| Character(s)  | Descrption                      | Range    |
+| Character(s)  | Description                     | Range    |
 | --------------| ------------------------------- | -------- |
 | 2-7           | Left joystick's x-displacement  | -511-512 |
 | 8-13          | Left joystick's y-displacement  | -511-512 |
@@ -33,34 +50,35 @@ commmands are sent to localhost:4000. A sample of this JSON string follows:
 | 33            | Dpad left                       | 0 or 1   |
 | 34            | Dpad right                      | 0 or 1   |
 
-### Controls -> Joystick ###
-The controls logic also sends back an empty JSON string to the joystick of the following format:
+### Core -> Joystick ###
+The core logic also sends back an empty JSON string to the joystick of the following format:
 ```
 {}
 ```
 The purpose of this empty message is to serve as a "heartbeat" to let the joystick know whether the controls logic is
 still alive. This allows the joystick to display a "connected" or "disconnected" message in its GUI.
 
-### Controls -> Vehicle ###
-The controls logic can perform whatever logic (PID, traction control, etc.) on the received joystick commands and then
-construct new commands to send to the vehicle. The message sent to the vehicle has the following form:
+### Core -> Vehicle ###
+The core logic performs whatever logic (PID, traction control, etc.) given the commands from the joystick and its model
+of the vehicle's state and then construct new commands to send to the vehicle. The message sent to the vehicle has the
+following form:
 ```
 { 00000 00000 00000 }
 ```
 
-| Character(s)  | Descrption                      | Range    |
+| Character(s)  | Description                     | Range    |
 | --------------| ------------------------------- | -------- |
 | 3-7           | Left drive motor speed          | -511-512 |
 | 9-13          | Right drive motor speed         | -511-512 |
 | 15-19         | Elevator motor speed            | -511-512 |
 
-### Vehicle -> Controls ###
+### Vehicle -> Core ###
 The vehicle continuously sends state information back to the controls logic. This message has the following form:
 ```
 { 00000 00000 00000 }
 ```
 
-| Character(s)  | Descrption                      | Range    |
+| Character(s)  | Description                     | Range    |
 | --------------| ------------------------------- | -------- |
 | 3-7           | Left drive encoder ticks        | 0-1024   |
 | 9-13          | Right drive encoder ticks       | 0-1024   |

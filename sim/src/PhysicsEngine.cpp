@@ -3,12 +3,12 @@
  */
 
 #include <VehicleModel.h>
-#include "CollisionDetector.h"
+#include "PhysicsEngine.h"
 
 using namespace Geometry;
 
 
-CollisionDetector::CollisionDetector(const WorldModel& wm, double timestamp) :
+PhysicsEngine::PhysicsEngine(const WorldModel& wm, double timestamp) :
         _prevTimestamp(timestamp),
         _muGamePiece(0.1),
         _gravity(0.0f, 0.0f),
@@ -63,7 +63,7 @@ CollisionDetector::CollisionDetector(const WorldModel& wm, double timestamp) :
 
 
 
-void CollisionDetector::update(WorldModel& wm, double currTimestamp)
+void PhysicsEngine::update(WorldModel& wm, double currTimestamp)
 {
     double elapsedTime = currTimestamp - _prevTimestamp;
 
@@ -119,7 +119,7 @@ void CollisionDetector::update(WorldModel& wm, double currTimestamp)
 
 
 
-void CollisionDetector::reset(WorldModel& wm)
+void PhysicsEngine::reset(WorldModel& wm)
 {
     // Destroy vehicle and game piece bodies
     _world.DestroyBody(_vehicleBody);
@@ -137,7 +137,7 @@ void CollisionDetector::reset(WorldModel& wm)
 
 
 
-b2Body* CollisionDetector::initVehicleBody(const VehicleModel& vehicleModel)
+b2Body* PhysicsEngine::initVehicleBody(const VehicleModel& vehicleModel)
 {
     // Define the dynamic body. We set its position and call the body factory.
     b2BodyDef vehicleBodyDef;
@@ -178,7 +178,7 @@ b2Body* CollisionDetector::initVehicleBody(const VehicleModel& vehicleModel)
 
 
 
-std::vector<b2Body*> CollisionDetector::initGamePieceBodies(const std::vector<GamePieceModel>& gamePieceModels)
+std::vector<b2Body*> PhysicsEngine::initGamePieceBodies(const std::vector<GamePieceModel>& gamePieceModels)
 {
     std::vector<b2Body*> gamePieceBodies;
     for (const auto& gamePieceModel : gamePieceModels)

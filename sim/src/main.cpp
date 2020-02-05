@@ -12,7 +12,7 @@
 #include "Timer.h"
 #include "CoreAgent.h"
 #include "WorldModel.h"
-#include "CollisionDetector.h"
+#include "PhysicsEngine.h"
 
 
 int main(int argc, char** argv)
@@ -50,7 +50,7 @@ int main(int argc, char** argv)
     // Initialize vehicle and field models
     double t = Time::now();
     WorldModel wm(config, t);
-    CollisionDetector collisions(wm, t);
+    PhysicsEngine physicsEngine(wm, t);
 
     // Initialize a timer to countdown 2m 15s
     Timer timer(t, 135);
@@ -139,7 +139,7 @@ int main(int argc, char** argv)
         wm.update(t);
 
         // Apply collisions and constraints
-        collisions.update(wm, t);
+        physicsEngine.update(wm, t);
 
         if (reset)
         {

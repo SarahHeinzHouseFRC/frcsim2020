@@ -15,7 +15,7 @@
 class WorldModel
 {
 friend class Scene;
-friend class CollisionDetector;
+friend class PhysicsEngine;
 public:
     /**
      * Constructor

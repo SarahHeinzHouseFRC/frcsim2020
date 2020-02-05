@@ -28,7 +28,7 @@ set(SRCS
         src/Color.cpp
         src/Label.cpp
         src/UdpNode.cpp
-        src/CollisionDetector.cpp
+        src/PhysicsEngine.cpp
         src/Geometry.cpp
         )
 

@@ -12,7 +12,7 @@
 class GamePieceModel : public BaseModel
 {
 friend class GamePieceView;
-friend class CollisionDetector;
+friend class PhysicsEngine;
 friend class WorldModel;
 public:
     /**

@@ -18,7 +18,7 @@ class VehicleModel : public BaseModel
 {
 friend class VehicleView;
 friend class Hud;
-friend class CollisionDetector;
+friend class PhysicsEngine;
 public:
     /**
      * Constructor

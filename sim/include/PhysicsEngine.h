@@ -2,8 +2,8 @@
  * Copyright (c) 2019 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_COLLISIONDETECTOR_H
-#define ROBOT_SIM_COLLISIONDETECTOR_H
+#ifndef ROBOT_SIM_PHYSICSENGINE_H
+#define ROBOT_SIM_PHYSICSENGINE_H
 
 #include "box2d/box2d.h"
 #include "Geometry.h"
@@ -11,13 +11,13 @@
 #include "BaseModel.h"
 
 
-class CollisionDetector
+class PhysicsEngine
 {
 public:
     /**
      * Constructor
      */
-    CollisionDetector(const WorldModel& wm, double timestamp);
+    PhysicsEngine(const WorldModel& wm, double timestamp);
 
     /**
      * Detects collisions between the field and field actors
@@ -98,4 +98,4 @@ private:
 };
 
 
-#endif //ROBOT_SIM_COLLISIONDETECTOR_H
+#endif //ROBOT_SIM_PHYSICSENGINE_H

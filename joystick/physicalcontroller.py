@@ -2,7 +2,7 @@
 # Copyright (c) 2020 FRC Team 3260
 #
 
-from thirdParty.frc4564_xbox_python.frc4564_xbox_python import Joystick
+from lib.frc4564_xbox_python.xbox import Joystick
 from comms import *
 from threading import Thread
 

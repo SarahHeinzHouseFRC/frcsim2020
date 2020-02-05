@@ -3,7 +3,7 @@ project(robot_sim)
 
 find_package(OpenSceneGraph REQUIRED COMPONENTS osgViewer osgDB osgGA osgText)
 
-add_subdirectory(extern/box2d)
+add_subdirectory(lib/box2d)
 
 include_directories(
         include

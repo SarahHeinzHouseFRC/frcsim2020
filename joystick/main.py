@@ -7,8 +7,8 @@
 import sys
 import argparse
 import yaml
-from virtualcontroller import VirtualXboxController
-from physicalcontroller import PhysicalXboxController
+from virtual_xbox_controller import VirtualXboxController
+from physical_xbox_controller import PhysicalXboxController
 from PyQt4.QtGui import QApplication
 
 CONFIG_FILE = "../config/robotConfig.yml"

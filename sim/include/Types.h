@@ -20,7 +20,7 @@ struct SensorState
     std::string asJson()
     {
         char tmp[1024];
-        sprintf(tmp, "{ %05d %05d %05d }", leftDriveEncoderPosition, rightDriveEncoderPosition, elevatorEncoderPosition);
+        sprintf(tmp, "{ 'leftDriveEncoder': %04d, 'rightDriveEncoder': %04d, 'elevatorEncoder': %04d }", leftDriveEncoderPosition, rightDriveEncoderPosition, elevatorEncoderPosition);
         return tmp;
     }
 };
@@ -49,12 +49,12 @@ struct CoreCommands
      */
     explicit CoreCommands(const std::string& json)
     {
-        leftDriveMotorSpeed = std::stoi(json.substr(2, 7));
-        rightDriveMotorSpeed = std::stoi(json.substr(8, 13));
-        elevatorMotorSpeed = std::stoi(json.substr(14, 19));
-        back = std::stoi(json.substr(20, 1));
-        guide = std::stoi(json.substr(21, 1));
-        start = std::stoi(json.substr(22, 1));
+        leftDriveMotorSpeed = std::stoi(json.substr(25, 4));
+        rightDriveMotorSpeed = std::stoi(json.substr(55, 4));
+        elevatorMotorSpeed = std::stoi(json.substr(83, 4));
+        back = std::stoi(json.substr(97, 1));
+        guide = std::stoi(json.substr(109, 1));
+        start = std::stoi(json.substr(121, 1));
     }
 
     void reset()

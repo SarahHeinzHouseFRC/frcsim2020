@@ -30,16 +30,17 @@ bool CoreAgent::rxCoreCommands()
     std::string msg = _comms->receive();
     if (msg[0] == '{')
     {
+        if (_verbose)
+        {
+            printf("CoreAgent: Received command %s\n", msg.c_str());
+        }
+
         // Translate received commands from JSON and store into _coreCommands
         _coreCommands = CoreCommands(msg);
 
         // Reset dropped packets count
         _numDroppedPackets = 0;
 
-        if (_verbose)
-        {
-            printf("CoreAgent: Received command %s\n", msg.c_str());
-        }
         return true;
     }
     else

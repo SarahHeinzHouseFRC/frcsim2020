@@ -13,8 +13,8 @@ public class SimState
 
     public void fromJson(String str)
     {
-        leftDriveEncoderPosition = Integer.parseInt(str.substring(2, 7));
-        rightDriveEncoderPosition = Integer.parseInt(str.substring(8, 13));
-        elevatorEncoderPos = Integer.parseInt(str.substring(14, 19));
+        leftDriveEncoderPosition = Integer.parseInt(str.substring(22, 26));
+        rightDriveEncoderPosition = Integer.parseInt(str.substring(49, 53));
+        elevatorEncoderPos = Integer.parseInt(str.substring(74, 78));
     }
 }

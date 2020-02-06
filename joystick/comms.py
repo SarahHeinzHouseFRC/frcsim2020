@@ -43,29 +43,26 @@ class ControllerState:
         self.dpad = DpadState()  # 4x 0 or 1
         self.bumper_right = ButtonState()  # 0 or 1
         self.bumper_left = ButtonState()  # 0 or 1
-        self.left_joystick = JoystickState()  # -511 to 512
-        self.right_joystick = JoystickState()  # -511 to 512
+        self.left_joystick = JoystickState()  # -512 to 512
+        self.right_joystick = JoystickState()  # -512 to 512
         self.back = ButtonState()  # 0 or 1
         self.guide = ButtonState()  # 0 or 1
         self.start = ButtonState()  # 0 or 1
 
     def toJson(self):
-        return "{ %05d %05d %05d %05d %01d%01d%01d%01d %01d%01d%01d%01d %01d%01d%01d }" % \
+        return "{ 'leftJoystick': [ %04d, %04d ], 'rightJoystick': [ %04d, %04d ], 'dpad': [ %01d, %01d, %01d, %01d ], 'buttons': [ %01d, %01d, %01d, %01d ], 'back': %01d, 'select': %01d, 'start': %01d }" % \
             (self.left_joystick.x, self.left_joystick.y, self.right_joystick.x, self.right_joystick.y,
-                self.a.pressed, self.b.pressed, self.x.pressed, self.y.pressed,
-                self.dpad.up.pressed,
-                self.dpad.down.pressed,
-                self.dpad.left.pressed,
-                self.dpad.right.pressed,
-                self.back.pressed,
-                self.guide.pressed,
-                self.start.pressed)
+             self.dpad.up.pressed, self.dpad.down.pressed, self.dpad.left.pressed, self.dpad.right.pressed,
+             self.a.pressed, self.b.pressed, self.x.pressed, self.y.pressed,
+             self.back.pressed,
+             self.guide.pressed,
+             self.start.pressed)
 
 
 class JoystickState:
     def __init__(self):
         """
-        X and y displacement which vary from -511 to 512
+        X and y displacement which vary from -512 to 512
         """
         self.x = 0
         self.y = 0

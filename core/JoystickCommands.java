@@ -25,22 +25,20 @@ public class JoystickCommands
 
     public void fromJson(String str)
     {
-        xLeftJoystick = Integer.parseInt(str.substring(2, 7));
-        yLeftJoystick = Integer.parseInt(str.substring(8, 13));
-        xRightJoystick = Integer.parseInt(str.substring(14, 19));
-        yRightJoystick = Integer.parseInt(str.substring(20, 25));
-        a = Integer.parseInt(str.substring(26, 27));
-        b = Integer.parseInt(str.substring(27, 28));
-        x = Integer.parseInt(str.substring(28, 29));
-        y = Integer.parseInt(str.substring(29, 30));
-        upDpad = Integer.parseInt(str.substring(31, 32));
-        downDpad = Integer.parseInt(str.substring(32, 33));
-        leftDpad = Integer.parseInt(str.substring(33, 34));
-        rightDpad = Integer.parseInt(str.substring(34, 35));
-        back = Integer.parseInt(str.substring(36, 37));
-        guide = Integer.parseInt(str.substring(37, 38));
-        start = Integer.parseInt(str.substring(38, 39));
-
-        // TODO: Error checking
+        xLeftJoystick = Integer.parseInt(str.substring(20, 24));
+        yLeftJoystick = Integer.parseInt(str.substring(26, 30));
+        xRightJoystick = Integer.parseInt(str.substring(53, 57));
+        yRightJoystick = Integer.parseInt(str.substring(59, 63));
+        upDpad = Integer.parseInt(str.substring(77, 78));
+        downDpad = Integer.parseInt(str.substring(80, 81));
+        leftDpad = Integer.parseInt(str.substring(83, 84));
+        rightDpad = Integer.parseInt(str.substring(86, 87));
+        a = Integer.parseInt(str.substring(104, 105));
+        b = Integer.parseInt(str.substring(107, 108));
+        x = Integer.parseInt(str.substring(110, 111));
+        y = Integer.parseInt(str.substring(113, 114));
+        back = Integer.parseInt(str.substring(126, 127));
+        guide = Integer.parseInt(str.substring(139, 140));
+        start = Integer.parseInt(str.substring(151, 152));
     }
 }

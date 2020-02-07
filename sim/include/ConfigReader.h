@@ -7,12 +7,14 @@
 
 #include <string>
 #include <yaml-cpp/yaml.h>
+#include "Geometry.h"
 
 
 /**
  * Parses and converts the values in a config file and allows public access to its fields to other classes. Note that
  * despite the config file specifying values in Imperial units, the sim uses SI units throughout. Some values provided
  * by this class are not directly read from the config file, but are calculated from other fields for convenient access.
+ * Also note that weights are converted into masses by this class.
  */
 class ConfigReader
 {
@@ -20,7 +22,7 @@ public:
     /**
      * Default constructor
      */
-    ConfigReader();
+    ConfigReader() = default;
 
     /**
      * Parses the given config file and stores its values as public fields within this class
@@ -35,10 +37,26 @@ public:
     } core;
     struct
     {
-        std::string ip; // IP address
-        int port;       // Port number
         struct
         {
+            std::string ip; // IP address
+            int port;       // Port number
+        } comms;
+        struct
+        {
+            std::vector<Geometry::Vertex2d> exteriorPolygon;
+            std::vector<std::vector<Geometry::Vertex2d>> interiorPolygons;
+        } field;
+        struct
+        {
+            std::vector<Geometry::Vertex2d> polygon; // Meters where (0,0) is CoG of the vehicle
+            float mass;                              // Kilograms
+            struct
+            {
+                float x;     // Meters
+                float y;     // Meters
+                float theta; // Degrees
+            } initialState;
             struct
             {
                 float width;         // Meters
@@ -56,6 +74,11 @@ public:
             } drivetrain;
             struct
             {
+                struct
+                {
+                    float motorSpeed;  // Rads/sec
+                    float carriagePos; // Meters
+                } initialState;
                 struct
                 {
                     float radius; // Meters
@@ -85,25 +108,12 @@ public:
                     float lengthZ; // Meters
                 } carriage;
             } elevator;
-            struct
-            {
-                float radius; // Meters
-            } gamePiece;
-        } constants;
+        } vehicle;
         struct
         {
-            struct
-            {
-                float x;     // Meters
-                float y;     // Meters
-                float theta; // Degrees
-            } drivetrain;
-            struct
-            {
-                float motorSpeed;  // Rads/sec
-                float carriagePos; // Meters
-            } elevator;
-        } initialState;
+            float radius;                                     // Meters
+            std::vector<Geometry::Vertex2d> initialPositions; // Meters (where (0, 0) is the center of the field)
+        } gamePiece;
     } sim;
     bool verbose;
     bool debugView;
@@ -120,14 +130,24 @@ private:
     void parseSimConfig(const YAML::Node& simConfig);
 
     /**
-     * Helper method for loading sim constant parameters
+     * Helper-helper method for loading sim comms config parameters
      */
-    void parseSimConstantsConfig(const YAML::Node& simConstantsConfig);
+    void parseSimCommsConfig(const YAML::Node& simConfig);
 
     /**
-     * Helper method for loading sim initial state parameters
+     * Helper-helper method for loading sim field config parameters
      */
-    void parseSimInitialStateConfig(const YAML::Node& simInitialStateConfig);
+    void parseSimFieldConfig(const YAML::Node& fieldConfig);
+
+    /**
+     * Helper-helper method for loading sim vehicle config parameters
+     */
+    void parseSimVehicleConfig(const YAML::Node& vehicleConfig);
+
+    /**
+     * Helper-helper method for loading sim game piece config parameters
+     */
+    void parseSimGamePieceConfig(const YAML::Node& gamePieceConfig);
 };
 
 

@@ -83,6 +83,7 @@ private:
     double _wheelRadius; // Needed to calculate travel of robot per unit time
     double _wheelTrack; // Needed to calculate arced turns
     double _drivetrainWidth; // Needed to calculate turning radius
+    double _mass; // Needed to calculate density for collision checker
     double _prevTimestamp; // Needed to calculate how much time has passed since last update()
 
     struct VehicleState

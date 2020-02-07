@@ -177,7 +177,7 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
     vehicleFixtureDef.shape = &vehicleDynamicBox;
 
     // Set the box density to be non-zero, so it will be dynamic.
-    vehicleFixtureDef.density = 83.91f / 0.53f;
+    vehicleFixtureDef.density = (vehicleModel._mass) / 0.53f;
 
     // Override the default friction.
     vehicleFixtureDef.friction = 0.3f;

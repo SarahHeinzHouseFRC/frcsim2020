@@ -17,8 +17,8 @@ public:
     /**
      * Constructor
      */
-    GamePieceModel(const ConfigReader& configReader, double x=0, double y=0) : _initialX(x), _initialY(y),
-            _radius(configReader.sim.constants.gamePiece.radius), _state({ { x, y, 0, 0 } }) {};
+    GamePieceModel(double radius, double x, double y) : _initialX(x), _initialY(y),
+            _radius(radius), _state({ { x, y, 0, 0 } }) {};
 
     /**
      * Reset

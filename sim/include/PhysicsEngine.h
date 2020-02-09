@@ -32,7 +32,7 @@ public:
     /**
      * Deletes all box2d bodies and recreates from them from the models
      */
-    void reset(FieldModel& fieldModel, VehicleModel& vehicleModel, std::vector<GamePieceModel>& gamePieceModels);
+    void reset(const FieldModel& fieldModel, const VehicleModel& vehicleModel, const std::vector<GamePieceModel>& gamePieceModels);
 
 private:
     class CollisionListener : public b2ContactListener

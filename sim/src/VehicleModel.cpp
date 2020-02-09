@@ -4,7 +4,6 @@
 
 #include <cmath>
 #include <ConfigReader.h>
-#include <VehicleModel.h>
 #include "VehicleModel.h"
 
 using namespace Geometry;
@@ -24,9 +23,10 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
         _mass(config.sim.vehicle.mass)
 {
     // Set initial state
-    _state.pose.x = config.sim.vehicle.initialState.x;
-    _state.pose.y = config.sim.vehicle.initialState.y;
-    _state.pose.theta = config.sim.vehicle.initialState.theta;
+    _initialState = { config.sim.vehicle.initialState.x, config.sim.vehicle.initialState.y, config.sim.vehicle.initialState.theta };
+    _state.pose.x = _initialState.x;
+    _state.pose.y = _initialState.y;
+    _state.pose.theta = _initialState.theta;
     _state.elevatorMotorSpeed = config.sim.vehicle.elevator.initialState.motorSpeed;
     _state.elevatorCarriagePos = config.sim.vehicle.elevator.initialState.carriagePos;
 
@@ -109,4 +109,15 @@ SensorState VehicleModel::getSensorState()
     SensorState state{0};
     state.elevatorEncoderPosition = int (1023 * _state.elevatorCarriagePos / _elevatorBeltLength);
     return state;
+}
+
+
+
+
+void VehicleModel::reset()
+{
+    _state = {0};
+    _state.pose.x = _initialState.x;
+    _state.pose.y = _initialState.y;
+    _state.pose.theta = _initialState.theta;
 }

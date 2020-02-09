@@ -46,4 +46,7 @@ void WorldModel::reset()
     {
         gamePiece.reset();
     }
+
+    // Physics engine
+    _physicsEngine.reset(_fieldModel, _vehicleModel, _gamePieceModels);
 }

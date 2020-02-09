@@ -99,20 +99,19 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
 
 
 
-void PhysicsEngine::reset(FieldModel& fieldModel, VehicleModel& vehicleModel, std::vector<GamePieceModel>& gamePieceModels)
+void PhysicsEngine::reset(const FieldModel& fieldModel, const VehicleModel& vehicleModel, const std::vector<GamePieceModel>& gamePieceModels)
 {
-    // Destroy vehicle and game piece bodies
-    _world->DestroyBody(_vehicleBody);
-    for (int i=0; i<_gamePieceBodies.size(); i++)
-    {
-        b2Body* body = _gamePieceBodies.back();
-        _gamePieceBodies.pop_back();
-        _world->DestroyBody(body);
-    }
+    // Reset vehicle
+    _vehicleBody->SetTransform(b2Vec2(vehicleModel._state.pose.x, vehicleModel._state.pose.y), vehicleModel._state.pose.theta);
 
-    // Re-initialize vehicle and game pieces from their models
-    _vehicleBody = initVehicleBody(_world.get(), vehicleModel);
-    _gamePieceBodies = initGamePieceBodies(_world.get(), gamePieceModels);
+    // Reset game pieces
+    for (unsigned int i=0; i<gamePieceModels.size(); i++)
+    {
+        const GamePieceModel& model = gamePieceModels.at(i);
+        b2Body* body = _gamePieceBodies.at(i);
+        body->SetTransform(b2Vec2(model._initialX, model._initialY), 0);
+        body->SetLinearVelocity({ 0, 0 });
+    }
 }
 
 
@@ -161,8 +160,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
     vehicleBodyDef.angle = vehicleModel._state.pose.theta;
     b2Body* vehicleBody = world->CreateBody(&vehicleBodyDef);
 
-    // Define another box shape for our dynamic body.
-    b2PolygonShape vehicleDynamicBox;
+    // Define a polygon shape for our dynamic body.
+    b2PolygonShape vehicleShape;
     Polygon2d bounds = vehicleModel._boundingPolygon;
     b2Vec2 vertices[bounds.numVertices()];
     for (unsigned int i=0; i<bounds.numVertices(); i++)
@@ -170,11 +169,11 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         Vertex2d v = bounds.vertices().at(i);
         vertices[i] = b2Vec2(v.x, v.y);
     }
-    vehicleDynamicBox.Set(vertices, bounds.numVertices());
+    vehicleShape.Set(vertices, bounds.numVertices());
 
     // Define the dynamic body fixture.
     b2FixtureDef vehicleFixtureDef;
-    vehicleFixtureDef.shape = &vehicleDynamicBox;
+    vehicleFixtureDef.shape = &vehicleShape;
 
     // Set the box density to be non-zero, so it will be dynamic.
     vehicleFixtureDef.density = (vehicleModel._mass) / 0.53f;

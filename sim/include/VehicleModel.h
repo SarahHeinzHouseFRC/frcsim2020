@@ -45,7 +45,7 @@ public:
     /**
      * Resets back to initial state
      */
-    void reset() { _state = {0}; }
+    void reset();
 
     /**
      * Returns the bounding polygon of the vehicle in world coordinates
@@ -85,6 +85,11 @@ private:
     double _drivetrainWidth; // Needed to calculate turning radius
     double _mass; // Needed to calculate density for collision checker
     double _prevTimestamp; // Needed to calculate how much time has passed since last update()
+
+    struct
+    {
+        double x, y, theta;
+    } _initialState;
 
     struct VehicleState
     {

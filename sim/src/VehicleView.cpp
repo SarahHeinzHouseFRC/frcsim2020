@@ -8,8 +8,6 @@
 #include "ViewUtils.h"
 #include "Color.h"
 
-#define DEFAULT_VEHICLE_FILE "/home/psahay/chassis.wrl"
-
 
 VehicleView::VehicleView(const ConfigReader& config, const VehicleModel& vehicleModel) :
         _wheelRadius(config.sim.vehicle.drivetrain.wheelRadius),
@@ -36,7 +34,7 @@ VehicleView::VehicleView(const ConfigReader& config, const VehicleModel& vehicle
     }
     else
     {
-        _vehicleNode = osgDB::readNodeFile(DEFAULT_VEHICLE_FILE);
+        _vehicleNode = osgDB::readNodeFile(config.sim.assets.vehicleModelFile);
         addChild(_vehicleNode);
     }
 

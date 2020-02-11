@@ -44,6 +44,13 @@ public:
         } comms;
         struct
         {
+            std::string fieldModelFile;     // Path
+            std::string vehicleModelFile;   // Path
+            std::string gamePieceModelFile; // Path
+            std::string fontFile;           // Path
+        } assets;
+        struct
+        {
             std::vector<Geometry::Vertex2d> exteriorPolygon;
             std::vector<std::vector<Geometry::Vertex2d>> interiorPolygons;
         } field;
@@ -132,7 +139,12 @@ private:
     /**
      * Helper-helper method for loading sim comms config parameters
      */
-    void parseSimCommsConfig(const YAML::Node& simConfig);
+    void parseSimCommsConfig(const YAML::Node& commsConfig);
+
+    /**
+     * Helper-helper method for loading sim asset config parameters
+     */
+    void parseSimAssetsConfig(const YAML::Node& assetsConfig);
 
     /**
      * Helper-helper method for loading sim field config parameters

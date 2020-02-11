@@ -7,8 +7,6 @@
 #include "ViewUtils.h"
 #include "Color.h"
 
-#define DEFAULT_FIELD_FILE "/home/psahay/field2020.wrl"
-
 
 FieldView::FieldView(const ConfigReader& config, const FieldModel& fieldModel)
 {
@@ -19,7 +17,7 @@ FieldView::FieldView(const ConfigReader& config, const FieldModel& fieldModel)
     }
     else
     {
-        _fieldNode = osgDB::readNodeFile(DEFAULT_FIELD_FILE);
+        _fieldNode = osgDB::readNodeFile(config.sim.assets.fieldModelFile);
         addChild(_fieldNode);
     }
 

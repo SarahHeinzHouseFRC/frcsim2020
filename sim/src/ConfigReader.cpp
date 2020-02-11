@@ -52,6 +52,7 @@ void ConfigReader::parseCoreConfig(const YAML::Node& coreConfig)
 void ConfigReader::parseSimConfig(const YAML::Node& simConfig)
 {
     parseSimCommsConfig(simConfig["comms"]);
+    parseSimAssetsConfig(simConfig["assets"]);
     parseSimFieldConfig(simConfig["field"]);
     parseSimVehicleConfig(simConfig["vehicle"]);
     parseSimGamePieceConfig(simConfig["gamePiece"]);
@@ -63,6 +64,16 @@ void ConfigReader::parseSimCommsConfig(const YAML::Node& commsConfig)
 {
     sim.comms.ip = commsConfig["ip"].as<std::string>();
     sim.comms.port = commsConfig["port"].as<int>();
+}
+
+
+
+void ConfigReader::parseSimAssetsConfig(const YAML::Node &assetsConfig)
+{
+    sim.assets.fieldModelFile = assetsConfig["fieldModelFile"].as<std::string>();
+    sim.assets.vehicleModelFile = assetsConfig["vehicleModelFile"].as<std::string>();
+    sim.assets.gamePieceModelFile = assetsConfig["gamePieceModelFile"].as<std::string>();
+    sim.assets.fontFile = assetsConfig["fontFile"].as<std::string>();
 }
 
 

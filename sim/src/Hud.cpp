@@ -46,10 +46,14 @@ Hud::Hud(const ConfigReader& config) : _width(225)
     _geode->addDrawable(_geom);
     _root->addChild(_geode);
 
+    constexpr int H1_FONT_SIZE = 24;
+    constexpr int H2_FONT_SIZE = 22;
+    constexpr int P_FONT_SIZE = 16;
+
     // Add labels to _labelsGeode
     _labelsGeode = new osg::Geode;
     _root->addChild(_labelsGeode);
-    _connected = new TopLabel("Connected", -94);
+    _connected = new TopLabel("Connected", -94, P_FONT_SIZE, config.sim.assets.fontFile);
     _connected->setDrawMode(osgText::TextBase::TEXT | osgText::TextBase::FILLEDBOUNDINGBOX);
     _connected->setBoundingBoxMargin(5);
     _labelsGeode->addChild(_connected);
@@ -57,36 +61,36 @@ Hud::Hud(const ConfigReader& config) : _width(225)
     float height = 0;
 
     height -= 34;
-    auto title = new TopLabel("Robot Sim", height, 24);
+    auto title = new TopLabel("Robot Sim", height, H1_FONT_SIZE, config.sim.assets.fontFile);
     _labelsGeode->addChild(title);
 
     height -= 20;
-    auto subtitle = new TopLabel("Team SHARP 3260", height);
+    auto subtitle = new TopLabel("Team SHARP 3260", height, P_FONT_SIZE, config.sim.assets.fontFile);
     subtitle->setColor(osg::Vec4(0.8, 0.8, 1, 1));
     _labelsGeode->addChild(subtitle);
 
     height -= 100;
-    _timer = new TopLabel("00:00", height, 22);
+    _timer = new TopLabel("00:00", height, H2_FONT_SIZE, config.sim.assets.fontFile);
     _labelsGeode->addChild(_timer);
 
     height -= 30;
-    _numCollisions = new TopLabel("Collisions: 0", height, 22);
+    _numCollisions = new TopLabel("Collisions: 0", height, H2_FONT_SIZE, config.sim.assets.fontFile);
     _labelsGeode->addChild(_numCollisions);
 
     height -= 50;
-    _vehiclePoseState = new TopLabel("", height);
+    _vehiclePoseState = new TopLabel("", height, P_FONT_SIZE, config.sim.assets.fontFile);
     _labelsGeode->addChild(_vehiclePoseState);
 
     height -= 80;
-    _vehicleElevatorState = new TopLabel("", height);
+    _vehicleElevatorState = new TopLabel("", height, P_FONT_SIZE, config.sim.assets.fontFile);
     _labelsGeode->addChild(_vehicleElevatorState);
 
     height -= 60;
-    _vehicleDrivetrainState = new TopLabel("", height);
+    _vehicleDrivetrainState = new TopLabel("", height, P_FONT_SIZE, config.sim.assets.fontFile);
     _labelsGeode->addChild(_vehicleDrivetrainState);
 
-    _labelsGeode->addChild(new BottomLabel("[1] Top-down view", 40));
-    _labelsGeode->addChild(new BottomLabel("[2] Orbit view", 20));
+    _labelsGeode->addChild(new BottomLabel("[1] Top-down view", 40, P_FONT_SIZE, config.sim.assets.fontFile));
+    _labelsGeode->addChild(new BottomLabel("[2] Orbit view", 20, P_FONT_SIZE, config.sim.assets.fontFile));
 }
 
 

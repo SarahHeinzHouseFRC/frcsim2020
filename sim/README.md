@@ -12,26 +12,6 @@ The backend consists of models of the field, vehicle, and game pieces. A physics
 in Angry Birds) performs the collision-checking and constraint-solving, which is included in this project and built as a
 statically-linked library.
 
-## Building and Running ##
-
-First, install the required C++ dependencies:
-```sh
-sudo apt install libopenscenegraph-3.4-dev libyaml-dev
-```
-
-Then, build the project with:
-```sh
-mkdir build
-cd build
-cmake ..
-make -j8
-```
-
-Finally, launch the project with the default config file:
-```sh
-./robot_sim <optional/path/to/config/file>
-```
-
 ## Usage ##
 
 OSG's origin (0, 0, 0) is at the center of the field. The robot follows OSG's convention and faces in the positive-x

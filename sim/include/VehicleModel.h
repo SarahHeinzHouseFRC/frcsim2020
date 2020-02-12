@@ -75,6 +75,7 @@ private:
 
     Geometry::Polygon2d _boundingPolygon; // Bounding polygon of the vehicle in vehicle frame
     Geometry::Polygon2d _boundingPolygonWorld; // Bounding polygon of the vehicle in world frame
+    Geometry::Polygon2d _ingestibleRegion; // Bounding polygon of the ingestible region in vehicle frame
     double _elevatorBeltLength; // Need to enforce the carriage to stay bw 0 and this belt length (meters)
     double _elevatorMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
     double _leftDriveMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)

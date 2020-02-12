@@ -33,6 +33,9 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
     // Make bounding polygon
     _boundingPolygon = Polygon2d(config.sim.vehicle.polygon);
     _boundingPolygonWorld = _boundingPolygon.transform(_state.pose.x, _state.pose.y, _state.pose.theta);
+
+    // Make ingestible region
+    _ingestibleRegion = std::vector<Vertex2d>{{0.55, -0.31}, {0.55, 0.31}, {0.43, 0.31}, {0.43, -0.31}};
 }
 
 

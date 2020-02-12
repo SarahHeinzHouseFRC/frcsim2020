@@ -26,10 +26,10 @@ VehicleView::VehicleView(const ConfigReader& config, const VehicleModel& vehicle
 {
     if (config.debugView)
     {
-        _vehicleNode = makeVehicle(config);
+        _vehicleNode = drawVehicle(config);
         addChild(_vehicleNode);
 
-        _elevatorPat = makeVehicleElevator();
+        _elevatorPat = drawElevator();
         addChild(_elevatorPat);
     }
     else
@@ -38,8 +38,11 @@ VehicleView::VehicleView(const ConfigReader& config, const VehicleModel& vehicle
         addChild(_vehicleNode);
     }
 
-    _vehicleBounds = makeVehicleBounds(vehicleModel);
+    _vehicleBounds = drawCollisionBoundary(vehicleModel);
     addChild(_vehicleBounds);
+
+    osg::ref_ptr<osg::Geode> ingestibleRegion = drawIngestibleRegion(vehicleModel);
+    addChild(ingestibleRegion);
 }
 
 
@@ -65,7 +68,7 @@ void VehicleView::update(const VehicleModel& vehicleModel)
 
 
 
-osg::ref_ptr<osg::Geode> VehicleView::makeVehicle(const ConfigReader &config)
+osg::ref_ptr<osg::Geode> VehicleView::drawVehicle(const ConfigReader &config)
 {
     osg::ref_ptr<osg::Geode> robotGeode = new osg::Geode;
 
@@ -166,7 +169,7 @@ osg::ref_ptr<osg::Geode> VehicleView::makeVehicle(const ConfigReader &config)
 
 
 
-osg::ref_ptr<osg::PositionAttitudeTransform> VehicleView::makeVehicleElevator()
+osg::ref_ptr<osg::PositionAttitudeTransform> VehicleView::drawElevator()
 {
     // Elevator carriage
     osg::ref_ptr<osg::PositionAttitudeTransform> carriagePat = new osg::PositionAttitudeTransform;
@@ -179,7 +182,7 @@ osg::ref_ptr<osg::PositionAttitudeTransform> VehicleView::makeVehicleElevator()
 
 
 
-osg::ref_ptr<osg::Geode> VehicleView::makeVehicleBounds(const VehicleModel& vehicleModel)
+osg::ref_ptr<osg::Geode> VehicleView::drawCollisionBoundary(const VehicleModel& vehicleModel)
 {
     osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
     for (const auto& vertex : vehicleModel._boundingPolygon.vertices())
@@ -189,5 +192,20 @@ osg::ref_ptr<osg::Geode> VehicleView::makeVehicleBounds(const VehicleModel& vehi
     osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeLineLoop(vertices, Color::Green);
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
     geode->addDrawable(boundingPolygon);
+    return geode;
+}
+
+
+
+osg::ref_ptr<osg::Geode> VehicleView::drawIngestibleRegion(const VehicleModel& vehicleModel)
+{
+    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+    for (const auto& vertex : vehicleModel._ingestibleRegion.vertices())
+    {
+        vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
+    }
+    osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeLineLoop(vertices, Color::Orange);
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+    geode->addDrawable(geom);
     return geode;
 }

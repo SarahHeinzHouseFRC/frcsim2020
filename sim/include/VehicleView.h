@@ -33,17 +33,22 @@ private:
      * Helper method for creating a default robot out of basic geometry
      */
 
-    osg::ref_ptr<osg::Geode> makeVehicle(const ConfigReader& config);
+    osg::ref_ptr<osg::Geode> drawVehicle(const ConfigReader& config);
 
     /**
      * Draws the collision boundary of the vehicle
      */
-    osg::ref_ptr<osg::Geode> makeVehicleBounds(const VehicleModel& vehicleModel);
+    osg::ref_ptr<osg::Geode> drawCollisionBoundary(const VehicleModel& vehicleModel);
+
+    /**
+     * Draws the ingestible region of the vehicle
+     */
+    osg::ref_ptr<osg::Geode> drawIngestibleRegion(const VehicleModel& vehicleModel);
 
     /**
      * Helper method to create a robot carriage
      */
-    osg::ref_ptr<osg::PositionAttitudeTransform> makeVehicleElevator();
+    osg::ref_ptr<osg::PositionAttitudeTransform> drawElevator();
 
     osg::ref_ptr<osg::Node> _vehicleNode;
     osg::ref_ptr<osg::Geode> _vehicleBounds;

@@ -184,14 +184,34 @@ osg::ref_ptr<osg::PositionAttitudeTransform> VehicleView::drawElevator()
 
 osg::ref_ptr<osg::Geode> VehicleView::drawCollisionBoundary(const VehicleModel& vehicleModel)
 {
-    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-    for (const auto& vertex : vehicleModel._boundingPolygon.vertices())
-    {
-        vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
-    }
-    osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeLineLoop(vertices, Color::Green);
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
-    geode->addDrawable(boundingPolygon);
+    {
+        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+        for (const auto& vertex : vehicleModel._boundingPolygonLeft.vertices())
+        {
+            vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
+        }
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeLineLoop(vertices, Color::Green);
+        geode->addDrawable(boundingPolygon);
+    }
+    {
+        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+        for (const auto& vertex : vehicleModel._boundingPolygonRight.vertices())
+        {
+            vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
+        }
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeLineLoop(vertices, Color::Green);
+        geode->addDrawable(boundingPolygon);
+    }
+    {
+        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+        for (const auto& vertex : vehicleModel._boundingPolygonRear.vertices())
+        {
+            vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
+        }
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeLineLoop(vertices, Color::Green);
+        geode->addDrawable(boundingPolygon);
+    }
     return geode;
 }
 

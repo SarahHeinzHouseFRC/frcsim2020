@@ -160,29 +160,65 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
     vehicleBodyDef.angle = vehicleModel._state.pose.theta;
     b2Body* vehicleBody = world->CreateBody(&vehicleBodyDef);
 
-    // Define a polygon shape for our dynamic body.
-    b2PolygonShape vehicleShape;
-    Polygon2d bounds = vehicleModel._boundingPolygon;
-    b2Vec2 vertices[bounds.numVertices()];
-    for (unsigned int i=0; i<bounds.numVertices(); i++)
+    // Define a left polygon shape for our dynamic body
     {
-        Vertex2d v = bounds.vertices().at(i);
-        vertices[i] = b2Vec2(v.x, v.y);
+        b2FixtureDef vehicleFixtureDef;
+        b2PolygonShape vehicleShape;
+        Polygon2d bounds = vehicleModel._boundingPolygonLeft;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        vehicleShape.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &vehicleShape;
+        vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
+        vehicleFixtureDef.friction = 0.3f;
+
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
     }
-    vehicleShape.Set(vertices, bounds.numVertices());
 
-    // Define the dynamic body fixture.
-    b2FixtureDef vehicleFixtureDef;
-    vehicleFixtureDef.shape = &vehicleShape;
+    // Define a left polygon shape for our dynamic body
+    {
+        b2FixtureDef vehicleFixtureDef;
+        b2PolygonShape vehicleShape;
+        Polygon2d bounds = vehicleModel._boundingPolygonRight;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        vehicleShape.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &vehicleShape;
+        vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
+        vehicleFixtureDef.friction = 0.3f;
 
-    // Set the box density to be non-zero, so it will be dynamic.
-    vehicleFixtureDef.density = (vehicleModel._mass) / 0.53f;
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
 
-    // Override the default friction.
-    vehicleFixtureDef.friction = 0.3f;
+    // Define a rear polygon shape for our dynamic body
+    {
+        b2FixtureDef vehicleFixtureDef;
+        b2PolygonShape vehicleShape;
+        Polygon2d bounds = vehicleModel._boundingPolygonRear;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        vehicleShape.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &vehicleShape;
+        vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
+        vehicleFixtureDef.friction = 0.3f;
 
-    // Add the shape to the body.
-    vehicleBody->CreateFixture(&vehicleFixtureDef);
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
 
     // Add user data
     vehicleBody->SetUserData((void*) &vehicleModel);

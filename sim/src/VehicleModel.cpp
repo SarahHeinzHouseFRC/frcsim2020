@@ -31,11 +31,12 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
     _state.elevatorCarriagePos = config.sim.vehicle.elevator.initialState.carriagePos;
 
     // Make bounding polygon
-    _boundingPolygon = Polygon2d(config.sim.vehicle.polygon);
-    _boundingPolygonWorld = _boundingPolygon.transform(_state.pose.x, _state.pose.y, _state.pose.theta);
+    _boundingPolygonLeft = std::vector<Vertex2d>{{0.43, 0.25}, {0.43, 0.31}, {-0.35, 0.31}, {-0.35, 0.25}};
+    _boundingPolygonRight = std::vector<Vertex2d>{{0.43, -0.31}, {0.43, -0.25}, {-0.35, -0.25}, {-0.35, -0.31}};
+    _boundingPolygonRear = std::vector<Vertex2d>{{-0.29, -0.25}, {-0.29, 0.25}, {-0.35, 0.25}, {-0.35, -0.25}};
 
     // Make ingestible region
-    _ingestibleRegion = std::vector<Vertex2d>{{0.55, -0.31}, {0.55, 0.31}, {0.43, 0.31}, {0.43, -0.31}};
+    _ingestibleRegion = std::vector<Vertex2d>{{0.75, -0.31}, {0.75, 0.31}, {0.43, 0.31}, {0.43, -0.31}};
 }
 
 
@@ -86,8 +87,6 @@ void VehicleModel::update(double currTimestamp)
         _state.pose.vy = deltaY / elapsedTime;
         _state.pose.omega = (currTheta - prevTheta) / elapsedTime;
     }
-
-    _boundingPolygonWorld = _boundingPolygon.transform(_state.pose.x, _state.pose.y, _state.pose.theta);
 
     // Update the last timestamp
     _prevTimestamp = currTimestamp;

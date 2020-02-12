@@ -48,11 +48,6 @@ public:
     void reset();
 
     /**
-     * Returns the bounding polygon of the vehicle in world coordinates
-     */
-    Geometry::Polygon2d polygon() const { return _boundingPolygonWorld; }
-
-    /**
      * Returns the model type
      */
     virtual ModelType modelType() { return VEHICLE_MODEL; }
@@ -73,8 +68,9 @@ private:
      */
     static double wrapAngle(double val) { while (val > 2*M_PI) { val -= 2*M_PI; } while (val < 0) { val += 2*M_PI; } return val; }
 
-    Geometry::Polygon2d _boundingPolygon; // Bounding polygon of the vehicle in vehicle frame
-    Geometry::Polygon2d _boundingPolygonWorld; // Bounding polygon of the vehicle in world frame
+    Geometry::Polygon2d _boundingPolygonLeft; // Left bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonRight; // Right bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonRear; // Rear bounding polygon of the vehicle in vehicle frame
     Geometry::Polygon2d _ingestibleRegion; // Bounding polygon of the ingestible region in vehicle frame
     double _elevatorBeltLength; // Need to enforce the carriage to stay bw 0 and this belt length (meters)
     double _elevatorMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)

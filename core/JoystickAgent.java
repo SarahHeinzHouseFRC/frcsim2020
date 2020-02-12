@@ -1,6 +1,14 @@
+/**
+ * Copyright (c) 2020 Team 3260
+ */
+
 import java.io.*;
 import java.net.*;
 
+/**
+ * Comms agent responsible for communicating with the joystick. Continuously sends a heartbeat (empty message) to the
+ * joystick so it knows it's connected and continuously listens for inputs from the joystick.
+ */
 public class JoystickAgent
 {
     public JoystickHeartbeat heartbeat;
@@ -32,6 +40,7 @@ public class JoystickAgent
         try
         {
             comms.send(msg);
+            // System.out.println("JoystickAgent: Transmit state " + msg);
         }
         catch (IOException e)
         {

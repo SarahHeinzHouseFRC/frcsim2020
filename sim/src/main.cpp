@@ -1,9 +1,10 @@
 /**
- * Copyright (c) 2019 FRC Team 3260
+ * Copyright (c) 2020 Team 3260
  */
 
 #include <iostream>
 #include <thread>
+#include "ArgumentParser.h"
 #include "ConfigReader.h"
 #include "Scene.h"
 #include "Hud.h"
@@ -12,25 +13,27 @@
 #include "Timer.h"
 #include "CoreAgent.h"
 #include "WorldModel.h"
-#include "CollisionDetector.h"
+
+#define DEFAULT_CONFIG_FILE "../../config/robotConfig.yml"
 
 
 int main(int argc, char** argv)
 {
-    // Use default or user-specified config
-    std::string configPath = (argc < 2 ? "../../config/robotConfig.yml" : argv[1]);
-
-    // Configure options
-    bool verbose = false;
-    if (argc > 2 && strcmp(argv[2], "--verbose") == 0)
+    // Configure from command line arguments
+    ArgumentParser args(argc, argv);
+    std::string configPath = (args.contains("--config") ? args.getValue("--config") : DEFAULT_CONFIG_FILE);
+    bool verbose = args.contains("--verbose") || args.contains("-v");
+    bool debugView = args.contains("--debug-view");
+    if (args.contains("--help") || args.contains("-h"))
     {
-        verbose = true;
-    }
-
-    bool debugView = false;
-    if (argc > 2 && strcmp(argv[2], "--debug-view") == 0)
-    {
-        debugView = true;
+        std::cout << "\nUsage: ./robot_sim [flags]\n"
+                     "\n"
+                     "Optional arguments:\n"
+                     "  -h, --help               Show this help message and exit\n"
+                     "  --config <config_file>   Use the given config file instead of the default\n"
+                     "  --verbose                Increase output verbosity\n"
+                     "  --debug-view             Launch with a lightweight view\n";
+        return 0;
     }
 
     // Read config file
@@ -50,7 +53,6 @@ int main(int argc, char** argv)
     // Initialize vehicle and field models
     double t = Time::now();
     WorldModel wm(config, t);
-    CollisionDetector collisions(wm, t);
 
     // Initialize a timer to countdown 2m 15s
     Timer timer(t, 135);
@@ -119,7 +121,7 @@ int main(int argc, char** argv)
             hud.displayConnectionStatus(coreAgent.isConnected());
             hud.displayVehicleState(wm.vehicleModel());
             hud.displayTimerStatus(timer.isRunning(), timer.getValue());
-            hud.displayNumCollisions(wm.fieldModel().getNumCollisions());
+            hud.displayNumCollisions(wm.fieldModel().getCollisionCount());
 
             // Step the visualizer
             vis.step();
@@ -138,13 +140,9 @@ int main(int argc, char** argv)
         // Update the world to reflect the current time
         wm.update(t);
 
-        // Apply collisions and constraints
-        collisions.update(wm, t);
-
         if (reset)
         {
-//            wm.reset();
-//            collisions.reset(wm);
+            wm.reset();
             timer.reset();
             reset = false;
         }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019 FRC Team 3260
+ * Copyright (c) 2020 FRC Team 3260
  */
 
 #ifndef ROBOT_SIM_BASEMODEL_H
@@ -17,9 +17,15 @@ public:
         GAME_PIECE_MODEL = 4
     };
 
+    /**
+     * Return the base type
+     */
     virtual ModelType modelType() = 0;
 
-    virtual void hasCollision(bool c) = 0;
+    /**
+     * Collision callback
+     */
+    virtual void isInCollision(bool c) = 0;
 };
 
 

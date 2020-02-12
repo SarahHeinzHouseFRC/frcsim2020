@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019 FRC Team 3260
+ * Copyright (c) 2020 FRC Team 3260
  */
 
 #ifndef ROBOT_SIM_WORLDMODEL_H
@@ -10,12 +10,12 @@
 #include "FieldModel.h"
 #include "VehicleModel.h"
 #include "GamePieceModel.h"
+#include "PhysicsEngine.h"
 
 
 class WorldModel
 {
 friend class Scene;
-friend class CollisionDetector;
 public:
     /**
      * Constructor
@@ -45,6 +45,7 @@ public:
 private:
     FieldModel _fieldModel;
     VehicleModel _vehicleModel;
+    PhysicsEngine _physicsEngine;
     std::vector<GamePieceModel> _gamePieceModels;
 };
 

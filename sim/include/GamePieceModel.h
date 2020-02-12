@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019 FRC Team 3260
+ * Copyright (c) 2020 FRC Team 3260
  */
 
 #ifndef ROBOT_SIM_GAMEPIECEMODEL_H
@@ -12,14 +12,13 @@
 class GamePieceModel : public BaseModel
 {
 friend class GamePieceView;
-friend class CollisionDetector;
-friend class WorldModel;
+friend class PhysicsEngine;
 public:
     /**
      * Constructor
      */
-    GamePieceModel(const ConfigReader& configReader, double x=0, double y=0) : _initialX(x), _initialY(y),
-            _radius(configReader.sim.constants.gamePiece.radius), _state({ { x, y, 0, 0 } }) {};
+    GamePieceModel(double radius, double x, double y) : _initialX(x), _initialY(y),
+            _radius(radius), _state({ { x, y, 0, 0 } }) {};
 
     /**
      * Reset
@@ -29,9 +28,20 @@ public:
         _state = { _initialX, _initialY, 0, 0 };
     }
 
+    /**
+     * Return the model type
+     */
     virtual ModelType modelType() { return GAME_PIECE_MODEL; }
 
-    virtual void hasCollision(bool c) {};
+    /**
+     * Collision callback
+     */
+    virtual void isInCollision(bool c) {};
+
+private:
+    double _radius;
+    double _initialX;
+    double _initialY;
 
     struct
     {
@@ -41,11 +51,6 @@ public:
             double vx, vy;
         } pose;
     } _state;
-
-private:
-    double _radius;
-    double _initialX;
-    double _initialY;
 };
 
 

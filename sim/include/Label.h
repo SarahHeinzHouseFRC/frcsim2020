@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019 FRC Team 3260
+ * Copyright (c) 2020 FRC Team 3260
  */
 
 #ifndef ROBOT_SIM_LABEL_H
@@ -20,7 +20,7 @@ public:
      * @param pos Z-coordinate to display wrt top, bottom, or middle
      * @param fontSize Character height
      */
-    Label(const std::string& text, float pos, float fontSize=16);
+    Label(const std::string& text, float pos, float fontSize, const std::string& fontFile);
 
     /**
      * Label user is responsible for calling this method whenever the window is resized
@@ -40,7 +40,7 @@ public:
     /**
      * Constructor
      */
-    TopLabel(const std::string& text, float pos, float fontSize=16) : Label(text, pos, fontSize) {};
+    TopLabel(const std::string& text, float pos, float fontSize, const std::string& fontFile) : Label(text, pos, fontSize, fontFile) {};
 
     /**
      * TopLabels will always position themselves relative to the top of the window
@@ -59,7 +59,7 @@ public:
     /**
      * Constructor
      */
-    MiddleLabel(const std::string& text, float pos, float fontSize=16) : Label(text, pos, fontSize) {};
+    MiddleLabel(const std::string& text, float pos, float fontSize, const std::string& fontFile) : Label(text, pos, fontSize, fontFile) {};
 
     /**
      * MiddleLabels will always position themselves relative to the vertical middle of the window
@@ -78,7 +78,7 @@ public:
     /**
      * Constructor
      */
-    BottomLabel(const std::string& text, float pos, float fontSize=16) : Label(text, pos, fontSize) {};
+    BottomLabel(const std::string& text, float pos, float fontSize, const std::string& fontFile) : Label(text, pos, fontSize, fontFile) {};
 
     /**
      * BottomLabels will always position themselves relative to the bottom of the window

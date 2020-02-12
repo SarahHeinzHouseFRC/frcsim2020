@@ -1,18 +1,14 @@
 /**
- * Copyright (c) 2019 FRC Team 3260
+ * Copyright (c) 2020 Team 3260
  */
 
 #include <iostream>
-#include <ConfigReader.h>
 #include "ConfigReader.h"
 
 #define RPM_TO_RADS_PER_SEC 0.1047f
 #define DEG_TO_RAD 0.0175f
 #define IN_TO_M 0.0254f
-
-
-ConfigReader::ConfigReader() = default;
-
+#define LBS_TO_KG 0.453f
 
 
 void ConfigReader::parse(const std::string &configFile)
@@ -55,124 +51,168 @@ void ConfigReader::parseCoreConfig(const YAML::Node& coreConfig)
 
 void ConfigReader::parseSimConfig(const YAML::Node& simConfig)
 {
-    sim.ip = simConfig["ip"].as<std::string>();
-    sim.port = simConfig["port"].as<int>();
-    parseSimConstantsConfig(simConfig["constants"]);
-    parseSimInitialStateConfig(simConfig["initialState"]);
+    parseSimCommsConfig(simConfig["comms"]);
+    parseSimAssetsConfig(simConfig["assets"]);
+    parseSimFieldConfig(simConfig["field"]);
+    parseSimVehicleConfig(simConfig["vehicle"]);
+    parseSimGamePieceConfig(simConfig["gamePiece"]);
 }
 
 
 
-void ConfigReader::parseSimConstantsConfig(const YAML::Node& simConstantsConfig)
+void ConfigReader::parseSimCommsConfig(const YAML::Node& commsConfig)
+{
+    sim.comms.ip = commsConfig["ip"].as<std::string>();
+    sim.comms.port = commsConfig["port"].as<int>();
+}
+
+
+
+void ConfigReader::parseSimAssetsConfig(const YAML::Node &assetsConfig)
+{
+    sim.assets.fieldModelFile = assetsConfig["fieldModelFile"].as<std::string>();
+    sim.assets.vehicleModelFile = assetsConfig["vehicleModelFile"].as<std::string>();
+    sim.assets.gamePieceModelFile = assetsConfig["gamePieceModelFile"].as<std::string>();
+    sim.assets.fontFile = assetsConfig["fontFile"].as<std::string>();
+}
+
+
+
+void ConfigReader::parseSimFieldConfig(const YAML::Node& fieldConfig)
+{
+    YAML::Node exteriorPolygon = fieldConfig["exteriorPolygon"];
+    for (const auto& vertex : exteriorPolygon)
+    {
+        sim.field.exteriorPolygon.emplace_back(vertex["x"].as<float>()*IN_TO_M, vertex["y"].as<float>()*IN_TO_M);
+    }
+    YAML::Node interiorPolygons = fieldConfig["interiorPolygons"];
+    for (const auto& interiorPolygon : interiorPolygons)
+    {
+        std::vector<Geometry::Vertex2d> interiorVertices;
+        for (const auto& vertex : interiorPolygon)
+        {
+            interiorVertices.emplace_back(vertex["x"].as<float>()*IN_TO_M, vertex["y"].as<float>()*IN_TO_M);
+        }
+        sim.field.interiorPolygons.emplace_back(interiorVertices);
+    }
+}
+
+
+
+void ConfigReader::parseSimVehicleConfig(const YAML::Node& vehicleConfig)
 {
     //
-    // Load drivetrain constant params
+    // Load vehicle params
     //
 
-    YAML::Node drivetrainConfig = simConstantsConfig["drivetrain"];
+    YAML::Node polygon = vehicleConfig["polygon"];
+    for (auto it=polygon.begin(); it!=polygon.end(); it++)
+    {
+        YAML::Node point = *it;
+        sim.vehicle.polygon.emplace_back(point["x"].as<float>()*IN_TO_M, point["y"].as<float>()*IN_TO_M);
+    }
+    sim.vehicle.mass = vehicleConfig["weight"].as<float>() * LBS_TO_KG;
+
+    YAML::Node initialState = vehicleConfig["initialState"];
+
+    if (initialState)
+    {
+        sim.vehicle.initialState.x = initialState["x"].as<float>() * IN_TO_M;
+        sim.vehicle.initialState.y = initialState["y"].as<float>() * IN_TO_M;
+        sim.vehicle.initialState.theta = initialState["theta"].as<float>() * DEG_TO_RAD;
+    }
+
+    //
+    // Load vehicle drivetrain params
+    //
+
+    YAML::Node drivetrainConfig = vehicleConfig["drivetrain"];
 
     if (drivetrainConfig)
     {
-        sim.constants.drivetrain.width = drivetrainConfig["width"].as<float>() * IN_TO_M;
-        sim.constants.drivetrain.depth = drivetrainConfig["depth"].as<float>() * IN_TO_M;
-        sim.constants.drivetrain.widthChannel = drivetrainConfig["widthChannel"].as<float>() * IN_TO_M;
-        sim.constants.drivetrain.heightChannel = drivetrainConfig["heightChannel"].as<float>() * IN_TO_M;
-        sim.constants.drivetrain.wheelRadius = drivetrainConfig["wheelRadius"].as<float>() * IN_TO_M;
-        sim.constants.drivetrain.wheelWidth = drivetrainConfig["wheelWidth"].as<float>() * IN_TO_M;
-        sim.constants.drivetrain.wheelBase = drivetrainConfig["wheelBase"].as<float>() * IN_TO_M;
-        sim.constants.drivetrain.wheelTrack = sim.constants.drivetrain.width - 2*sim.constants.drivetrain.widthChannel - sim.constants.drivetrain.wheelWidth;
-        sim.constants.drivetrain.motor.maxSpeed = drivetrainConfig["motor"]["maxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
+        sim.vehicle.drivetrain.width = drivetrainConfig["width"].as<float>() * IN_TO_M;
+        sim.vehicle.drivetrain.depth = drivetrainConfig["depth"].as<float>() * IN_TO_M;
+        sim.vehicle.drivetrain.widthChannel = drivetrainConfig["widthChannel"].as<float>() * IN_TO_M;
+        sim.vehicle.drivetrain.heightChannel = drivetrainConfig["heightChannel"].as<float>() * IN_TO_M;
+        sim.vehicle.drivetrain.wheelRadius = drivetrainConfig["wheelRadius"].as<float>() * IN_TO_M;
+        sim.vehicle.drivetrain.wheelWidth = drivetrainConfig["wheelWidth"].as<float>() * IN_TO_M;
+        sim.vehicle.drivetrain.wheelBase = drivetrainConfig["wheelBase"].as<float>() * IN_TO_M;
+        sim.vehicle.drivetrain.wheelTrack = sim.vehicle.drivetrain.width - 2*sim.vehicle.drivetrain.widthChannel - sim.vehicle.drivetrain.wheelWidth;
+        sim.vehicle.drivetrain.motor.maxSpeed = drivetrainConfig["motor"]["maxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
     }
 
     //
     // Load elevator constant params
     //
 
-    YAML::Node elevatorConfig = simConstantsConfig["elevator"];
+    YAML::Node elevatorConfig = vehicleConfig["elevator"];
 
     if (elevatorConfig)
     {
+        // Initial state
+        YAML::Node initialStateConfig = elevatorConfig["initialState"];
+        if (initialStateConfig)
+        {
+            sim.vehicle.elevator.initialState.motorSpeed = initialStateConfig["motorSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
+            sim.vehicle.elevator.initialState.carriagePos = initialStateConfig["carriagePos"].as<float>() * IN_TO_M;
+        }
+
         // Load belt
         YAML::Node beltConfig = elevatorConfig["belt"];
         if (beltConfig)
         {
-            sim.constants.elevator.belt.radius = beltConfig["radius"].as<float>() * IN_TO_M;
-            sim.constants.elevator.belt.width = beltConfig["width"].as<float>() * IN_TO_M;
-            sim.constants.elevator.belt.length = beltConfig["length"].as<float>() * IN_TO_M;
+            sim.vehicle.elevator.belt.radius = beltConfig["radius"].as<float>() * IN_TO_M;
+            sim.vehicle.elevator.belt.width = beltConfig["width"].as<float>() * IN_TO_M;
+            sim.vehicle.elevator.belt.length = beltConfig["length"].as<float>() * IN_TO_M;
         }
 
         // Load motor shaft
         YAML::Node motorShaftConfig = elevatorConfig["motorShaft"];
         if (beltConfig)
         {
-            sim.constants.elevator.motorShaft.radius = motorShaftConfig["radius"].as<float>() * IN_TO_M;
-            sim.constants.elevator.motorShaft.length = motorShaftConfig["length"].as<float>() * IN_TO_M;
+            sim.vehicle.elevator.motorShaft.radius = motorShaftConfig["radius"].as<float>() * IN_TO_M;
+            sim.vehicle.elevator.motorShaft.length = motorShaftConfig["length"].as<float>() * IN_TO_M;
         }
 
         // Load motor
         YAML::Node motorConfig = elevatorConfig["motor"];
         if (motorConfig)
         {
-            sim.constants.elevator.motor.radius = motorConfig["radius"].as<float>() * IN_TO_M;
-            sim.constants.elevator.motor.length = motorConfig["length"].as<float>() * IN_TO_M;
-            sim.constants.elevator.motor.maxSpeed = motorConfig["maxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
+            sim.vehicle.elevator.motor.radius = motorConfig["radius"].as<float>() * IN_TO_M;
+            sim.vehicle.elevator.motor.length = motorConfig["length"].as<float>() * IN_TO_M;
+            sim.vehicle.elevator.motor.maxSpeed = motorConfig["maxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
         }
 
         // Load encoder
         YAML::Node encoderConfig = elevatorConfig["encoder"];
         if (encoderConfig)
         {
-            sim.constants.elevator.encoder.radius = encoderConfig["radius"].as<float>() * IN_TO_M;
-            sim.constants.elevator.encoder.length = encoderConfig["length"].as<float>() * IN_TO_M;
+            sim.vehicle.elevator.encoder.radius = encoderConfig["radius"].as<float>() * IN_TO_M;
+            sim.vehicle.elevator.encoder.length = encoderConfig["length"].as<float>() * IN_TO_M;
         }
 
         // Load carriage
         YAML::Node carriageConfig = elevatorConfig["carriage"];
         if (carriageConfig)
         {
-            sim.constants.elevator.carriage.lengthX = carriageConfig["lengthX"].as<float>() * IN_TO_M;
-            sim.constants.elevator.carriage.lengthY = carriageConfig["lengthY"].as<float>() * IN_TO_M;
-            sim.constants.elevator.carriage.lengthZ = carriageConfig["lengthZ"].as<float>() * IN_TO_M;
+            sim.vehicle.elevator.carriage.lengthX = carriageConfig["lengthX"].as<float>() * IN_TO_M;
+            sim.vehicle.elevator.carriage.lengthY = carriageConfig["lengthY"].as<float>() * IN_TO_M;
+            sim.vehicle.elevator.carriage.lengthZ = carriageConfig["lengthZ"].as<float>() * IN_TO_M;
         }
-    }
-
-    //
-    // Load game piece config
-    //
-
-    YAML::Node gamePieceConfig = simConstantsConfig["gamePiece"];
-    if (gamePieceConfig)
-    {
-        sim.constants.gamePiece.radius = gamePieceConfig["radius"].as<float>() * IN_TO_M;
     }
 }
 
 
 
-void ConfigReader::parseSimInitialStateConfig(const YAML::Node& simInitialStateConfig)
+void ConfigReader::parseSimGamePieceConfig(const YAML::Node& gamePieceConfig)
 {
-    //
-    // Load drivetrain initial state params
-    //
-
-    YAML::Node drivetrainConfig = simInitialStateConfig["drivetrain"];
-
-    if (drivetrainConfig)
+    if (gamePieceConfig)
     {
-        sim.initialState.drivetrain.x = drivetrainConfig["x"].as<float>() * IN_TO_M;
-        sim.initialState.drivetrain.y = drivetrainConfig["y"].as<float>() * IN_TO_M;
-        sim.initialState.drivetrain.theta = drivetrainConfig["theta"].as<float>() * DEG_TO_RAD;
-    }
-
-    //
-    // Load elevator initial state params
-    //
-
-    YAML::Node elevatorConfig = simInitialStateConfig["elevator"];
-
-    if (elevatorConfig)
-    {
-        sim.initialState.elevator.motorSpeed = elevatorConfig["motorSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
-        sim.initialState.elevator.carriagePos = elevatorConfig["carriagePos"].as<float>() * IN_TO_M;
+        sim.gamePiece.radius = gamePieceConfig["radius"].as<float>() * IN_TO_M;
+        YAML::Node initialPositions = gamePieceConfig["initialPositions"];
+        for (const auto& position : initialPositions)
+        {
+            sim.gamePiece.initialPositions.emplace_back(position["x"].as<float>()*IN_TO_M, position["y"].as<float>()*IN_TO_M);
+        }
     }
 }

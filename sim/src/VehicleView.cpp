@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019 FRC Team 3260
+ * Copyright (c) 2020 Team 3260
  */
 
 #include <osgDB/ReadFile>
@@ -8,23 +8,21 @@
 #include "ViewUtils.h"
 #include "Color.h"
 
-#define DEFAULT_VEHICLE_FILE "/home/psahay/chassis.wrl"
-
 
 VehicleView::VehicleView(const ConfigReader& config, const VehicleModel& vehicleModel) :
-        _wheelRadius(config.sim.constants.drivetrain.wheelRadius),
-        _beltRadius(config.sim.constants.elevator.belt.radius),
-        _beltWidth(config.sim.constants.elevator.belt.width),
-        _beltLength(config.sim.constants.elevator.belt.length),
-        _motorShaftRadius(config.sim.constants.elevator.motorShaft.radius),
-        _motorShaftLength(config.sim.constants.elevator.motorShaft.length),
-        _motorRadius(config.sim.constants.elevator.motor.radius),
-        _motorLength(config.sim.constants.elevator.motor.length),
-        _encoderRadius(config.sim.constants.elevator.encoder.radius),
-        _encoderLength(config.sim.constants.elevator.encoder.length),
-        _carriageLengthX(config.sim.constants.elevator.carriage.lengthX),
-        _carriageLengthY(config.sim.constants.elevator.carriage.lengthY),
-        _carriageLengthZ(config.sim.constants.elevator.carriage.lengthZ)
+        _wheelRadius(config.sim.vehicle.drivetrain.wheelRadius),
+        _beltRadius(config.sim.vehicle.elevator.belt.radius),
+        _beltWidth(config.sim.vehicle.elevator.belt.width),
+        _beltLength(config.sim.vehicle.elevator.belt.length),
+        _motorShaftRadius(config.sim.vehicle.elevator.motorShaft.radius),
+        _motorShaftLength(config.sim.vehicle.elevator.motorShaft.length),
+        _motorRadius(config.sim.vehicle.elevator.motor.radius),
+        _motorLength(config.sim.vehicle.elevator.motor.length),
+        _encoderRadius(config.sim.vehicle.elevator.encoder.radius),
+        _encoderLength(config.sim.vehicle.elevator.encoder.length),
+        _carriageLengthX(config.sim.vehicle.elevator.carriage.lengthX),
+        _carriageLengthY(config.sim.vehicle.elevator.carriage.lengthY),
+        _carriageLengthZ(config.sim.vehicle.elevator.carriage.lengthZ)
 {
     if (config.debugView)
     {
@@ -36,7 +34,7 @@ VehicleView::VehicleView(const ConfigReader& config, const VehicleModel& vehicle
     }
     else
     {
-        _vehicleNode = osgDB::readNodeFile(DEFAULT_VEHICLE_FILE);
+        _vehicleNode = osgDB::readNodeFile(config.sim.assets.vehicleModelFile);
         addChild(_vehicleNode);
     }
 
@@ -75,14 +73,14 @@ osg::ref_ptr<osg::Geode> VehicleView::makeVehicle(const ConfigReader &config)
     // Render the robot drivetrain
     //
 
-    float widthChassis = config.sim.constants.drivetrain.width;
-    float depthChassis = config.sim.constants.drivetrain.depth;
-    float widthChannel = config.sim.constants.drivetrain.widthChannel;
-    float heightChannel = config.sim.constants.drivetrain.heightChannel;
-    float wheelWidth = config.sim.constants.drivetrain.wheelWidth;
-    float wheelRadius = config.sim.constants.drivetrain.wheelRadius;
-    float wheelBase = config.sim.constants.drivetrain.wheelBase;
-    float wheelTrack = config.sim.constants.drivetrain.wheelTrack;
+    float widthChassis = config.sim.vehicle.drivetrain.width;
+    float depthChassis = config.sim.vehicle.drivetrain.depth;
+    float widthChannel = config.sim.vehicle.drivetrain.widthChannel;
+    float heightChannel = config.sim.vehicle.drivetrain.heightChannel;
+    float wheelWidth = config.sim.vehicle.drivetrain.wheelWidth;
+    float wheelRadius = config.sim.vehicle.drivetrain.wheelRadius;
+    float wheelBase = config.sim.vehicle.drivetrain.wheelBase;
+    float wheelTrack = config.sim.vehicle.drivetrain.wheelTrack;
 
     osg::ref_ptr<osg::ShapeDrawable> outerLeftEdge = ViewUtils::makeBox(osg::Vec3(0, widthChassis/2 - widthChannel/2, 0), depthChassis, widthChannel, heightChannel, Color::Gray);
     robotGeode->addDrawable(outerLeftEdge);

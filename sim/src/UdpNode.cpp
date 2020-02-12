@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019 FRC Team 3260
+ * Copyright (c) 2020 Team 3260
  */
 
 #include "UdpNode.h"
@@ -63,9 +63,9 @@ std::string UdpNode::receive()
     char buffer[MAXLINE];
     int len, n;
     n = recvfrom(_sockfd, (char *) buffer, MAXLINE, MSG_DONTWAIT, ( struct sockaddr *) &cliaddr, (socklen_t*) &len);
-    if (n > MAXLINE)
+    if (n >= MAXLINE)
     {
-        printf("UdpNode: Received large message!\n");
+        printf("UdpNode: Large message received, buffer overflow!\n");
     }
     buffer[n] = '\0';
     return buffer;

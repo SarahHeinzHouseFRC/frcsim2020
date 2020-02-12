@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019 FRC Team 3260
+ * Copyright (c) 2020 FRC Team 3260
  */
 
 #ifndef ROBOT_SIM_VEHICLEMODEL_H
@@ -18,7 +18,7 @@ class VehicleModel : public BaseModel
 {
 friend class VehicleView;
 friend class Hud;
-friend class CollisionDetector;
+friend class PhysicsEngine;
 public:
     /**
      * Constructor
@@ -45,16 +45,22 @@ public:
     /**
      * Resets back to initial state
      */
-    void reset() { _state = {0}; }
+    void reset();
 
     /**
      * Returns the bounding polygon of the vehicle in world coordinates
      */
     Geometry::Polygon2d polygon() const { return _boundingPolygonWorld; }
 
+    /**
+     * Returns the model type
+     */
     virtual ModelType modelType() { return VEHICLE_MODEL; }
 
-    virtual void hasCollision(bool c) {};
+    /**
+     * Collision callback
+     */
+    virtual void isInCollision(bool c) {};
 
 private:
     /**
@@ -77,7 +83,13 @@ private:
     double _wheelRadius; // Needed to calculate travel of robot per unit time
     double _wheelTrack; // Needed to calculate arced turns
     double _drivetrainWidth; // Needed to calculate turning radius
+    double _mass; // Needed to calculate density for collision checker
     double _prevTimestamp; // Needed to calculate how much time has passed since last update()
+
+    struct
+    {
+        double x, y, theta;
+    } _initialState;
 
     struct VehicleState
     {

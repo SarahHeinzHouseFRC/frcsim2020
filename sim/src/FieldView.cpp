@@ -1,13 +1,11 @@
 /**
- * Copyright (c) 2019 FRC Team 3260
+ * Copyright (c) 2020 Team 3260
  */
 
 #include <osgDB/ReadFile>
 #include "FieldView.h"
 #include "ViewUtils.h"
 #include "Color.h"
-
-#define DEFAULT_FIELD_FILE "/home/psahay/field2020.wrl"
 
 
 FieldView::FieldView(const ConfigReader& config, const FieldModel& fieldModel)
@@ -19,7 +17,7 @@ FieldView::FieldView(const ConfigReader& config, const FieldModel& fieldModel)
     }
     else
     {
-        _fieldNode = osgDB::readNodeFile(DEFAULT_FIELD_FILE);
+        _fieldNode = osgDB::readNodeFile(config.sim.assets.fieldModelFile);
         addChild(_fieldNode);
     }
 

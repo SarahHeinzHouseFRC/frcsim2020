@@ -1,7 +1,6 @@
-# Controller #
+# Joystick #
 
-This project is designed to emulate an Xbox controller. Upon launching the application, the user can click the joystick
-to translate mouse inputs into JSON, which will be sent over UDP to the controls. The controls will send back a simple
-heartbeat signal to let the joystick know it's connected.
-
-This project uses Python 2.7 and is built on top of PyQt4.
+The joystick code is designed to give inputs to the core software. It can run in either "virtual" or "physical" mode,
+meaning the user can either launch this application with a physical Xbox 360 controller plugged into a USB port on a
+computer or as a PyQt application that emulates an Xbox 360 controller. The library used for supporting the physical
+controller was written by FRC Team 4564 in 2013.

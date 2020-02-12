@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019 FRC Team 3260
+ * Copyright (c) 2020 Team 3260
  */
 
 #include <osgDB/ReadFile>
@@ -7,8 +7,6 @@
 #include <osg/Shape>
 #include "Color.h"
 #include "GamePieceView.h"
-
-#define DEFAULT_GAME_PIECE_FILE "/home/psahay/ball.wrl"
 
 
 GamePieceView::GamePieceView(const ConfigReader& config, const GamePieceModel& gamePieceModel)
@@ -20,7 +18,7 @@ GamePieceView::GamePieceView(const ConfigReader& config, const GamePieceModel& g
     }
     else
     {
-        _node = osgDB::readNodeFile(DEFAULT_GAME_PIECE_FILE);
+        _node = osgDB::readNodeFile(config.sim.assets.gamePieceModelFile);
         addChild(_node);
     }
     setPosition(osg::Vec3(gamePieceModel._state.pose.x, gamePieceModel._state.pose.y, 0));

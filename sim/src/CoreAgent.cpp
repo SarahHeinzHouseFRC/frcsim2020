@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019 FRC Team 3260
+ * Copyright (c) 2020 Team 3260
  */
 
 #include <string>
@@ -10,7 +10,7 @@
 CoreAgent::CoreAgent(const ConfigReader& config) :
         _sensorState{0}, _coreCommands{}, _numDroppedPackets(0), _verbose(config.verbose)
 {
-    _comms = new UdpNode(config.sim.port, config.core.ip, config.core.vehiclePort);
+    _comms = new UdpNode(config.sim.comms.port, config.core.ip, config.core.vehiclePort);
 }
 
 
@@ -30,16 +30,17 @@ bool CoreAgent::rxCoreCommands()
     std::string msg = _comms->receive();
     if (msg[0] == '{')
     {
+        if (_verbose)
+        {
+            printf("CoreAgent: Received command %s\n", msg.c_str());
+        }
+
         // Translate received commands from JSON and store into _coreCommands
         _coreCommands = CoreCommands(msg);
 
         // Reset dropped packets count
         _numDroppedPackets = 0;
 
-        if (_verbose)
-        {
-            printf("CoreAgent: Received command %s\n", msg.c_str());
-        }
         return true;
     }
     else

@@ -1,14 +1,14 @@
 #
-# Copyright (c) 2019 FRC Team 3260
+# Copyright (c) 2020 FRC Team 3260
 #
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from comms import *
-from connected import ConnectedWidget
-from controller import ControllerWidget
-from hotkeys import HotkeysWidget
-from info import InfoWidget
+from connected_widget import ConnectedWidget
+from controller_widget import ControllerWidget
+from hotkeys_widget import HotkeysWidget
+from info_widget import InfoWidget
 
 
 class CommsQThread(QThread):
@@ -30,7 +30,7 @@ class CommsQThread(QThread):
 
             # Receive heartbeat
             rx_msg = self.comms.rx()
-            if rx_msg == "{}":
+            if rx_msg:
                 self.connection_status.emit(True)
             elif rx_msg is None:
                 self.connection_status.emit(False)

@@ -1,10 +1,9 @@
 /**
- * Copyright (c) 2019 FRC Team 3260
+ * Copyright (c) 2020 Team 3260
  */
 
 #include <cmath>
 #include <ConfigReader.h>
-#include <VehicleModel.h>
 #include "VehicleModel.h"
 
 using namespace Geometry;
@@ -13,24 +12,26 @@ using namespace Geometry;
 VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
         _prevTimestamp(startTimestamp),
         _state{0},
-        _leftDriveMotorMaxSpeed(config.sim.constants.drivetrain.motor.maxSpeed),
-        _rightDriveMotorMaxSpeed(config.sim.constants.drivetrain.motor.maxSpeed),
-        _wheelRadius(config.sim.constants.drivetrain.wheelRadius),
-        _drivetrainWidth(config.sim.constants.drivetrain.width),
-        _wheelTrack(config.sim.constants.drivetrain.wheelTrack),
-        _elevatorBeltLength(config.sim.constants.elevator.belt.length),
-        _elevatorMotorMaxSpeed(config.sim.constants.elevator.motor.maxSpeed),
-        _elevatorMotorRadius(config.sim.constants.elevator.motor.radius)
+        _leftDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.motor.maxSpeed),
+        _rightDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.motor.maxSpeed),
+        _wheelRadius(config.sim.vehicle.drivetrain.wheelRadius),
+        _drivetrainWidth(config.sim.vehicle.drivetrain.width),
+        _wheelTrack(config.sim.vehicle.drivetrain.wheelTrack),
+        _elevatorBeltLength(config.sim.vehicle.elevator.belt.length),
+        _elevatorMotorMaxSpeed(config.sim.vehicle.elevator.motor.maxSpeed),
+        _elevatorMotorRadius(config.sim.vehicle.elevator.motor.radius),
+        _mass(config.sim.vehicle.mass)
 {
     // Set initial state
-    _state.pose.x = config.sim.initialState.drivetrain.x;
-    _state.pose.y = config.sim.initialState.drivetrain.y;
-    _state.pose.theta = config.sim.initialState.drivetrain.theta;
-    _state.elevatorMotorSpeed = config.sim.initialState.elevator.motorSpeed;
-    _state.elevatorCarriagePos = config.sim.initialState.elevator.carriagePos;
+    _initialState = { config.sim.vehicle.initialState.x, config.sim.vehicle.initialState.y, config.sim.vehicle.initialState.theta };
+    _state.pose.x = _initialState.x;
+    _state.pose.y = _initialState.y;
+    _state.pose.theta = _initialState.theta;
+    _state.elevatorMotorSpeed = config.sim.vehicle.elevator.initialState.motorSpeed;
+    _state.elevatorCarriagePos = config.sim.vehicle.elevator.initialState.carriagePos;
 
     // Make bounding polygon
-    _boundingPolygon = Polygon2d({ { 0.43, 0.31 }, { -0.35, 0.31 }, { -0.35, -0.31 }, { 0.43, -0.31 } });
+    _boundingPolygon = Polygon2d(config.sim.vehicle.polygon);
     _boundingPolygonWorld = _boundingPolygon.transform(_state.pose.x, _state.pose.y, _state.pose.theta);
 }
 
@@ -108,4 +109,15 @@ SensorState VehicleModel::getSensorState()
     SensorState state{0};
     state.elevatorEncoderPosition = int (1023 * _state.elevatorCarriagePos / _elevatorBeltLength);
     return state;
+}
+
+
+
+
+void VehicleModel::reset()
+{
+    _state = {0};
+    _state.pose.x = _initialState.x;
+    _state.pose.y = _initialState.y;
+    _state.pose.theta = _initialState.theta;
 }

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2019 FRC Team 3260
+# Copyright (c) 2020 FRC Team 3260
 #
 
 from PyQt4.QtCore import *
@@ -86,17 +86,17 @@ class ControllerWidget(QSvgWidget):
         if event.key() == Qt.Key_Up:
             self.right_joystick.set_y(512)
         if event.key() == Qt.Key_Down:
-            self.right_joystick.set_y(-511)
+            self.right_joystick.set_y(-512)
         if event.key() == Qt.Key_Left:
-            self.right_joystick.set_x(-511)
+            self.right_joystick.set_x(-512)
         if event.key() == Qt.Key_Right:
             self.right_joystick.set_x(512)
         if event.key() == Qt.Key_W:
             self.left_joystick.set_y(512)
         if event.key() == Qt.Key_S:
-            self.left_joystick.set_y(-511)
+            self.left_joystick.set_y(-512)
         if event.key() == Qt.Key_A:
-            self.left_joystick.set_x(-511)
+            self.left_joystick.set_x(-512)
         if event.key() == Qt.Key_D:
             self.left_joystick.set_x(512)
         event.accept()
@@ -146,8 +146,8 @@ class JoystickWidget(QSvgWidget):
         """
         Sets the joystick's x-axis state to x and updates the visualization accordingly
         """
-        if x < -511:
-            x = -511
+        if x < -512:
+            x = -512
         if x > 512:
             x = 512
         self.state.x = x
@@ -157,8 +157,8 @@ class JoystickWidget(QSvgWidget):
         """
         Sets the joystick's y-axis state to x and updates the visualization accordingly
         """
-        if y < -511:
-            y = -511
+        if y < -512:
+            y = -512
         if y > 512:
             y = 512
         self.state.y = y

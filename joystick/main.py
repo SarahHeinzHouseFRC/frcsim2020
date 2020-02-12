@@ -1,14 +1,14 @@
 #!/usr/bin/python
 
 #
-# Copyright (c) 2019 FRC Team 3260
+# Copyright (c) 2020 FRC Team 3260
 #
 
 import sys
 import argparse
 import yaml
-from virtualcontroller import VirtualXboxController
-from physicalcontroller import PhysicalXboxController
+from virtual_xbox_controller import VirtualXboxController
+from physical_xbox_controller import PhysicalXboxController
 from PyQt4.QtGui import QApplication
 
 CONFIG_FILE = "../config/robotConfig.yml"
@@ -17,7 +17,7 @@ CONFIG_FILE = "../config/robotConfig.yml"
 def main():
     # Read command line args
     parser = argparse.ArgumentParser()
-    parser.add_argument("controller_type", help='"virtual" or "physical"')
+    parser.add_argument("controller_type", help='"virtual" for onscreen controller or "physical" for USB controller')
     parser.add_argument("--verbose", help="increase output verbosity", action="store_true")
     args = parser.parse_args()
 
@@ -30,8 +30,8 @@ def main():
             "tx_ip": data['core']['ip'],
             "tx_port": data['core']['joystickPort']
         }
-    print "Running at {}:{}".format(comms_config["rx_ip"], comms_config["rx_port"])
-    print "Sending to {}:{}".format(comms_config["tx_ip"], comms_config["tx_port"])
+    print "Rx at {}:{}".format(comms_config["rx_ip"], comms_config["rx_port"])
+    print "Tx to {}:{}".format(comms_config["tx_ip"], comms_config["tx_port"])
 
     # Launch main window
     if args.controller_type == "virtual":

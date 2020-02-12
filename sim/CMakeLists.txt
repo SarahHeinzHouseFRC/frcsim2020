@@ -3,7 +3,7 @@ project(robot_sim)
 
 find_package(OpenSceneGraph REQUIRED COMPONENTS osgViewer osgDB osgGA osgText)
 
-add_subdirectory(extern/box2d)
+add_subdirectory(lib/box2d)
 
 include_directories(
         include
@@ -28,8 +28,9 @@ set(SRCS
         src/Color.cpp
         src/Label.cpp
         src/UdpNode.cpp
-        src/CollisionDetector.cpp
+        src/PhysicsEngine.cpp
         src/Geometry.cpp
+        src/ArgumentParser.cpp
         )
 
 add_executable(robot_sim ${SRCS})

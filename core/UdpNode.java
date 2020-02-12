@@ -1,6 +1,13 @@
+/**
+ * Copyright (c) 2020 Team 3260
+ */
+
 import java.io.*;
 import java.net.*;
 
+/**
+ * Base UDP functionality to abstract comms layer from SimAgent and JoystickAgent
+ */
 public class UdpNode
 {
     private DatagramSocket socket;

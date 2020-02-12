@@ -2,6 +2,7 @@
  * Copyright (c) 2020 Team 3260
  */
 
+#include <GamePieceModel.h>
 #include "Geometry.h"
 #include "PhysicsEngine.h"
 
@@ -66,6 +67,12 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
         }
     }
 
+    // Manually move ingested game pieces
+    for (GamePieceModel* gamePieceModel : vehicleModel._ingested)
+    {
+        // Enter a slave state
+    }
+
     // Instruct the world to perform a single step of simulation.
     // It is generally best to keep the time step and iterations fixed.
     _world->Step(elapsedTime, _velocityIterations, _positionIterations);
@@ -93,6 +100,27 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
             gamePieceModels[i]._state.pose.y = position.y;
         }
     }
+
+    // Get a list of balls in the ingestible region
+    _ingestedGamePieceBodies.clear();
+    vehicleModel._ingested.clear();
+    for (const auto& gamePieceBody : _gamePieceBodies)
+    {
+        b2Transform xfA = _vehicleBody->GetTransform(), xfB = gamePieceBody->GetTransform();
+        bool overlap = b2TestOverlap(&_ingestibleRegionShape, 0, &_gamePieceShape, 0, xfA, xfB);
+        auto model = (GamePieceModel*) gamePieceBody->GetUserData();
+        if (overlap)
+        {
+            _ingestedGamePieceBodies.push_back(gamePieceBody);
+            vehicleModel._ingested.push_back(model);
+            model->_state.ingestion = GamePieceModel::INGESTIBLE;
+        }
+        else
+        {
+            model->_state.ingestion = GamePieceModel::NOT_INGESTED;
+        }
+    }
+
 
     _prevTimestamp = currTimestamp;
 }
@@ -220,6 +248,27 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleBody->CreateFixture(&vehicleFixtureDef);
     }
 
+    // Define ingestible region
+    {
+        b2FixtureDef vehicleFixtureDef;
+        Polygon2d bounds = vehicleModel._ingestibleRegion;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        _ingestibleRegionShape.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &_ingestibleRegionShape;
+        vehicleFixtureDef.density = 0;
+        vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = 0x0002;
+        vehicleFixtureDef.filter.maskBits = 0x0002;
+
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
+
     // Add user data
     vehicleBody->SetUserData((void*) &vehicleModel);
 
@@ -240,11 +289,10 @@ std::vector<b2Body*> PhysicsEngine::initGamePieceBodies(b2World* world, const st
         b2Body* gamePieceBody = world->CreateBody(&gamePieceBodyDef);
 
         // Define another box shape for our dynamic body.
-        b2CircleShape gamePieceDynamicCircle;
-        gamePieceDynamicCircle.m_radius = gamePieceModel._radius;
+        _gamePieceShape.m_radius = gamePieceModel._radius;
 
         b2FixtureDef gamePieceFixtureDef;
-        gamePieceFixtureDef.shape = &gamePieceDynamicCircle;
+        gamePieceFixtureDef.shape = &_gamePieceShape;
         gamePieceFixtureDef.restitution = 0.5f;
 
         gamePieceFixtureDef.density = 1.0f;

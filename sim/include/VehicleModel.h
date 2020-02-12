@@ -9,6 +9,7 @@
 #include "Types.h"
 #include "Geometry.h"
 #include "BaseModel.h"
+#include "GamePieceModel.h"
 
 
 /**
@@ -82,6 +83,7 @@ private:
     double _drivetrainWidth; // Needed to calculate turning radius
     double _mass; // Needed to calculate density for collision checker
     double _prevTimestamp; // Needed to calculate how much time has passed since last update()
+    std::vector<GamePieceModel*> _ingested;
 
     struct
     {

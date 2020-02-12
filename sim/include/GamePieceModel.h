@@ -14,6 +14,13 @@ class GamePieceModel : public BaseModel
 friend class GamePieceView;
 friend class PhysicsEngine;
 public:
+    enum IngestionState
+    {
+        NOT_INGESTED,
+        INGESTIBLE,
+        INGESTED
+    };
+
     /**
      * Constructor
      */
@@ -50,6 +57,7 @@ private:
             double x, y;
             double vx, vy;
         } pose;
+        IngestionState ingestion;
     } _state;
 };
 

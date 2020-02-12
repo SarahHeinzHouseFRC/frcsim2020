@@ -102,7 +102,10 @@ private:
     b2Vec2 _gravity;
     std::unique_ptr<b2World> _world;
     b2Body* _vehicleBody;
+    b2PolygonShape _ingestibleRegionShape;
+    b2CircleShape _gamePieceShape;
     std::vector<b2Body*> _gamePieceBodies;
+    std::vector<b2Body*> _ingestedGamePieceBodies;
     int32 _velocityIterations;
     int32 _positionIterations;
     double _prevTimestamp;

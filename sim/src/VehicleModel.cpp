@@ -115,7 +115,6 @@ SensorState VehicleModel::getSensorState()
 
 
 
-
 void VehicleModel::reset()
 {
     _state = {0};

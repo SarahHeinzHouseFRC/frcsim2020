@@ -82,10 +82,10 @@ int main(int argc, char** argv)
                 auto rxCommands = coreAgent.getCoreCommands();
 
                 // If the user hits "start" on the joystick, then start/stop the countdown timer
-                timer.processCommand(rxCommands.start, Time::now());
+                timer.processCommand(rxCommands.timerStartStop, Time::now());
 
                 // If the user hits "guide" on the joystick, then reset the world
-                if (rxCommands.guide)
+                if (rxCommands.reset)
                 {
                     reset = true;
                 }
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
                 // If the timer hits zero, stop allowing the controller to update the vehicle
                 if (timer.getValue() <= 0)
                 {
-                    rxCommands.reset();
+                    rxCommands.clear();
                 }
                 wm.vehicleModel().processCommands(rxCommands);
             }

@@ -10,27 +10,12 @@
 
 
 VehicleView::VehicleView(const ConfigReader& config, const VehicleModel& vehicleModel) :
-        _wheelRadius(config.sim.vehicle.drivetrain.wheelRadius),
-        _beltRadius(config.sim.vehicle.elevator.belt.radius),
-        _beltWidth(config.sim.vehicle.elevator.belt.width),
-        _beltLength(config.sim.vehicle.elevator.belt.length),
-        _motorShaftRadius(config.sim.vehicle.elevator.motorShaft.radius),
-        _motorShaftLength(config.sim.vehicle.elevator.motorShaft.length),
-        _motorRadius(config.sim.vehicle.elevator.motor.radius),
-        _motorLength(config.sim.vehicle.elevator.motor.length),
-        _encoderRadius(config.sim.vehicle.elevator.encoder.radius),
-        _encoderLength(config.sim.vehicle.elevator.encoder.length),
-        _carriageLengthX(config.sim.vehicle.elevator.carriage.lengthX),
-        _carriageLengthY(config.sim.vehicle.elevator.carriage.lengthY),
-        _carriageLengthZ(config.sim.vehicle.elevator.carriage.lengthZ)
+        _wheelRadius(config.sim.vehicle.drivetrain.wheelRadius)
 {
     if (config.debugView)
     {
         _vehicleNode = drawVehicle(config);
         addChild(_vehicleNode);
-
-        _elevatorPat = drawElevator();
-        addChild(_elevatorPat);
     }
     else
     {
@@ -49,13 +34,6 @@ VehicleView::VehicleView(const ConfigReader& config, const VehicleModel& vehicle
 
 void VehicleView::update(const VehicleModel& vehicleModel)
 {
-    // Update elevator position
-    if (_elevatorPat)
-    {
-        double elevatorPos = vehicleModel._state.elevatorCarriagePos;
-        _elevatorPat->setPosition(osg::Vec3(0, 0, elevatorPos));
-    }
-
     // Update the position
     double x = vehicleModel._state.pose.x;
     double y = vehicleModel._state.pose.y;
@@ -100,84 +78,14 @@ osg::ref_ptr<osg::Geode> VehicleView::drawVehicle(const ConfigReader &config)
 
     osg::ref_ptr<osg::ShapeDrawable> frontLeftWheel = ViewUtils::makeCylinder(osg::Vec3(wheelBase/2, wheelTrack/2, 0), wheelRadius, wheelWidth, Color::White);
     robotGeode->addDrawable(frontLeftWheel);
-    osg::ref_ptr<osg::ShapeDrawable> middleLeftWheel = ViewUtils::makeCylinder(osg::Vec3(0, wheelTrack/2, 0), wheelRadius, wheelWidth, Color::White);
-    robotGeode->addDrawable(middleLeftWheel);
     osg::ref_ptr<osg::ShapeDrawable> rearLeftWheel = ViewUtils::makeCylinder(osg::Vec3(-wheelBase/2, wheelTrack/2, 0), wheelRadius, wheelWidth, Color::White);
     robotGeode->addDrawable(rearLeftWheel);
     osg::ref_ptr<osg::ShapeDrawable> frontRightWheel = ViewUtils::makeCylinder(osg::Vec3(wheelBase/2, -wheelTrack/2, 0), wheelRadius, wheelWidth, Color::White);
     robotGeode->addDrawable(frontRightWheel);
-    osg::ref_ptr<osg::ShapeDrawable> middleRightWheel = ViewUtils::makeCylinder(osg::Vec3(0, -wheelTrack/2, 0), wheelRadius, wheelWidth, Color::White);
-    robotGeode->addDrawable(middleRightWheel);
     osg::ref_ptr<osg::ShapeDrawable> rearRightWheel = ViewUtils::makeCylinder(osg::Vec3(-wheelBase/2, -wheelTrack/2, 0), wheelRadius, wheelWidth, Color::White);
     robotGeode->addDrawable(rearRightWheel);
 
-    //
-    // Render the robot elevator assembly
-    //
-
-    // Bottom sprocket
-    osg::ref_ptr<osg::ShapeDrawable> bottomSprocket = ViewUtils::makeCylinder(osg::Vec3(0, 0, 0), _beltRadius, _beltWidth, Color::Orange);
-    robotGeode->addDrawable(bottomSprocket);
-
-    // Top sprocket
-    osg::ref_ptr<osg::ShapeDrawable> topSprocket = ViewUtils::makeCylinder(osg::Vec3(0, 0, _beltLength), _beltRadius, _beltWidth, Color::Orange);
-    robotGeode->addDrawable(topSprocket);
-
-    // Front and back surfaces of belt
-    {
-        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-        vertices->push_back(osg::Vec3(_beltRadius, _beltWidth/2, 0)); // Front vertices
-        vertices->push_back(osg::Vec3(_beltRadius, _beltWidth/2, _beltLength));
-        vertices->push_back(osg::Vec3(_beltRadius, -_beltWidth/2, _beltLength));
-        vertices->push_back(osg::Vec3(_beltRadius, -_beltWidth/2, 0));
-        vertices->push_back(osg::Vec3(-_beltRadius, _beltWidth/2, 0)); // Back vertices
-        vertices->push_back(osg::Vec3(-_beltRadius, _beltWidth/2, _beltLength));
-        vertices->push_back(osg::Vec3(-_beltRadius, -_beltWidth/2, _beltLength));
-        vertices->push_back(osg::Vec3(-_beltRadius, -_beltWidth/2, 0));
-        osg::ref_ptr<osg::Geometry> belt = ViewUtils::makeQuads(vertices, Color(Color::Orange, 127.0));
-        robotGeode->addDrawable(belt);
-    }
-    // Outline of front and back surfaces of belt
-    {
-        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-        vertices->push_back(osg::Vec3(_beltRadius, _beltWidth/2, 0)); // Front vertices
-        vertices->push_back(osg::Vec3(_beltRadius, _beltWidth/2, _beltLength));
-        vertices->push_back(osg::Vec3(_beltRadius, -_beltWidth/2, _beltLength));
-        vertices->push_back(osg::Vec3(_beltRadius, -_beltWidth/2, 0));
-        vertices->push_back(osg::Vec3(-_beltRadius, _beltWidth/2, 0)); // Back vertices
-        vertices->push_back(osg::Vec3(-_beltRadius, _beltWidth/2, _beltLength));
-        vertices->push_back(osg::Vec3(-_beltRadius, -_beltWidth/2, _beltLength));
-        vertices->push_back(osg::Vec3(-_beltRadius, -_beltWidth/2, 0));
-        osg::ref_ptr<osg::Geometry> beltOutline = ViewUtils::makeLines(vertices, Color::Orange);
-        robotGeode->addDrawable(beltOutline);
-    }
-
-    // Motor shaft
-    auto motorShaft = ViewUtils::makeCylinder(osg::Vec3(0, _beltWidth/2 + _motorShaftLength/2, 0), _motorShaftRadius, _motorShaftLength, Color::Gray);
-    robotGeode->addDrawable(motorShaft);
-
-    // Motor
-    auto motor = ViewUtils::makeCylinder(osg::Vec3(0, _beltWidth/2 + _motorShaftLength + _motorLength/2, 0), _motorRadius, _motorLength, Color::Gray);
-    robotGeode->addDrawable(motor);
-
-    // Encoder
-    auto encoder = ViewUtils::makeCylinder(osg::Vec3(0, _beltWidth/2 + _motorShaftLength - _encoderLength/2, 0), _encoderRadius, _encoderLength, Color::Green);
-    robotGeode->addDrawable(encoder);
-
     return robotGeode;
-}
-
-
-
-osg::ref_ptr<osg::PositionAttitudeTransform> VehicleView::drawElevator()
-{
-    // Elevator carriage
-    osg::ref_ptr<osg::PositionAttitudeTransform> carriagePat = new osg::PositionAttitudeTransform;
-    osg::ref_ptr<osg::Geode> carriageGeode = new osg::Geode;
-    carriagePat->addChild(carriageGeode);
-    auto elevatorCarriage = ViewUtils::makeBox(osg::Vec3(_beltRadius + _carriageLengthX/2, 0, 0), _carriageLengthX, _carriageLengthY, _carriageLengthZ, Color::Blue);
-    carriageGeode->addDrawable(elevatorCarriage);
-    return carriagePat;
 }
 
 

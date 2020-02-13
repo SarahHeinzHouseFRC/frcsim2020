@@ -56,7 +56,19 @@ public class Main
             }
             prevSelectButtonState = currBackButtonState;
 
-            // Construct sim commands
+            // Construct intake motor commands
+            int intakeCenterMotorSpeed = 0;
+            if (joystickAgent.commands.a == 1)
+            {
+                intakeCenterMotorSpeed = 512;
+            }
+            else if (joystickAgent.commands.b == 1)
+            {
+                intakeCenterMotorSpeed = -512;
+            }
+            simAgent.commands.intakeCenterMotorSpeed = intakeCenterMotorSpeed;
+
+            // Construct drivetrain commands
             if (isTankDrive)
             {
                 simAgent.commands.leftDriveMotorSpeed = joystickAgent.commands.yLeftJoystick;
@@ -69,10 +81,8 @@ public class Main
                 simAgent.commands.leftDriveMotorSpeed = leftDriveMotorSpeed;
                 simAgent.commands.rightDriveMotorSpeed = rightDriveMotorSpeed;
             }
-            simAgent.commands.elevatorMotorSpeed = elevatorMotorSpeed;
-            simAgent.commands.back = joystickAgent.commands.back;
-            simAgent.commands.guide = joystickAgent.commands.guide;
-            simAgent.commands.start = joystickAgent.commands.start;
+            simAgent.commands.timerStartStop = joystickAgent.commands.start;
+            simAgent.commands.reset = joystickAgent.commands.guide;
 
             try
             {

@@ -41,7 +41,7 @@ public class SimAgent
         try
         {
             comms.send(msg);
-            // System.out.println("SimAgent: Transmit commands " + msg);
+            System.out.println("SimAgent: Transmit commands " + msg);
         }
         catch (IOException e)
         {

@@ -45,27 +45,9 @@ private:
      */
     osg::ref_ptr<osg::Geode> drawIngestibleRegion(const VehicleModel& vehicleModel);
 
-    /**
-     * Helper method to create a robot carriage
-     */
-    osg::ref_ptr<osg::PositionAttitudeTransform> drawElevator();
-
     osg::ref_ptr<osg::Node> _vehicleNode;
     osg::ref_ptr<osg::Geode> _vehicleBounds;
-    osg::ref_ptr<osg::PositionAttitudeTransform> _elevatorPat;
     float _wheelRadius;
-    float _beltRadius;
-    float _beltWidth;
-    float _beltLength;
-    float _motorShaftRadius;
-    float _motorShaftLength;
-    float _motorRadius;
-    float _motorLength;
-    float _encoderRadius;
-    float _encoderLength;
-    float _carriageLengthX;
-    float _carriageLengthY;
-    float _carriageLengthZ;
 };
 
 

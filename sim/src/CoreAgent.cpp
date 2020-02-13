@@ -45,7 +45,7 @@ bool CoreAgent::rxCoreCommands()
     }
     else
     {
-        _coreCommands.reset();
+        _coreCommands.clear();
         _numDroppedPackets++;
         return false;
     }

@@ -12,14 +12,11 @@ using namespace Geometry;
 VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
         _prevTimestamp(startTimestamp),
         _state{0},
-        _leftDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.motor.maxSpeed),
-        _rightDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.motor.maxSpeed),
+        _leftDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.leftMotorMaxSpeed),
+        _rightDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.rightMotorMaxSpeed),
         _wheelRadius(config.sim.vehicle.drivetrain.wheelRadius),
         _drivetrainWidth(config.sim.vehicle.drivetrain.width),
         _wheelTrack(config.sim.vehicle.drivetrain.wheelTrack),
-        _elevatorBeltLength(config.sim.vehicle.elevator.belt.length),
-        _elevatorMotorMaxSpeed(config.sim.vehicle.elevator.motor.maxSpeed),
-        _elevatorMotorRadius(config.sim.vehicle.elevator.motor.radius),
         _mass(config.sim.vehicle.mass)
 {
     // Set initial state
@@ -27,8 +24,6 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
     _state.pose.x = _initialState.x;
     _state.pose.y = _initialState.y;
     _state.pose.theta = _initialState.theta;
-    _state.elevatorMotorSpeed = config.sim.vehicle.elevator.initialState.motorSpeed;
-    _state.elevatorCarriagePos = config.sim.vehicle.elevator.initialState.carriagePos;
 
     // Make bounding polygon
     _boundingPolygonLeft = std::vector<Vertex2d>{{0.43, 0.25}, {0.43, 0.31}, {-0.35, 0.31}, {-0.35, 0.25}};
@@ -48,15 +43,6 @@ void VehicleModel::update(double currTimestamp)
     {
         return; // Nothing to update
     }
-
-    //
-    // Update elevator position based on elevator motor speed
-    //
-
-    // Move the carriage up by y = omega * r * t
-    double y = _state.elevatorMotorSpeed * _elevatorMotorRadius * elapsedTime;
-    _state.elevatorCarriagePos += y;
-    _state.elevatorCarriagePos = bound(_state.elevatorCarriagePos, 0, _elevatorBeltLength);
 
     //
     // Update pose based on drivetrain motor speeds
@@ -96,12 +82,12 @@ void VehicleModel::update(double currTimestamp)
 
 void VehicleModel::processCommands(const CoreCommands& commands)
 {
-    // Update elevator motor speed
-    _state.elevatorMotorSpeed = (commands.elevatorMotorSpeed / 512.0) * _elevatorMotorMaxSpeed;
-
     // Update drivetrain
     _state.leftDriveMotorSpeed = (commands.leftDriveMotorSpeed / 512.0) * _leftDriveMotorMaxSpeed;
     _state.rightDriveMotorSpeed = (commands.rightDriveMotorSpeed / 512.0) * _rightDriveMotorMaxSpeed;
+
+    // Update intake motors
+    _state.intakeCenterMotorSpeed = (commands.leftDriveMotorSpeed / 512.0) * _intakeCenterMotorMaxSpeed;
 }
 
 
@@ -109,7 +95,6 @@ void VehicleModel::processCommands(const CoreCommands& commands)
 SensorState VehicleModel::getSensorState()
 {
     SensorState state{0};
-    state.elevatorEncoderPosition = int (1023 * _state.elevatorCarriagePos / _elevatorBeltLength);
     return state;
 }
 

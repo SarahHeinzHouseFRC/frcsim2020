@@ -73,11 +73,9 @@ private:
     Geometry::Polygon2d _boundingPolygonRight; // Right bounding polygon of the vehicle in vehicle frame
     Geometry::Polygon2d _boundingPolygonRear; // Rear bounding polygon of the vehicle in vehicle frame
     Geometry::Polygon2d _ingestibleRegion; // Bounding polygon of the ingestible region in vehicle frame
-    double _elevatorBeltLength; // Need to enforce the carriage to stay bw 0 and this belt length (meters)
-    double _elevatorMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
     double _leftDriveMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
     double _rightDriveMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
-    double _elevatorMotorRadius; // Needed to calculate travel of belt per unit time
+    double _intakeCenterMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
     double _wheelRadius; // Needed to calculate travel of robot per unit time
     double _wheelTrack; // Needed to calculate arced turns
     double _drivetrainWidth; // Needed to calculate turning radius
@@ -92,10 +90,11 @@ private:
 
     struct VehicleState
     {
-        double elevatorMotorSpeed; // Rads/sec, 0-maxElevatorMotorSpeed
-        double elevatorCarriagePos; // Meters, 0-elevatorBeltLength
-        double leftDriveMotorSpeed; // Rads/sec, 0-maxDriveSpeed
-        double rightDriveMotorSpeed; // Rads/sec, 0-maxDriveSpeed
+        double leftDriveMotorSpeed; // Rads/sec, 0-maxLeftDriveMotorSpeed
+        double rightDriveMotorSpeed; // Rads/sec, 0-maxRightDriveMotorSpeed
+        double intakeCenterMotorSpeed; // Rads/sec, 0-maxCenterMotorSpeed
+        double intakeLeftMotorSpeed; // Rads/sec, 0-maxLeftMotorSpeed
+        double intakeRightMotorSpeed; // Rads/sec, 0-maxRightMotorSpeed
         struct
         {
             double x;     // Meters

@@ -138,67 +138,8 @@ void ConfigReader::parseSimVehicleConfig(const YAML::Node& vehicleConfig)
         sim.vehicle.drivetrain.wheelWidth = drivetrainConfig["wheelWidth"].as<float>() * IN_TO_M;
         sim.vehicle.drivetrain.wheelBase = drivetrainConfig["wheelBase"].as<float>() * IN_TO_M;
         sim.vehicle.drivetrain.wheelTrack = sim.vehicle.drivetrain.width - 2*sim.vehicle.drivetrain.widthChannel - sim.vehicle.drivetrain.wheelWidth;
-        sim.vehicle.drivetrain.motor.maxSpeed = drivetrainConfig["motor"]["maxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
-    }
-
-    //
-    // Load elevator constant params
-    //
-
-    YAML::Node elevatorConfig = vehicleConfig["elevator"];
-
-    if (elevatorConfig)
-    {
-        // Initial state
-        YAML::Node initialStateConfig = elevatorConfig["initialState"];
-        if (initialStateConfig)
-        {
-            sim.vehicle.elevator.initialState.motorSpeed = initialStateConfig["motorSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
-            sim.vehicle.elevator.initialState.carriagePos = initialStateConfig["carriagePos"].as<float>() * IN_TO_M;
-        }
-
-        // Load belt
-        YAML::Node beltConfig = elevatorConfig["belt"];
-        if (beltConfig)
-        {
-            sim.vehicle.elevator.belt.radius = beltConfig["radius"].as<float>() * IN_TO_M;
-            sim.vehicle.elevator.belt.width = beltConfig["width"].as<float>() * IN_TO_M;
-            sim.vehicle.elevator.belt.length = beltConfig["length"].as<float>() * IN_TO_M;
-        }
-
-        // Load motor shaft
-        YAML::Node motorShaftConfig = elevatorConfig["motorShaft"];
-        if (beltConfig)
-        {
-            sim.vehicle.elevator.motorShaft.radius = motorShaftConfig["radius"].as<float>() * IN_TO_M;
-            sim.vehicle.elevator.motorShaft.length = motorShaftConfig["length"].as<float>() * IN_TO_M;
-        }
-
-        // Load motor
-        YAML::Node motorConfig = elevatorConfig["motor"];
-        if (motorConfig)
-        {
-            sim.vehicle.elevator.motor.radius = motorConfig["radius"].as<float>() * IN_TO_M;
-            sim.vehicle.elevator.motor.length = motorConfig["length"].as<float>() * IN_TO_M;
-            sim.vehicle.elevator.motor.maxSpeed = motorConfig["maxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
-        }
-
-        // Load encoder
-        YAML::Node encoderConfig = elevatorConfig["encoder"];
-        if (encoderConfig)
-        {
-            sim.vehicle.elevator.encoder.radius = encoderConfig["radius"].as<float>() * IN_TO_M;
-            sim.vehicle.elevator.encoder.length = encoderConfig["length"].as<float>() * IN_TO_M;
-        }
-
-        // Load carriage
-        YAML::Node carriageConfig = elevatorConfig["carriage"];
-        if (carriageConfig)
-        {
-            sim.vehicle.elevator.carriage.lengthX = carriageConfig["lengthX"].as<float>() * IN_TO_M;
-            sim.vehicle.elevator.carriage.lengthY = carriageConfig["lengthY"].as<float>() * IN_TO_M;
-            sim.vehicle.elevator.carriage.lengthZ = carriageConfig["lengthZ"].as<float>() * IN_TO_M;
-        }
+        sim.vehicle.drivetrain.leftMotorMaxSpeed = drivetrainConfig["leftMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
+        sim.vehicle.drivetrain.rightMotorMaxSpeed = drivetrainConfig["rightMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
     }
 }
 

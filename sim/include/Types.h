@@ -29,19 +29,21 @@ struct SensorState
 
 struct CoreCommands
 {
-    int leftDriveMotorSpeed;  // -511 - 512
-    int rightDriveMotorSpeed; // -511 - 512
-    int elevatorMotorSpeed;   // -511 - 512
-    int back;                 // 0 or 1
-    int guide;                // 0 or 1
-    int start;                // 0 or 1
+    int leftDriveMotorSpeed;    // -512 - 512
+    int rightDriveMotorSpeed;   // -512 - 512
+    int intakeCenterMotorSpeed; // -512 - 512
+    int intakeLeftMotorSpeed;   // -512 - 512
+    int intakeRightMotorSpeed;  // -512 - 512
+    int tubeMotorSpeed;         // -512 - 512
+    int timerStartStop;         // 0 or 1
+    int reset;                  // 0 or 1
 
     /**
      * Default constructor
      */
     CoreCommands()
     {
-        reset();
+        clear();
     };
 
     /**
@@ -51,20 +53,24 @@ struct CoreCommands
     {
         leftDriveMotorSpeed = std::stoi(json.substr(25, 4));
         rightDriveMotorSpeed = std::stoi(json.substr(55, 4));
-        elevatorMotorSpeed = std::stoi(json.substr(83, 4));
-        back = std::stoi(json.substr(97, 1));
-        guide = std::stoi(json.substr(109, 1));
-        start = std::stoi(json.substr(121, 1));
+        intakeCenterMotorSpeed = std::stoi(json.substr(87, 4));
+        intakeLeftMotorSpeed = std::stoi(json.substr(117, 4));
+        intakeRightMotorSpeed = std::stoi(json.substr(148, 4));
+        tubeMotorSpeed = std::stoi(json.substr(172, 4));
+        timerStartStop = std::stoi(json.substr(196, 1));
+        reset = std::stoi(json.substr(208, 1));
     }
 
-    void reset()
+    void clear()
     {
         leftDriveMotorSpeed = 0;
         rightDriveMotorSpeed = 0;
-        elevatorMotorSpeed = 0;
-        back = 0;
-        guide = 0;
-        start = 0;
+        intakeCenterMotorSpeed = 0;
+        intakeLeftMotorSpeed = 0;
+        intakeRightMotorSpeed = 0;
+        tubeMotorSpeed = 0;
+        timerStartStop = 0;
+        reset = 0;
     }
 };
 

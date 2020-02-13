@@ -66,55 +66,17 @@ public:
             } initialState;
             struct
             {
-                float width;         // Meters
-                float depth;         // Meters
-                float widthChannel;  // Meters
-                float heightChannel; // Meters
-                float wheelRadius;   // Meters
-                float wheelWidth;    // Meters
-                float wheelBase;     // Meters
-                float wheelTrack;    // Meters (calculated value)
-                struct
-                {
-                    float maxSpeed; // Rads/sec
-                } motor;
+                float width;              // Meters
+                float depth;              // Meters
+                float widthChannel;       // Meters
+                float heightChannel;      // Meters
+                float wheelRadius;        // Meters
+                float wheelWidth;         // Meters
+                float wheelBase;          // Meters
+                float wheelTrack;         // Meters (derived value)
+                float leftMotorMaxSpeed;  // Rads/sec
+                float rightMotorMaxSpeed; // Rads/sec
             } drivetrain;
-            struct
-            {
-                struct
-                {
-                    float motorSpeed;  // Rads/sec
-                    float carriagePos; // Meters
-                } initialState;
-                struct
-                {
-                    float radius; // Meters
-                    float width;  // Meters
-                    float length; // Meters
-                } belt;
-                struct
-                {
-                    float radius; // Meters
-                    float length; // Meters
-                } motorShaft;
-                struct
-                {
-                    float radius;   // Meters
-                    float length;   // Meters
-                    float maxSpeed; // Rads/sec
-                } motor;
-                struct
-                {
-                    float radius; // Meters
-                    float length; // Meters
-                } encoder;
-                struct
-                {
-                    float lengthX; // Meters
-                    float lengthY; // Meters
-                    float lengthZ; // Meters
-                } carriage;
-            } elevator;
         } vehicle;
         struct
         {

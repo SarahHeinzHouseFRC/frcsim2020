@@ -68,7 +68,6 @@ private:
     std::vector<Label*> _labels;
     osg::ref_ptr<Label> _connected;
     osg::ref_ptr<Label> _vehiclePoseState;
-    osg::ref_ptr<Label> _vehicleElevatorState;
     osg::ref_ptr<Label> _vehicleDrivetrainState;
     osg::ref_ptr<Label> _timer;
     osg::ref_ptr<Label> _numCollisions;

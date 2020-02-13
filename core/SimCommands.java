@@ -7,17 +7,19 @@
  */
 public class SimCommands
 {
-    public int elevatorMotorSpeed; // Integer from -512 to 512
     public int leftDriveMotorSpeed; // Integer from -512 to 512
     public int rightDriveMotorSpeed; // Integer from -512 to 512
-    public int back; // Integer 0 or 1
-    public int guide; // Integer 0 or 1
-    public int start; // Integer 0 or 1
+    public int intakeCenterMotorSpeed; // Integer from -512 to 512
+    public int intakeLeftMotorSpeed; // Integer from -512 to 512
+    public int intakeRightMotorSpeed; // Integer from -512 to 512
+    public int tubeMotorSpeed; // Integer from -512 to 512
+    public int timerStartStop; // Integer 0 or 1
+    public int reset; // Integer 0 or 1
 
     public String toJson()
     {
-        String str = String.format("{ 'leftDriveMotorSpeed': %04d, 'rightDriveMotorSpeed': %04d, 'elevatorMotorSpeed': %04d, 'back': %01d, 'guide': %01d, 'start': %01d }",
-                leftDriveMotorSpeed, rightDriveMotorSpeed, elevatorMotorSpeed, back, guide, start);
+        String str = String.format("{ 'leftDriveMotorSpeed': %04d, 'rightDriveMotorSpeed': %04d, 'intakeCenterMotorSpeed': %04d, 'intakeLeftMotorSpeed': %04d, 'intakeRightMotorSpeed': %04d, 'tubeMotorSpeed': %04d, 'timerStartStop': %01d, 'reset': %01d }",
+                leftDriveMotorSpeed, rightDriveMotorSpeed, intakeCenterMotorSpeed, intakeLeftMotorSpeed, intakeRightMotorSpeed, tubeMotorSpeed, timerStartStop, reset);
         return str;
     }
 }

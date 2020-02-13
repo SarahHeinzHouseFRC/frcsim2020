@@ -14,6 +14,9 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
         _state{0},
         _leftDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.leftMotorMaxSpeed),
         _rightDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.rightMotorMaxSpeed),
+        _intakeCenterMotorMaxSpeed(config.sim.vehicle.intake.centerMotorMaxSpeed),
+        _intakeLeftMotorMaxSpeed(config.sim.vehicle.intake.leftMotorMaxSpeed),
+        _intakeRightMotorMaxSpeed(config.sim.vehicle.intake.rightMotorMaxSpeed),
         _wheelRadius(config.sim.vehicle.drivetrain.wheelRadius),
         _drivetrainWidth(config.sim.vehicle.drivetrain.width),
         _wheelTrack(config.sim.vehicle.drivetrain.wheelTrack),
@@ -87,7 +90,7 @@ void VehicleModel::processCommands(const CoreCommands& commands)
     _state.rightDriveMotorSpeed = (commands.rightDriveMotorSpeed / 512.0) * _rightDriveMotorMaxSpeed;
 
     // Update intake motors
-    _state.intakeCenterMotorSpeed = (commands.leftDriveMotorSpeed / 512.0) * _intakeCenterMotorMaxSpeed;
+    _state.intakeCenterMotorSpeed = (commands.intakeCenterMotorSpeed / 512.0) * _intakeCenterMotorMaxSpeed;
 }
 
 

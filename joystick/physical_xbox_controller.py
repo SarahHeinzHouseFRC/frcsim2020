@@ -54,6 +54,10 @@ class PhysicalXboxController:
                 self.controller_state.left_joystick.y = left_joystick_y * 512
                 self.controller_state.right_joystick.x = right_joystick_x * 512
                 self.controller_state.right_joystick.y = right_joystick_y * 512
+                self.controller_state.a.pressed = self.joystick.A()
+                self.controller_state.b.pressed = self.joystick.B()
+                self.controller_state.x.pressed = self.joystick.X()
+                self.controller_state.y.pressed = self.joystick.Y()
                 self.controller_state.dpad.up.pressed = self.joystick.dpadUp()
                 self.controller_state.dpad.down.pressed = self.joystick.dpadDown()
                 self.controller_state.dpad.left.pressed = self.joystick.dpadLeft()

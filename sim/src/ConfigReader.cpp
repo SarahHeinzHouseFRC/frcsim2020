@@ -3,6 +3,7 @@
  */
 
 #include <iostream>
+#include <ConfigReader.h>
 #include "ConfigReader.h"
 
 #define RPM_TO_RADS_PER_SEC 0.1047f
@@ -140,6 +141,19 @@ void ConfigReader::parseSimVehicleConfig(const YAML::Node& vehicleConfig)
         sim.vehicle.drivetrain.wheelTrack = sim.vehicle.drivetrain.width - 2*sim.vehicle.drivetrain.widthChannel - sim.vehicle.drivetrain.wheelWidth;
         sim.vehicle.drivetrain.leftMotorMaxSpeed = drivetrainConfig["leftMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
         sim.vehicle.drivetrain.rightMotorMaxSpeed = drivetrainConfig["rightMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
+    }
+
+    //
+    // Load vehicle drivetrain params
+    //
+
+    YAML::Node intakeConfig = vehicleConfig["intake"];
+
+    if (intakeConfig)
+    {
+        sim.vehicle.intake.centerMotorMaxSpeed = intakeConfig["centerMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
+        sim.vehicle.intake.leftMotorMaxSpeed = intakeConfig["leftMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
+        sim.vehicle.intake.rightMotorMaxSpeed = intakeConfig["rightMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
     }
 }
 

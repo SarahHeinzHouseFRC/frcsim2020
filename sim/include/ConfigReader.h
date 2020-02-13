@@ -77,6 +77,12 @@ public:
                 float leftMotorMaxSpeed;  // Rads/sec
                 float rightMotorMaxSpeed; // Rads/sec
             } drivetrain;
+            struct
+            {
+                float centerMotorMaxSpeed; // Rads/sec
+                float leftMotorMaxSpeed;   // Rads/sec
+                float rightMotorMaxSpeed;  // Rads/sec
+            } intake;
         } vehicle;
         struct
         {

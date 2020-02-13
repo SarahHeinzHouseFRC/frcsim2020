@@ -9,12 +9,23 @@ public class Main
 {
     public static void main(String[] args)
     {
-        JoystickAgent joystickAgent = new JoystickAgent(4000, "localhost", 2000);
-        SimAgent simAgent = new SimAgent(6000, "localhost", 8000);
+        int joystickRxPort = 4000;
+        int joystickTxPort = 2000;
+        String joystickTxIp = "localhost";
+        int simRxPort = 6000;
+        int simTxPort = 8000;
+        String simTxIp = "localhost";
+
+        JoystickAgent joystickAgent = new JoystickAgent(joystickRxPort, joystickTxIp, joystickTxPort);
+        SimAgent simAgent = new SimAgent(simRxPort, simTxIp, simTxPort);
 
         CommsThread commsThread = new CommsThread(simAgent, joystickAgent);
         commsThread.start();
 
+        System.out.println("Rx joystick at " + joystickTxIp + ":" + joystickTxPort);
+        System.out.println("Tx joystick at localhost:" + joystickRxPort);
+        System.out.println("Rx sim at " + simTxIp + ":" + simTxPort);
+        System.out.println("Tx sim at localhost:" + simRxPort);
         System.out.println("Core: Launched");
 
         int elevatorMotorSpeed = 0;

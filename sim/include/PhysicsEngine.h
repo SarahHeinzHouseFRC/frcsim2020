@@ -105,7 +105,7 @@ private:
     b2PolygonShape _ingestibleRegionShape;
     b2CircleShape _gamePieceShape;
     std::vector<b2Body*> _gamePieceBodies;
-    std::vector<b2Body*> _ingestedGamePieceBodies;
+    std::vector<b2Body*> _ingestibleGamePieceBodies; // Game pieces in the ingestible region
     int32 _velocityIterations;
     int32 _positionIterations;
     double _prevTimestamp;

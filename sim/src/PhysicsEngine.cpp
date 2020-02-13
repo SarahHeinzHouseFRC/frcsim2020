@@ -68,9 +68,14 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
     }
 
     // Manually move ingested game pieces
-    for (GamePieceModel* gamePieceModel : vehicleModel._ingested)
+    for (b2Body* gamePieceBody : _ingestibleGamePieceBodies)
     {
-        // Enter a slave state
+        // Enter a slave state, move according to intake motors
+        float velocityMagnitude = vehicleModel._state.intakeCenterMotorSpeed;
+        b2Vec2 velocity = _vehicleBody->GetWorldVector(b2Vec2(-1, 0));
+        velocity *= velocityMagnitude;
+        velocity += _vehicleBody->GetLinearVelocityFromWorldPoint(gamePieceBody->GetPosition());
+        gamePieceBody->SetLinearVelocity(velocity);
     }
 
     // Instruct the world to perform a single step of simulation.
@@ -102,7 +107,7 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
     }
 
     // Get a list of balls in the ingestible region
-    _ingestedGamePieceBodies.clear();
+    _ingestibleGamePieceBodies.clear();
     vehicleModel._ingested.clear();
     for (const auto& gamePieceBody : _gamePieceBodies)
     {
@@ -111,7 +116,7 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
         auto model = (GamePieceModel*) gamePieceBody->GetUserData();
         if (overlap)
         {
-            _ingestedGamePieceBodies.push_back(gamePieceBody);
+            _ingestibleGamePieceBodies.push_back(gamePieceBody);
             vehicleModel._ingested.push_back(model);
             model->_state.ingestion = GamePieceModel::INGESTIBLE;
         }

@@ -31,19 +31,22 @@ void GamePieceView::update(const GamePieceModel& gamePieceModel)
 {
     setPosition(osg::Vec3(gamePieceModel._state.pose.x, gamePieceModel._state.pose.y, gamePieceModel._radius));
 
-    switch (gamePieceModel._state.ingestion)
+    if (_shape)
     {
-        case GamePieceModel::NOT_INGESTED:
-            _shape->setColor(Color::Yellow);
-            break;
+        switch (gamePieceModel._state.ingestion)
+        {
+            case GamePieceModel::NOT_INGESTED:
+                _shape->setColor(Color::Yellow);
+                break;
 
-        case GamePieceModel::INGESTIBLE:
-            _shape->setColor(Color::Orange);
-            break;
+            case GamePieceModel::INGESTIBLE:
+                _shape->setColor(Color::Orange);
+                break;
 
-        case GamePieceModel::INGESTED:
-            _shape->setColor(Color::Green);
-            break;
+            case GamePieceModel::INGESTED:
+                _shape->setColor(Color::Green);
+                break;
+        }
     }
 }
 

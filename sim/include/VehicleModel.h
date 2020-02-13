@@ -76,6 +76,8 @@ private:
     double _leftDriveMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
     double _rightDriveMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
     double _intakeCenterMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
+    double _intakeLeftMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
+    double _intakeRightMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
     double _wheelRadius; // Needed to calculate travel of robot per unit time
     double _wheelTrack; // Needed to calculate arced turns
     double _drivetrainWidth; // Needed to calculate turning radius

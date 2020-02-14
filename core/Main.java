@@ -32,7 +32,7 @@ public class Main
         int leftDriveMotorSpeed = 0;
         int rightDriveMotorSpeed = 0;
         int prevSelectButtonState = 0;
-        Boolean isTankDrive = false;
+        Boolean isTwoHandDrive = true;
 
         while (true)
         {
@@ -55,14 +55,14 @@ public class Main
             int currBackButtonState = joystickAgent.commands.back;
             if (currBackButtonState == 0 && prevSelectButtonState == 1)
             {
-                isTankDrive = !isTankDrive;
-                if (isTankDrive)
+                isTwoHandDrive = !isTwoHandDrive;
+                if (isTwoHandDrive)
                 {
-                    System.out.println("Tank drive enabled");
+                    System.out.println("Two-handed drive enabled");
                 }
                 else
                 {
-                    System.out.println("Tank drive disabled");
+                    System.out.println("One-handed drive enabled");
                 }
             }
             prevSelectButtonState = currBackButtonState;
@@ -80,15 +80,17 @@ public class Main
             simAgent.commands.intakeCenterMotorSpeed = intakeCenterMotorSpeed;
 
             // Construct drivetrain commands
-            if (isTankDrive)
+            if (isTwoHandDrive)
             {
-                simAgent.commands.leftDriveMotorSpeed = joystickAgent.commands.yLeftJoystick;
-                simAgent.commands.rightDriveMotorSpeed = joystickAgent.commands.yRightJoystick;
+                leftDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick + joystickAgent.commands.xRightJoystick/2, -512, 512);
+                rightDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick - joystickAgent.commands.xRightJoystick/2, -512, 512);
+                simAgent.commands.leftDriveMotorSpeed = leftDriveMotorSpeed;
+                simAgent.commands.rightDriveMotorSpeed = rightDriveMotorSpeed;
             }
             else
             {
-                leftDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick + joystickAgent.commands.xRightJoystick/2, -511, 512);
-                rightDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick - joystickAgent.commands.xRightJoystick/2, -511, 512);
+                leftDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick + joystickAgent.commands.xLeftJoystick/2, -512, 512);
+                rightDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick - joystickAgent.commands.xLeftJoystick/2, -512, 512);
                 simAgent.commands.leftDriveMotorSpeed = leftDriveMotorSpeed;
                 simAgent.commands.rightDriveMotorSpeed = rightDriveMotorSpeed;
             }

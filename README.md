@@ -1,6 +1,6 @@
 # SHARP Team 3260 FRC Simulator #
 This project consists of core robot code (Java), a mock joystick controller (Python), and a vehicle simulator (C++)
-which communicate over fast UDP using JSON strings. This code was tested and runs in Ubuntu 18.04.
+which communicate over fast UDP using JSON-ish strings. This code was tested and runs in Ubuntu 18.04.
 
 Among other benefits, this software allows the software team to rapidly develop and test their software independently of
 the hardware team, status of the robot, and availability of physical joysticks; game strategy development; driver
@@ -110,16 +110,16 @@ shapes.
 
 
 ## Interface Control Document (ICD) ##
-This section defines the interfaces between all three components of the simulator. They communicate over fast UDP using
-a JSON-ish specification. Eventually this will move to real JSON, but for now I took a shortcut and implemented
-something simple to get started. Feel free to extend the interface and develop more components that plug into this
-simulator.
+This section defines the interfaces between all three components of the simulator. They communicate over UDP using a
+JSON-ish specification. Eventually this will transition to using real JSON, but for now I took some shortcuts and
+implemented something simple and human-readable, but not easily extensible to get started. Using real JSON will help
+others interface and develop more components that plug into this simulator.
 
 ### Joystick -> Core ###
 The joystick sends the user's commands to the robot's core logic over UDP as JSON-ish strings. In the default
-configuration, these commands are sent to localhost:4000. A sample of this JSON string follows:
+configuration, these commands are sent to localhost:4000. A sample of this message string follows:
 ```json
-{ 'leftJoystick': [ 0000, 0000 ], 'rightJoystick': [ 0000, 0000 ], 'dpad': [ 0, 0, 0, 0 ], 'buttons': [ 0, 0, 0, 0 ], 'back': 0, 'select': 0, 'start': 0 }
+{ 'leftJoystick': [ 0000, 0000 ], 'rightJoystick': [ 0000, 0000 ], 'dpad': [ 0, 0, 0, 0 ], 'leftTrigger': 0000, 'rightTrigger': 0000, 'leftBumper': 0, 'rightBumper': 0, 'a': 0, 'b': 0, 'x': 0, 'y': 0, 'back': 0, 'guide': 0, 'start': 0 }
 ```
 
 | Character(s)  | Description                     | Range      |
@@ -132,13 +132,17 @@ configuration, these commands are sent to localhost:4000. A sample of this JSON 
 | 80-81         | Dpad down                       | 0 or 1     |
 | 83-84         | Dpad left                       | 0 or 1     |
 | 86-87         | Dpad right                      | 0 or 1     |
-| 104-105       | A button                        | 0 or 1     |
-| 107-108       | B button                        | 0 or 1     |
-| 110-111       | X button                        | 0 or 1     |
-| 113-114       | Y button                        | 0 or 1     |
-| 126-127       | Back button                     | 0 or 1     |
-| 139-140       | Select button                   | 0 or 1     |
-| 151-152       | Start button                    | 0 or 1     |
+| 106-110       | Left trigger                    | 0 - 512    |
+| 128-132       | Right trigger                   | 0 - 512    |
+| 148-149       | Left bumper                     | 0 or 1     |
+| 166-167       | Right bumper                    | 0 or 1     |
+| 174-175       | A button                        | 0 or 1     |
+| 182-183       | B button                        | 0 or 1     |
+| 190-191       | X button                        | 0 or 1     |
+| 198-199       | Y button                        | 0 or 1     |
+| 209-210       | Back button                     | 0 or 1     |
+| 221-222       | Guide button                    | 0 or 1     |
+| 233-234       | Start button                    | 0 or 1     |
 
 ### Core -> Joystick ###
 The core logic also sends back an empty JSON string to the joystick of the following format:

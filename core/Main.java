@@ -28,7 +28,7 @@ public class Main
         System.out.println("Tx sim at localhost:" + simRxPort);
         System.out.println("Core: Launched");
 
-        int prevSelectButtonState = 0;
+        int prevBackButtonState = 0;
         Boolean isTwoHandDrive = true;
 
         while (true)
@@ -39,7 +39,7 @@ public class Main
 
             // Toggle tank drive
             int currBackButtonState = joystickAgent.commands.back;
-            if (currBackButtonState == 0 && prevSelectButtonState == 1)
+            if (currBackButtonState == 0 && prevBackButtonState == 1)
             {
                 isTwoHandDrive = !isTwoHandDrive;
                 if (isTwoHandDrive)
@@ -51,29 +51,13 @@ public class Main
                     System.out.println("One-handed drive enabled");
                 }
             }
-            prevSelectButtonState = currBackButtonState;
+            prevBackButtonState = currBackButtonState;
 
             // Construct intake motor commands
-            int intakeMotorSpeed = 0;
-            if (joystickAgent.commands.a == 1)
-            {
-                intakeMotorSpeed = 512;
-            }
-            else if (joystickAgent.commands.b == 1)
-            {
-                intakeMotorSpeed = -512;
-            }
+            int intakeMotorSpeed = joystickAgent.commands.leftTrigger;
 
             // Construct tube motor commands
-            int tubeMotorSpeed = 0;
-            if (joystickAgent.commands.x == 1)
-            {
-                tubeMotorSpeed = 512;
-            }
-            else if (joystickAgent.commands.y == 1)
-            {
-                tubeMotorSpeed = -512;
-            }
+            int tubeMotorSpeed = joystickAgent.commands.rightTrigger;
 
             // Construct drivetrain commands
             int leftDriveMotorSpeed = 0;

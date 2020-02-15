@@ -29,16 +29,23 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
     _state.pose.y = _initialState.y;
     _state.pose.theta = _initialState.theta;
 
-    // Make bounding polygon
-    _boundingPolygonLeft = std::vector<Vertex2d>{{0.43, 0.25}, {0.43, 0.31}, {-0.35, 0.31}, {-0.35, 0.25}};
-    _boundingPolygonRight = std::vector<Vertex2d>{{0.43, -0.31}, {0.43, -0.25}, {-0.35, -0.25}, {-0.35, -0.31}};
-    _boundingPolygonRear = std::vector<Vertex2d>{{-0.29, -0.25}, {-0.29, 0.25}, {-0.35, 0.25}, {-0.35, -0.25}};
+    // Make bounding polygons
+    _boundingPolygonFrontLeft = std::vector<Vertex2d>{{0.20, 0.11}, {0.20, 0.31}, {0.05, 0.31}, {0.05, 0.11}};
+    _boundingPolygonRearLeft = std::vector<Vertex2d>{{0.05, 0.18}, {0.05, 0.31}, {-0.51, 0.31}, {-0.51, 0.18}};
+    _boundingPolygonFrontRight = std::vector<Vertex2d>{{0.20, -0.31}, {0.20, -0.11}, {0.05, -0.11}, {0.05, -0.31}};
+    _boundingPolygonRearRight = std::vector<Vertex2d>{{0.05, -0.31}, {0.05, -0.18}, {-0.51, -0.18}, {-0.51, -0.31}};
+
+    _boundingPolygonBumperFrontLeft = std::vector<Vertex2d>{ {0.30, 0.16}, {0.30, 0.31}, {0.20, 0.31}, {0.20, 0.16} };
+    _boundingPolygonBumperFrontRight = std::vector<Vertex2d>{ {0.30, -0.31}, {0.30, -0.16}, {0.20, -0.16}, {0.20, -0.31} };
+    _boundingPolygonBumperLeft = std::vector<Vertex2d>{ {0.30, 0.31}, {0.30, 0.40}, {-0.60, 0.40}, {-0.60, 0.31} };
+    _boundingPolygonBumperRight = std::vector<Vertex2d>{ {0.30, -0.40}, {0.30, -0.31}, {-0.60, -0.31}, {-0.60, -0.40} };
+    _boundingPolygonBumperRear = std::vector<Vertex2d>{ {-0.51, -0.31}, {-0.51, 0.31}, {-0.60, 0.31}, {-0.60, -0.31} };
 
     // Make ingestible/ingested regions
-    _ingestibleRegionCenter = std::vector<Vertex2d>{{0.75, -0.16}, {0.75, 0.16}, {0.43, 0.16}, {0.43, -0.16}};
-    _ingestibleRegionLeft = std::vector<Vertex2d>{{0.75, 0.16}, {0.75, 0.31}, {0.43, 0.31}, {0.43, 0.16}};
-    _ingestibleRegionRight = std::vector<Vertex2d>{{0.75, -0.31}, {0.75, -0.16}, {0.43, -0.16}, {0.43, -0.31}};
-    _ingestedRegion = std::vector<Vertex2d>{{0.43, -0.25}, {0.43, 0.25}, {-0.29, 0.25}, {-0.29, -0.25}};
+    _ingestibleRegionCenter = std::vector<Vertex2d>{{0.51, -0.11}, {0.51, 0.11}, {0.05, 0.11}, {0.05, -0.11}};
+    _ingestibleRegionLeft = std::vector<Vertex2d>{{0.51, 0.11}, {0.51, 0.26}, {0.30, 0.26}, {0.30, 0.11}};
+    _ingestibleRegionRight = std::vector<Vertex2d>{{0.51, -0.26}, {0.51, -0.11}, {0.30, -0.11}, {0.30, -0.26}};
+    _ingestedRegion = std::vector<Vertex2d>{{0.05, -0.18}, {0.05, 0.18}, {-0.51, 0.18}, {-0.51, -0.18}};
 }
 
 

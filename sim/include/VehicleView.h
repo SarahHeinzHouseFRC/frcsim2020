@@ -41,6 +41,11 @@ private:
     osg::ref_ptr<osg::Geode> drawCollisionBoundary(const VehicleModel& vehicleModel);
 
     /**
+     * Draws the bumpers around the vehicle
+     */
+    osg::ref_ptr<osg::Geode> drawBumpers(const VehicleModel& vehicleModel);
+
+    /**
      * Draws the ingestible region of the vehicle
      */
     osg::ref_ptr<osg::Geode> drawIngestibleRegions(const VehicleModel& vehicleModel);

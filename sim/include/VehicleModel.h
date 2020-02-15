@@ -69,9 +69,15 @@ private:
      */
     static double wrapAngle(double val) { while (val > 2*M_PI) { val -= 2*M_PI; } while (val < 0) { val += 2*M_PI; } return val; }
 
-    Geometry::Polygon2d _boundingPolygonLeft; // Left bounding polygon of the vehicle in vehicle frame
-    Geometry::Polygon2d _boundingPolygonRight; // Right bounding polygon of the vehicle in vehicle frame
-    Geometry::Polygon2d _boundingPolygonRear; // Rear bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonFrontLeft; // Front left bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonFrontRight; // Front right bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonRearLeft; // Rear left bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonRearRight; // Rear right bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonBumperFrontLeft; // Rear right bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonBumperFrontRight; // Rear right bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonBumperLeft; // Rear right bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonBumperRight; // Rear right bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonBumperRear; // Rear right bounding polygon of the vehicle in vehicle frame
     Geometry::Polygon2d _ingestibleRegionCenter; // Bounding polygon of the center ingestible region in vehicle frame
     Geometry::Polygon2d _ingestedRegion; // Bounding polygon of the ingestion region in vehicle frame
     Geometry::Polygon2d _ingestibleRegionLeft; // Bounding polygon of the left ingestible region in vehicle frame

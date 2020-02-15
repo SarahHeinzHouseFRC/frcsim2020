@@ -184,9 +184,19 @@ osg::ref_ptr<osg::Geode> VehicleView::drawBumpers(const VehicleModel& vehicleMod
         geode->addDrawable(boundingPolygon);
     }
     {
-        // Rear
+        // Rear left
         osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-        for (const auto& vertex : vehicleModel._boundingPolygonBumperRear.vertices())
+        for (const auto& vertex : vehicleModel._boundingPolygonBumperRearLeft.vertices())
+        {
+            vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
+        }
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeQuads(vertices, Color(Color::Blue, 127));
+        geode->addDrawable(boundingPolygon);
+    }
+    {
+        // Rear left
+        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+        for (const auto& vertex : vehicleModel._boundingPolygonBumperRearRight.vertices())
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }

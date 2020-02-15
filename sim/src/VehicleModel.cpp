@@ -31,15 +31,16 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
 
     // Make bounding polygons
     _boundingPolygonFrontLeft = std::vector<Vertex2d>{{0.20, 0.11}, {0.20, 0.31}, {0.05, 0.31}, {0.05, 0.11}};
-    _boundingPolygonRearLeft = std::vector<Vertex2d>{{0.05, 0.18}, {0.05, 0.31}, {-0.51, 0.31}, {-0.51, 0.18}};
     _boundingPolygonFrontRight = std::vector<Vertex2d>{{0.20, -0.31}, {0.20, -0.11}, {0.05, -0.11}, {0.05, -0.31}};
+    _boundingPolygonRearLeft = std::vector<Vertex2d>{{0.05, 0.18}, {0.05, 0.31}, {-0.51, 0.31}, {-0.51, 0.18}};
     _boundingPolygonRearRight = std::vector<Vertex2d>{{0.05, -0.31}, {0.05, -0.18}, {-0.51, -0.18}, {-0.51, -0.31}};
 
     _boundingPolygonBumperFrontLeft = std::vector<Vertex2d>{ {0.30, 0.16}, {0.30, 0.31}, {0.20, 0.31}, {0.20, 0.16} };
     _boundingPolygonBumperFrontRight = std::vector<Vertex2d>{ {0.30, -0.31}, {0.30, -0.16}, {0.20, -0.16}, {0.20, -0.31} };
     _boundingPolygonBumperLeft = std::vector<Vertex2d>{ {0.30, 0.31}, {0.30, 0.40}, {-0.60, 0.40}, {-0.60, 0.31} };
     _boundingPolygonBumperRight = std::vector<Vertex2d>{ {0.30, -0.40}, {0.30, -0.31}, {-0.60, -0.31}, {-0.60, -0.40} };
-    _boundingPolygonBumperRear = std::vector<Vertex2d>{ {-0.51, -0.31}, {-0.51, 0.31}, {-0.60, 0.31}, {-0.60, -0.31} };
+    _boundingPolygonBumperRearLeft = std::vector<Vertex2d>{ {-0.51, 0.18}, {-0.51, 0.31}, {-0.60, 0.31}, {-0.60, 0.18} };
+    _boundingPolygonBumperRearRight = std::vector<Vertex2d>{ {-0.51, -0.31}, {-0.51, -0.18}, {-0.60, -0.18}, {-0.60, -0.31} };
 
     // Make ingestible/ingested regions
     _ingestibleRegionCenter = std::vector<Vertex2d>{{0.51, -0.11}, {0.51, 0.11}, {0.05, 0.11}, {0.05, -0.11}};

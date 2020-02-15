@@ -7,10 +7,10 @@
  */
 public class JoystickCommands
 {
-    public int xLeftJoystick; // Integer from -511 to 512
-    public int yLeftJoystick; // Integer from -511 to 512
-    public int xRightJoystick; // Integer from -511 to 512
-    public int yRightJoystick; // Integer from -511 to 512
+    public int xLeftJoystick; // Integer from -512 to 512
+    public int yLeftJoystick; // Integer from -512 to 512
+    public int xRightJoystick; // Integer from -512 to 512
+    public int yRightJoystick; // Integer from -512 to 512
     public int a; // Binary value 0 or 1
     public int b; // Binary value 0 or 1
     public int x; // Binary value 0 or 1

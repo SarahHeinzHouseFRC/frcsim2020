@@ -28,9 +28,6 @@ public class Main
         System.out.println("Tx sim at localhost:" + simRxPort);
         System.out.println("Core: Launched");
 
-        int elevatorMotorSpeed = 0;
-        int leftDriveMotorSpeed = 0;
-        int rightDriveMotorSpeed = 0;
         int prevSelectButtonState = 0;
         Boolean isTwoHandDrive = true;
 
@@ -39,17 +36,6 @@ public class Main
             //
             // Construct sim commands
             //
-
-            // Construct elevator command
-            elevatorMotorSpeed = 0;
-            if (joystickAgent.commands.upDpad == 1)
-            {
-                elevatorMotorSpeed = 512;
-            }
-            else if (joystickAgent.commands.downDpad == 1)
-            {
-                elevatorMotorSpeed = -511;
-            }
 
             // Toggle tank drive
             int currBackButtonState = joystickAgent.commands.back;
@@ -68,34 +54,47 @@ public class Main
             prevSelectButtonState = currBackButtonState;
 
             // Construct intake motor commands
-            int intakeCenterMotorSpeed = 0;
+            int intakeMotorSpeed = 0;
             if (joystickAgent.commands.a == 1)
             {
-                intakeCenterMotorSpeed = 512;
+                intakeMotorSpeed = 512;
             }
             else if (joystickAgent.commands.b == 1)
             {
-                intakeCenterMotorSpeed = -512;
+                intakeMotorSpeed = -512;
             }
-            simAgent.commands.intakeCenterMotorSpeed = intakeCenterMotorSpeed;
-            simAgent.commands.intakeLeftMotorSpeed = intakeCenterMotorSpeed;
-            simAgent.commands.intakeRightMotorSpeed = intakeCenterMotorSpeed;
+
+            // Construct tube motor commands
+            int tubeMotorSpeed = 0;
+            if (joystickAgent.commands.x == 1)
+            {
+                tubeMotorSpeed = 512;
+            }
+            else if (joystickAgent.commands.y == 1)
+            {
+                tubeMotorSpeed = -512;
+            }
 
             // Construct drivetrain commands
+            int leftDriveMotorSpeed = 0;
+            int rightDriveMotorSpeed = 0;
             if (isTwoHandDrive)
             {
                 leftDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick + joystickAgent.commands.xRightJoystick/2, -512, 512);
                 rightDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick - joystickAgent.commands.xRightJoystick/2, -512, 512);
-                simAgent.commands.leftDriveMotorSpeed = leftDriveMotorSpeed;
-                simAgent.commands.rightDriveMotorSpeed = rightDriveMotorSpeed;
             }
             else
             {
                 leftDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick + joystickAgent.commands.xLeftJoystick/2, -512, 512);
                 rightDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick - joystickAgent.commands.xLeftJoystick/2, -512, 512);
-                simAgent.commands.leftDriveMotorSpeed = leftDriveMotorSpeed;
-                simAgent.commands.rightDriveMotorSpeed = rightDriveMotorSpeed;
             }
+
+            simAgent.commands.intakeCenterMotorSpeed = intakeMotorSpeed;
+            simAgent.commands.intakeLeftMotorSpeed = intakeMotorSpeed;
+            simAgent.commands.intakeRightMotorSpeed = intakeMotorSpeed;
+            simAgent.commands.tubeMotorSpeed = tubeMotorSpeed;
+            simAgent.commands.leftDriveMotorSpeed = leftDriveMotorSpeed;
+            simAgent.commands.rightDriveMotorSpeed = rightDriveMotorSpeed;
             simAgent.commands.timerStartStop = joystickAgent.commands.start;
             simAgent.commands.reset = joystickAgent.commands.guide;
 

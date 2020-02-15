@@ -99,6 +99,14 @@ class ControllerWidget(QSvgWidget):
             self.left_joystick.set_x(-512)
         if event.key() == Qt.Key_D:
             self.left_joystick.set_x(512)
+        if event.key() == Qt.Key_Slash:
+            self.a_button.set(True)
+        if event.key() == Qt.Key_Apostrophe:
+            self.b_button.set(True)
+        if event.key() == Qt.Key_Period:
+            self.x_button.set(True)
+        if event.key() == Qt.Key_Semicolon:
+            self.y_button.set(True)
         event.accept()
 
     def keyReleaseEvent(self, event):
@@ -121,6 +129,14 @@ class ControllerWidget(QSvgWidget):
             self.left_joystick.set_x(0)
         if event.key() == Qt.Key_D:
             self.left_joystick.set_x(0)
+        if event.key() == Qt.Key_Slash:
+            self.a_button.set(False)
+        if event.key() == Qt.Key_Apostrophe:
+            self.b_button.set(False)
+        if event.key() == Qt.Key_Period:
+            self.x_button.set(False)
+        if event.key() == Qt.Key_Semicolon:
+            self.y_button.set(False)
         event.accept()
 
 
@@ -284,15 +300,21 @@ class ButtonWidget(QSvgWidget):
         self.show_released()
 
     def mousePressEvent(self, event):
-        self.show_pressed()
-        self.button_state.pressed = 1
+        self.set(True)
 
     def mouseReleaseEvent(self, event):
-        self.show_released()
-        self.button_state.pressed = 0
+        self.set(False)
+
+    def show_pressed(self):
+        self.load(self.pressed_img)
 
     def show_released(self):
         self.load(self.released_img)
 
-    def show_pressed(self):
-        self.load(self.pressed_img)
+    def set(self, is_pressed):
+        if is_pressed:
+            self.show_pressed()
+            self.button_state.pressed = 1
+        else:
+            self.show_released()
+            self.button_state.pressed = 0

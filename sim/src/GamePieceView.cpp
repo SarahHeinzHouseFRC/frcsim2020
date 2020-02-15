@@ -39,8 +39,16 @@ void GamePieceView::update(const GamePieceModel& gamePieceModel)
                 _shape->setColor(Color::Yellow);
                 break;
 
-            case GamePieceModel::INGESTIBLE:
+            case GamePieceModel::CENTER_INGESTIBLE:
                 _shape->setColor(Color::Orange);
+                break;
+
+            case GamePieceModel::LEFT_INGESTIBLE:
+                _shape->setColor(Color::Blue);
+                break;
+
+            case GamePieceModel::RIGHT_INGESTIBLE:
+                _shape->setColor(Color::Red);
                 break;
 
             case GamePieceModel::INGESTED:

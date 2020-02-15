@@ -127,13 +127,33 @@ osg::ref_ptr<osg::Geode> VehicleView::drawCollisionBoundary(const VehicleModel& 
 
 osg::ref_ptr<osg::Geode> VehicleView::drawIngestibleRegion(const VehicleModel& vehicleModel)
 {
-    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-    for (const auto& vertex : vehicleModel._ingestibleRegion.vertices())
-    {
-        vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
-    }
-    osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeLineLoop(vertices, Color::Orange);
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
-    geode->addDrawable(geom);
+    {
+        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+        for (const auto& vertex : vehicleModel._ingestibleRegionCenter.vertices())
+        {
+            vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
+        }
+        osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeLineLoop(vertices, Color::Orange);
+        geode->addDrawable(geom);
+    }
+    {
+        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+        for (const auto& vertex : vehicleModel._ingestibleRegionLeft.vertices())
+        {
+            vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
+        }
+        osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeLineLoop(vertices, Color::Blue);
+        geode->addDrawable(geom);
+    }
+    {
+        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+        for (const auto& vertex : vehicleModel._ingestibleRegionRight.vertices())
+        {
+            vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
+        }
+        osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeLineLoop(vertices, Color::Red);
+        geode->addDrawable(geom);
+    }
     return geode;
 }

@@ -17,7 +17,9 @@ public:
     enum IngestionState
     {
         NOT_INGESTED,
-        INGESTIBLE,
+        CENTER_INGESTIBLE,
+        LEFT_INGESTIBLE,
+        RIGHT_INGESTIBLE,
         INGESTED
     };
 

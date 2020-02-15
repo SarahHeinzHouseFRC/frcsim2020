@@ -68,11 +68,27 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
     }
 
     // Manually move ingested game pieces
-    for (b2Body* gamePieceBody : _ingestibleGamePieceBodies)
+    float velocityMagnitude = vehicleModel._state.intakeCenterMotorSpeed;
+    for (b2Body* gamePieceBody : _ingestibleCenterGamePieceBodies)
     {
-        // Enter a slave state, move according to intake motors
-        float velocityMagnitude = vehicleModel._state.intakeCenterMotorSpeed;
+        // Enter a slave state, move according to center intake motors
         b2Vec2 velocity = _vehicleBody->GetWorldVector(b2Vec2(-1, 0));
+        velocity *= velocityMagnitude;
+        velocity += _vehicleBody->GetLinearVelocityFromWorldPoint(gamePieceBody->GetPosition());
+        gamePieceBody->SetLinearVelocity(velocity);
+    }
+    for (b2Body* gamePieceBody : _ingestibleLeftGamePieceBodies)
+    {
+        // Enter a slave state, move according to left intake motors
+        b2Vec2 velocity = _vehicleBody->GetWorldVector(b2Vec2(0, -1));
+        velocity *= velocityMagnitude;
+        velocity += _vehicleBody->GetLinearVelocityFromWorldPoint(gamePieceBody->GetPosition());
+        gamePieceBody->SetLinearVelocity(velocity);
+    }
+    for (b2Body* gamePieceBody : _ingestibleRightGamePieceBodies)
+    {
+        // Enter a slave state, move according to right intake motors
+        b2Vec2 velocity = _vehicleBody->GetWorldVector(b2Vec2(0, 1));
         velocity *= velocityMagnitude;
         velocity += _vehicleBody->GetLinearVelocityFromWorldPoint(gamePieceBody->GetPosition());
         gamePieceBody->SetLinearVelocity(velocity);
@@ -106,26 +122,40 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
         }
     }
 
-    // Get a list of balls in the ingestible region
-    _ingestibleGamePieceBodies.clear();
-    vehicleModel._ingested.clear();
+    // Determine the balls in each region
+    _ingestibleCenterGamePieceBodies.clear();
+    _ingestibleLeftGamePieceBodies.clear();
+    _ingestibleRightGamePieceBodies.clear();
     for (const auto& gamePieceBody : _gamePieceBodies)
     {
         b2Transform xfA = _vehicleBody->GetTransform(), xfB = gamePieceBody->GetTransform();
-        bool overlap = b2TestOverlap(&_ingestibleRegionShape, 0, &_gamePieceShape, 0, xfA, xfB);
+        bool overlapCenter = _ingestibleRegionCenterShape.TestPoint(xfA, gamePieceBody->GetWorldCenter());
+        bool overlapLeft = _ingestibleRegionLeftShape.TestPoint(xfA, gamePieceBody->GetWorldCenter());
+        bool overlapRight = _ingestibleRegionRightShape.TestPoint(xfA, gamePieceBody->GetWorldCenter());
+//        bool overlapCenter = b2TestOverlap(&_ingestibleRegionCenterShape, 0, &_gamePieceShape, 0, xfA, xfB);
+//        bool overlapLeft = b2TestOverlap(&_ingestibleRegionLeftShape, 0, &_gamePieceShape, 0, xfA, xfB);
+//        bool overlapRight = b2TestOverlap(&_ingestibleRegionRightShape, 0, &_gamePieceShape, 0, xfA, xfB);
         auto model = (GamePieceModel*) gamePieceBody->GetUserData();
-        if (overlap)
+        if (overlapCenter)
         {
-            _ingestibleGamePieceBodies.push_back(gamePieceBody);
-            vehicleModel._ingested.push_back(model);
-            model->_state.ingestion = GamePieceModel::INGESTIBLE;
+            _ingestibleCenterGamePieceBodies.push_back(gamePieceBody);
+            model->_state.ingestion = GamePieceModel::CENTER_INGESTIBLE;
+        }
+        else if (overlapLeft)
+        {
+            _ingestibleLeftGamePieceBodies.push_back(gamePieceBody);
+            model->_state.ingestion = GamePieceModel::LEFT_INGESTIBLE;
+        }
+        else if (overlapRight)
+        {
+            _ingestibleRightGamePieceBodies.push_back(gamePieceBody);
+            model->_state.ingestion = GamePieceModel::RIGHT_INGESTIBLE;
         }
         else
         {
             model->_state.ingestion = GamePieceModel::NOT_INGESTED;
         }
     }
-
 
     _prevTimestamp = currTimestamp;
 }
@@ -253,18 +283,60 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleBody->CreateFixture(&vehicleFixtureDef);
     }
 
-    // Define ingestible region
+    // Define center ingestible region
     {
         b2FixtureDef vehicleFixtureDef;
-        Polygon2d bounds = vehicleModel._ingestibleRegion;
+        Polygon2d bounds = vehicleModel._ingestibleRegionCenter;
+        b2Vec2 verticesCenter[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            verticesCenter[i] = b2Vec2(v.x, v.y);
+        }
+        _ingestibleRegionCenterShape.Set(verticesCenter, bounds.numVertices());
+        vehicleFixtureDef.shape = &_ingestibleRegionCenterShape;
+        vehicleFixtureDef.density = 0;
+        vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = 0x0002;
+        vehicleFixtureDef.filter.maskBits = 0x0002;
+
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
+
+    // Define left ingestible region
+    {
+        b2FixtureDef vehicleFixtureDef;
+        Polygon2d bounds = vehicleModel._ingestibleRegionLeft;
         b2Vec2 vertices[bounds.numVertices()];
         for (unsigned int i=0; i<bounds.numVertices(); i++)
         {
             Vertex2d v = bounds.vertices().at(i);
             vertices[i] = b2Vec2(v.x, v.y);
         }
-        _ingestibleRegionShape.Set(vertices, bounds.numVertices());
-        vehicleFixtureDef.shape = &_ingestibleRegionShape;
+        _ingestibleRegionLeftShape.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &_ingestibleRegionLeftShape;
+        vehicleFixtureDef.density = 0;
+        vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = 0x0002;
+        vehicleFixtureDef.filter.maskBits = 0x0002;
+
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
+
+    // Define right ingestible region
+    {
+        b2FixtureDef vehicleFixtureDef;
+        Polygon2d bounds = vehicleModel._ingestibleRegionRight;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        _ingestibleRegionRightShape.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &_ingestibleRegionRightShape;
         vehicleFixtureDef.density = 0;
         vehicleFixtureDef.friction = 0.3f;
         vehicleFixtureDef.filter.categoryBits = 0x0002;

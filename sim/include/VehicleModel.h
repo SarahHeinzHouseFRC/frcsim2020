@@ -72,7 +72,9 @@ private:
     Geometry::Polygon2d _boundingPolygonLeft; // Left bounding polygon of the vehicle in vehicle frame
     Geometry::Polygon2d _boundingPolygonRight; // Right bounding polygon of the vehicle in vehicle frame
     Geometry::Polygon2d _boundingPolygonRear; // Rear bounding polygon of the vehicle in vehicle frame
-    Geometry::Polygon2d _ingestibleRegion; // Bounding polygon of the ingestible region in vehicle frame
+    Geometry::Polygon2d _ingestibleRegionCenter; // Bounding polygon of the center ingestible region in vehicle frame
+    Geometry::Polygon2d _ingestibleRegionLeft; // Bounding polygon of the left ingestible region in vehicle frame
+    Geometry::Polygon2d _ingestibleRegionRight; // Bounding polygon of the right ingestible region in vehicle frame
     double _leftDriveMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
     double _rightDriveMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
     double _intakeCenterMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
@@ -83,7 +85,6 @@ private:
     double _drivetrainWidth; // Needed to calculate turning radius
     double _mass; // Needed to calculate density for collision checker
     double _prevTimestamp; // Needed to calculate how much time has passed since last update()
-    std::vector<GamePieceModel*> _ingested;
 
     struct
     {

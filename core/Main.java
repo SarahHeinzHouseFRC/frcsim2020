@@ -78,6 +78,8 @@ public class Main
                 intakeCenterMotorSpeed = -512;
             }
             simAgent.commands.intakeCenterMotorSpeed = intakeCenterMotorSpeed;
+            simAgent.commands.intakeLeftMotorSpeed = intakeCenterMotorSpeed;
+            simAgent.commands.intakeRightMotorSpeed = intakeCenterMotorSpeed;
 
             // Construct drivetrain commands
             if (isTwoHandDrive)

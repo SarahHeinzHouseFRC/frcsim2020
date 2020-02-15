@@ -43,7 +43,7 @@ private:
     /**
      * Draws the ingestible region of the vehicle
      */
-    osg::ref_ptr<osg::Geode> drawIngestibleRegion(const VehicleModel& vehicleModel);
+    osg::ref_ptr<osg::Geode> drawIngestibleRegions(const VehicleModel& vehicleModel);
 
     osg::ref_ptr<osg::Node> _vehicleNode;
     osg::ref_ptr<osg::Geode> _vehicleBounds;

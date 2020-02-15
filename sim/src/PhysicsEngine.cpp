@@ -67,30 +67,48 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
         }
     }
 
-    // Manually move ingested game pieces
-    float velocityMagnitude = vehicleModel._state.intakeCenterMotorSpeed;
+    // Manually move ingestible/tube game pieces
     for (b2Body* gamePieceBody : _ingestibleCenterGamePieceBodies)
     {
-        // Enter a slave state, move according to center intake motors
+        // Enter a slave state, move according to center intake motor and half the vehicle speed
+        float velocityMagnitude = vehicleModel._state.intakeCenterMotorSpeed;
         b2Vec2 velocity = _vehicleBody->GetWorldVector(b2Vec2(-1, 0));
         velocity *= velocityMagnitude;
-        velocity += _vehicleBody->GetLinearVelocityFromWorldPoint(gamePieceBody->GetPosition());
+        b2Vec2 vehicleVelocity = _vehicleBody->GetLinearVelocityFromWorldPoint(gamePieceBody->GetPosition());
+        vehicleVelocity *= 0.5;
+        velocity += vehicleVelocity;
         gamePieceBody->SetLinearVelocity(velocity);
     }
     for (b2Body* gamePieceBody : _ingestibleLeftGamePieceBodies)
     {
-        // Enter a slave state, move according to left intake motors
+        // Enter a slave state, move according to left intake motor and half the vehicle speed
+        float velocityMagnitude = vehicleModel._state.intakeLeftMotorSpeed;
         b2Vec2 velocity = _vehicleBody->GetWorldVector(b2Vec2(0, -1));
         velocity *= velocityMagnitude;
-        velocity += _vehicleBody->GetLinearVelocityFromWorldPoint(gamePieceBody->GetPosition());
+        b2Vec2 vehicleVelocity = _vehicleBody->GetLinearVelocityFromWorldPoint(gamePieceBody->GetPosition());
+        vehicleVelocity *= 0.5;
+        velocity += vehicleVelocity;
         gamePieceBody->SetLinearVelocity(velocity);
     }
     for (b2Body* gamePieceBody : _ingestibleRightGamePieceBodies)
     {
-        // Enter a slave state, move according to right intake motors
+        // Enter a slave state, move according to right intake motor and half the vehicle speed
+        float velocityMagnitude = vehicleModel._state.intakeRightMotorSpeed;
         b2Vec2 velocity = _vehicleBody->GetWorldVector(b2Vec2(0, 1));
         velocity *= velocityMagnitude;
-        velocity += _vehicleBody->GetLinearVelocityFromWorldPoint(gamePieceBody->GetPosition());
+        b2Vec2 vehicleVelocity = _vehicleBody->GetLinearVelocityFromWorldPoint(gamePieceBody->GetPosition());
+        vehicleVelocity *= 0.5;
+        velocity += vehicleVelocity;
+        gamePieceBody->SetLinearVelocity(velocity);
+    }
+    for (b2Body* gamePieceBody : _tubeGamePieceBodies)
+    {
+        // Enter a slave state, move according to tube motor and the vehicle speed
+        float velocityMagnitude = vehicleModel._state.tubeMotorSpeed;
+        b2Vec2 velocity = _vehicleBody->GetWorldVector(b2Vec2(-1, 0));
+        velocity *= velocityMagnitude;
+        b2Vec2 vehicleVelocity = _vehicleBody->GetLinearVelocityFromWorldPoint(gamePieceBody->GetPosition());
+        velocity += vehicleVelocity;
         gamePieceBody->SetLinearVelocity(velocity);
     }
 
@@ -126,15 +144,15 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
     _ingestibleCenterGamePieceBodies.clear();
     _ingestibleLeftGamePieceBodies.clear();
     _ingestibleRightGamePieceBodies.clear();
+    _tubeGamePieceBodies.clear();
     for (const auto& gamePieceBody : _gamePieceBodies)
     {
-        b2Transform xfA = _vehicleBody->GetTransform(), xfB = gamePieceBody->GetTransform();
-        bool overlapCenter = _ingestibleRegionCenterShape.TestPoint(xfA, gamePieceBody->GetWorldCenter());
-        bool overlapLeft = _ingestibleRegionLeftShape.TestPoint(xfA, gamePieceBody->GetWorldCenter());
-        bool overlapRight = _ingestibleRegionRightShape.TestPoint(xfA, gamePieceBody->GetWorldCenter());
-//        bool overlapCenter = b2TestOverlap(&_ingestibleRegionCenterShape, 0, &_gamePieceShape, 0, xfA, xfB);
-//        bool overlapLeft = b2TestOverlap(&_ingestibleRegionLeftShape, 0, &_gamePieceShape, 0, xfA, xfB);
-//        bool overlapRight = b2TestOverlap(&_ingestibleRegionRightShape, 0, &_gamePieceShape, 0, xfA, xfB);
+        b2Transform vehicleTf = _vehicleBody->GetTransform();
+        b2Vec2 gamePiecePosition = gamePieceBody->GetWorldCenter();
+        bool overlapCenter = _ingestibleRegionCenterShape.TestPoint(vehicleTf, gamePiecePosition);
+        bool overlapLeft = _ingestibleRegionLeftShape.TestPoint(vehicleTf, gamePiecePosition);
+        bool overlapRight = _ingestibleRegionRightShape.TestPoint(vehicleTf, gamePiecePosition);
+        bool overlapIngested = _tubeRegion.TestPoint(vehicleTf, gamePiecePosition);
         auto model = (GamePieceModel*) gamePieceBody->GetUserData();
         if (overlapCenter)
         {
@@ -150,6 +168,11 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
         {
             _ingestibleRightGamePieceBodies.push_back(gamePieceBody);
             model->_state.ingestion = GamePieceModel::RIGHT_INGESTIBLE;
+        }
+        else if (overlapIngested)
+        {
+            _tubeGamePieceBodies.push_back(gamePieceBody);
+            model->_state.ingestion = GamePieceModel::INGESTED;
         }
         else
         {
@@ -337,6 +360,27 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         }
         _ingestibleRegionRightShape.Set(vertices, bounds.numVertices());
         vehicleFixtureDef.shape = &_ingestibleRegionRightShape;
+        vehicleFixtureDef.density = 0;
+        vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = 0x0002;
+        vehicleFixtureDef.filter.maskBits = 0x0002;
+
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
+
+    // Define ingested region
+    {
+        b2FixtureDef vehicleFixtureDef;
+        Polygon2d bounds = vehicleModel._ingestedRegion;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        _tubeRegion.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &_tubeRegion;
         vehicleFixtureDef.density = 0;
         vehicleFixtureDef.friction = 0.3f;
         vehicleFixtureDef.filter.categoryBits = 0x0002;

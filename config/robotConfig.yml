@@ -95,6 +95,7 @@ sim:
       centerMotorMaxSpeed: 50                            # RPM
       leftMotorMaxSpeed: 50                              # RPM
       rightMotorMaxSpeed: 50                             # RPM
+      tubeMotorMaxSpeed: 50                              # RPM
   gamePiece:
     radius: 3.50                                         # Inches
     initialPositions:                                    # Inches (where (0, 0) is the center of the field)

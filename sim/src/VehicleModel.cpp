@@ -17,6 +17,7 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
         _intakeCenterMotorMaxSpeed(config.sim.vehicle.intake.centerMotorMaxSpeed),
         _intakeLeftMotorMaxSpeed(config.sim.vehicle.intake.leftMotorMaxSpeed),
         _intakeRightMotorMaxSpeed(config.sim.vehicle.intake.rightMotorMaxSpeed),
+        _tubeMotorMaxSpeed(config.sim.vehicle.intake.tubeMotorMaxSpeed),
         _wheelRadius(config.sim.vehicle.drivetrain.wheelRadius),
         _drivetrainWidth(config.sim.vehicle.drivetrain.width),
         _wheelTrack(config.sim.vehicle.drivetrain.wheelTrack),
@@ -33,10 +34,11 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
     _boundingPolygonRight = std::vector<Vertex2d>{{0.43, -0.31}, {0.43, -0.25}, {-0.35, -0.25}, {-0.35, -0.31}};
     _boundingPolygonRear = std::vector<Vertex2d>{{-0.29, -0.25}, {-0.29, 0.25}, {-0.35, 0.25}, {-0.35, -0.25}};
 
-    // Make ingestible region
+    // Make ingestible/ingested regions
     _ingestibleRegionCenter = std::vector<Vertex2d>{{0.75, -0.16}, {0.75, 0.16}, {0.43, 0.16}, {0.43, -0.16}};
     _ingestibleRegionLeft = std::vector<Vertex2d>{{0.75, 0.16}, {0.75, 0.31}, {0.43, 0.31}, {0.43, 0.16}};
     _ingestibleRegionRight = std::vector<Vertex2d>{{0.75, -0.31}, {0.75, -0.16}, {0.43, -0.16}, {0.43, -0.31}};
+    _ingestedRegion = std::vector<Vertex2d>{{0.43, -0.25}, {0.43, 0.25}, {-0.29, 0.25}, {-0.29, -0.25}};
 }
 
 
@@ -95,6 +97,7 @@ void VehicleModel::processCommands(const CoreCommands& commands)
     _state.intakeCenterMotorSpeed = (commands.intakeCenterMotorSpeed / 512.0) * _intakeCenterMotorMaxSpeed;
     _state.intakeLeftMotorSpeed = (commands.intakeLeftMotorSpeed / 512.0) * _intakeLeftMotorMaxSpeed;
     _state.intakeRightMotorSpeed = (commands.intakeRightMotorSpeed / 512.0) * _intakeRightMotorMaxSpeed;
+    _state.tubeMotorSpeed = (commands.tubeMotorSpeed / 512.0) * _tubeMotorMaxSpeed;
 }
 
 

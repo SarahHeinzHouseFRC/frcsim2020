@@ -154,6 +154,7 @@ void ConfigReader::parseSimVehicleConfig(const YAML::Node& vehicleConfig)
         sim.vehicle.intake.centerMotorMaxSpeed = intakeConfig["centerMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
         sim.vehicle.intake.leftMotorMaxSpeed = intakeConfig["leftMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
         sim.vehicle.intake.rightMotorMaxSpeed = intakeConfig["rightMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
+        sim.vehicle.intake.tubeMotorMaxSpeed = intakeConfig["tubeMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
     }
 }
 

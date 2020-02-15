@@ -29,7 +29,7 @@ GamePieceView::GamePieceView(const ConfigReader& config, const GamePieceModel& g
 
 void GamePieceView::update(const GamePieceModel& gamePieceModel)
 {
-    setPosition(osg::Vec3(gamePieceModel._state.pose.x, gamePieceModel._state.pose.y, gamePieceModel._radius));
+    setPosition(osg::Vec3(gamePieceModel._state.pose.x, gamePieceModel._state.pose.y, gamePieceModel._state.pose.z + gamePieceModel._radius));
 
     if (_shape)
     {
@@ -39,19 +39,19 @@ void GamePieceView::update(const GamePieceModel& gamePieceModel)
                 _shape->setColor(Color::Yellow);
                 break;
 
-            case GamePieceModel::CENTER_INGESTIBLE:
+            case GamePieceModel::CENTER_INTAKE:
                 _shape->setColor(Color::Orange);
                 break;
 
-            case GamePieceModel::LEFT_INGESTIBLE:
+            case GamePieceModel::LEFT_INTAKE:
                 _shape->setColor(Color::Blue);
                 break;
 
-            case GamePieceModel::RIGHT_INGESTIBLE:
+            case GamePieceModel::RIGHT_INTAKE:
                 _shape->setColor(Color::Red);
                 break;
 
-            case GamePieceModel::INGESTED:
+            case GamePieceModel::TUBE:
                 _shape->setColor(Color::Green);
                 break;
         }

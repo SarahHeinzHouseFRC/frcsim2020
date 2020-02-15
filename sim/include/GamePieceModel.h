@@ -17,17 +17,17 @@ public:
     enum IngestionState
     {
         NOT_INGESTED,
-        CENTER_INGESTIBLE,
-        LEFT_INGESTIBLE,
-        RIGHT_INGESTIBLE,
-        INGESTED
+        CENTER_INTAKE,
+        LEFT_INTAKE,
+        RIGHT_INTAKE,
+        TUBE
     };
 
     /**
      * Constructor
      */
     GamePieceModel(double radius, double x, double y) : _initialX(x), _initialY(y),
-            _radius(radius), _state({ { x, y, 0, 0 } }) {};
+            _radius(radius), _state({ { x, y, 0, 0, 0 } }) {};
 
     /**
      * Reset
@@ -56,7 +56,7 @@ private:
     {
         struct
         {
-            double x, y;
+            double x, y, z;
             double vx, vy;
         } pose;
         IngestionState ingestion;

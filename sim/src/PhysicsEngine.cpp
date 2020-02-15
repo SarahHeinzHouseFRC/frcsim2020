@@ -152,30 +152,40 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
         bool overlapCenter = _ingestibleRegionCenterShape.TestPoint(vehicleTf, gamePiecePosition);
         bool overlapLeft = _ingestibleRegionLeftShape.TestPoint(vehicleTf, gamePiecePosition);
         bool overlapRight = _ingestibleRegionRightShape.TestPoint(vehicleTf, gamePiecePosition);
-        bool overlapIngested = _tubeRegion.TestPoint(vehicleTf, gamePiecePosition);
+        bool overlapTube = _tubeRegion.TestPoint(vehicleTf, gamePiecePosition);
         auto model = (GamePieceModel*) gamePieceBody->GetUserData();
         if (overlapCenter)
         {
             _ingestibleCenterGamePieceBodies.push_back(gamePieceBody);
-            model->_state.ingestion = GamePieceModel::CENTER_INGESTIBLE;
+            model->_state.ingestion = GamePieceModel::CENTER_INTAKE;
         }
         else if (overlapLeft)
         {
             _ingestibleLeftGamePieceBodies.push_back(gamePieceBody);
-            model->_state.ingestion = GamePieceModel::LEFT_INGESTIBLE;
+            model->_state.ingestion = GamePieceModel::LEFT_INTAKE;
         }
         else if (overlapRight)
         {
             _ingestibleRightGamePieceBodies.push_back(gamePieceBody);
-            model->_state.ingestion = GamePieceModel::RIGHT_INGESTIBLE;
+            model->_state.ingestion = GamePieceModel::RIGHT_INTAKE;
         }
-        else if (overlapIngested)
+        else if (overlapTube)
         {
             _tubeGamePieceBodies.push_back(gamePieceBody);
-            model->_state.ingestion = GamePieceModel::INGESTED;
+            b2Vec2 rearLeftCornerLocal(0.05, 0.11);
+            b2Vec2 rearRightCornerLocal(0.05, -0.11);
+            b2Vec2 rearEdge = rearLeftCornerLocal - rearRightCornerLocal;
+            b2Vec2 rearEdgePerp(rearEdge.y, rearEdge.x);
+            rearEdgePerp.Normalize();
+            b2Vec2 gamePiecePosLocal = _vehicleBody->GetLocalPoint(gamePieceBody->GetPosition());
+            b2Vec2 vecToGamePiece = gamePiecePosLocal - rearRightCornerLocal;
+            float dist = -b2Dot(rearEdgePerp, vecToGamePiece);
+            model->_state.pose.z = dist * (0.37 / 0.51);
+            model->_state.ingestion = GamePieceModel::TUBE;
         }
         else
         {
+            model->_state.pose.z = 0;
             model->_state.ingestion = GamePieceModel::NOT_INGESTED;
         }
     }

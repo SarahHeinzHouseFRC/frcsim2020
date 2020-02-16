@@ -52,6 +52,10 @@ private:
 
     osg::ref_ptr<osg::Node> _vehicleNode;
     osg::ref_ptr<osg::Geode> _vehicleBounds;
+    osg::ref_ptr<osg::Geometry> _ingestibleRegionCenterArrow;
+    osg::ref_ptr<osg::Geometry> _ingestibleRegionLeftArrow;
+    osg::ref_ptr<osg::Geometry> _ingestibleRegionRightArrow;
+    osg::ref_ptr<osg::Geometry> _tubeRegionArrow;
     float _wheelRadius;
 };
 

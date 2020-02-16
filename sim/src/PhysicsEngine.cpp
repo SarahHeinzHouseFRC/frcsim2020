@@ -180,7 +180,7 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
             b2Vec2 gamePiecePosLocal = _vehicleBody->GetLocalPoint(gamePieceBody->GetPosition());
             b2Vec2 vecToGamePiece = gamePiecePosLocal - rearRightCornerLocal;
             float dist = -b2Dot(rearEdgePerp, vecToGamePiece);
-            model->_state.pose.z = dist * (0.37 / 0.51);
+            model->_state.pose.z = dist * (0.45 / 0.51);
             model->_state.ingestion = GamePieceModel::TUBE;
         }
         else
@@ -522,7 +522,7 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
     // Define ingested region
     {
         b2FixtureDef vehicleFixtureDef;
-        Polygon2d bounds = vehicleModel._ingestedRegion;
+        Polygon2d bounds = vehicleModel._tubeRegion;
         b2Vec2 vertices[bounds.numVertices()];
         for (unsigned int i=0; i<bounds.numVertices(); i++)
         {

@@ -44,11 +44,11 @@ void GamePieceView::update(const GamePieceModel& gamePieceModel)
                 break;
 
             case GamePieceModel::LEFT_INTAKE:
-                _shape->setColor(Color::Blue);
+                _shape->setColor(Color::Orange);
                 break;
 
             case GamePieceModel::RIGHT_INTAKE:
-                _shape->setColor(Color::Red);
+                _shape->setColor(Color::Orange);
                 break;
 
             case GamePieceModel::TUBE:

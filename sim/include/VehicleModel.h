@@ -80,7 +80,7 @@ private:
     Geometry::Polygon2d _boundingPolygonBumperRearLeft; // Rear left bounding polygon of the vehicle in vehicle frame
     Geometry::Polygon2d _boundingPolygonBumperRearRight; // Rear right bounding polygon of the vehicle in vehicle frame
     Geometry::Polygon2d _ingestibleRegionCenter; // Bounding polygon of the center ingestible region in vehicle frame
-    Geometry::Polygon2d _ingestedRegion; // Bounding polygon of the ingestion region in vehicle frame
+    Geometry::Polygon2d _tubeRegion; // Bounding polygon of the ingestion region in vehicle frame
     Geometry::Polygon2d _ingestibleRegionLeft; // Bounding polygon of the left ingestible region in vehicle frame
     Geometry::Polygon2d _ingestibleRegionRight; // Bounding polygon of the right ingestible region in vehicle frame
     double _leftDriveMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)

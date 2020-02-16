@@ -92,10 +92,10 @@ sim:
       leftMotorMaxSpeed: 833                             # RPM
       rightMotorMaxSpeed: 833                            # RPM
     intake:
-      centerMotorMaxSpeed: 50                            # RPM
-      leftMotorMaxSpeed: 50                              # RPM
-      rightMotorMaxSpeed: 50                             # RPM
-      tubeMotorMaxSpeed: 10                              # RPM
+      centerMotorMaxSpeed: 25                            # RPM
+      leftMotorMaxSpeed: 25                              # RPM
+      rightMotorMaxSpeed: 25                             # RPM
+      tubeMotorMaxSpeed: 25                              # RPM
   gamePiece:
     radius: 3.50                                         # Inches
     initialPositions:                                    # Inches (where (0, 0) is the center of the field)

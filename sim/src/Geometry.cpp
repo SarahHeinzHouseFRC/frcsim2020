@@ -95,6 +95,17 @@ Polygon2d::Polygon2d(const std::vector<Vertex2d>& vertices) : _vertices(vertices
         Edge2d edge{ _vertices[i], _vertices[j] };
         _edges.push_back(edge);
     }
+
+    // Calculate center
+    double avgX = 0, avgY = 0;
+    for (auto & vertex : _vertices)
+    {
+        avgX += vertex.x;
+        avgY += vertex.y;
+    }
+    avgX /= _vertices.size();
+    avgY /= _vertices.size();
+    _center = { avgX, avgY };
 }
 
 

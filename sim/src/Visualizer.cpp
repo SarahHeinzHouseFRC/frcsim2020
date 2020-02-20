@@ -41,6 +41,7 @@ Visualizer::Visualizer(Scene &scene, Hud& hud) : _scene(scene), _hud(hud), _wind
     _viewer.setSceneData(scene.getRoot());
 
     _viewer.addEventHandler(new osgViewer::StatsHandler);
+    _viewer.addEventHandler(new osgViewer::WindowSizeHandler);
 
     osg::Camera* camera = _hud.getCamera();
     camera->setViewport(0, 0, _windowWidth, _windowHeight);

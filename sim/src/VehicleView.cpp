@@ -41,9 +41,7 @@ void VehicleView::update(const VehicleModel& vehicleModel)
     double y = vehicleModel._state.pose.y;
     double theta = vehicleModel._state.pose.theta;
     this->setPosition(osg::Vec3(x, y, _wheelRadius));
-    osg::Matrix mat;
-    mat.makeRotate(theta, osg::Z_AXIS);
-    this->setAttitude(mat.getRotate());
+    this->setAttitude(osg::Quat(theta, osg::Z_AXIS));
 }
 
 

@@ -39,9 +39,7 @@ osg::ref_ptr<osg::Geometry> ViewUtils::makeQuads(osg::ref_ptr<osg::Vec3Array> ve
 osg::ref_ptr<osg::ShapeDrawable> ViewUtils::makeCylinder(const osg::Vec3& pos, float radius, float height, const osg::Vec4& color)
 {
     osg::ref_ptr<osg::Cylinder> cylinder = new osg::Cylinder(pos, radius, height);
-    osg::Matrix mat;
-    mat.makeRotate(osg::DegreesToRadians(90.0), osg::X_AXIS);
-    cylinder->setRotation(mat.getRotate());
+    cylinder->setRotation(osg::Quat(M_PI/2, osg::X_AXIS));
     osg::ref_ptr<osg::ShapeDrawable> shape = new osg::ShapeDrawable(cylinder);
     shape->setColor(color);
     return shape;
@@ -51,8 +49,7 @@ osg::ref_ptr<osg::ShapeDrawable> ViewUtils::makeCylinder(const osg::Vec3& pos, f
 
 osg::ref_ptr<osg::ShapeDrawable> ViewUtils::makeBox(const osg::Vec3& pos, float lengthX, float lengthY, float lengthZ, const osg::Vec4& color)
 {
-    osg::ref_ptr<osg::Box> box = new osg::Box(pos, lengthX, lengthY, lengthZ);
-    osg::ref_ptr<osg::ShapeDrawable> shape = new osg::ShapeDrawable(box);
+    osg::ref_ptr<osg::ShapeDrawable> shape = new osg::ShapeDrawable(new osg::Box(pos, lengthX, lengthY, lengthZ));
     shape->setColor(color);
     return shape;
 }

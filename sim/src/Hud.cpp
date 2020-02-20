@@ -85,8 +85,12 @@ Hud::Hud(const ConfigReader& config) : _width(225)
     _vehicleDrivetrainState = new TopLabel("", height, P_FONT_SIZE, config.sim.assets.fontFile);
     _labelsGeode->addChild(_vehicleDrivetrainState);
 
-    _labelsGeode->addChild(new BottomLabel("[1] Top-down view", 40, P_FONT_SIZE, config.sim.assets.fontFile));
-    _labelsGeode->addChild(new BottomLabel("[2] Orbit view", 20, P_FONT_SIZE, config.sim.assets.fontFile));
+    height = 60;
+    _labelsGeode->addChild(new BottomLabel("[1] Top-down view", height, P_FONT_SIZE, config.sim.assets.fontFile));
+    height -= 20;
+    _labelsGeode->addChild(new BottomLabel("[2] Orbit view", height, P_FONT_SIZE, config.sim.assets.fontFile));
+    height -= 20;
+    _labelsGeode->addChild(new BottomLabel("[F] Toggle full screen", height, P_FONT_SIZE, config.sim.assets.fontFile));
 }
 
 

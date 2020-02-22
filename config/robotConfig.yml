@@ -20,7 +20,7 @@ sim:
     gamePieceModelFile: "/data/models/gamepiece2020.wrl" # Path to 3D WRL model of the game piece
     fontFile: "/data/fonts/helvetica.ttf"                # Path to font file for HUD text
   field:
-    exteriorPolygon:
+    exteriorPolygon:                                     # Exterior wall
       - { x: 161.81, y: 288.58 }
       - { x: 90.94, y: 314.96 }
       - { x: -90.94, y: 314.96 }
@@ -89,30 +89,13 @@ sim:
       wheelBase: 18                                      # Inches, distance between centers of front and rear wheels
       wheelRadius: 3.0                                   # Inches
       wheelWidth: 1.0                                    # Inches
-      motor:
-        maxSpeed: 833                                    # RPM
-    elevator:
-      initialState:
-        motorSpeed: 0                                    # RPM (-motor.maxSpeed to +motor.maxSpeed)
-        carriagePos: 0                                   # Inches (0 to belt.length)
-      belt:
-        radius: 0.79                                     # Inches
-        width: 7.87                                      # Inches
-        length: 24                                       # Inches
-      motorShaft:
-        radius: 0.2                                      # Inches
-        length: 1.18                                     # Inches
-      motor:
-        radius: 0.59                                     # Inches
-        length: 1.18                                     # Inches
-        maxSpeed: 500                                    # RPM
-      encoder:
-        radius: 0.39                                     # Inches
-        length: 0.12                                     # Inches
-      carriage:
-        lengthX: 3.94                                    # Inches
-        lengthY: 7.87                                    # Inches
-        lengthZ: 0.04                                    # Inches
+      leftMotorMaxSpeed: 833                             # RPM
+      rightMotorMaxSpeed: 833                            # RPM
+    intake:
+      centerMotorMaxSpeed: 25                            # RPM
+      leftMotorMaxSpeed: 25                              # RPM
+      rightMotorMaxSpeed: 25                             # RPM
+      tubeMotorMaxSpeed: 25                              # RPM
   gamePiece:
     radius: 3.50                                         # Inches
     initialPositions:                                    # Inches (where (0, 0) is the center of the field)

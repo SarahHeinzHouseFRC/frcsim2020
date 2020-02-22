@@ -9,6 +9,7 @@
 #include "Types.h"
 #include "Geometry.h"
 #include "BaseModel.h"
+#include "GamePieceModel.h"
 
 
 /**
@@ -48,11 +49,6 @@ public:
     void reset();
 
     /**
-     * Returns the bounding polygon of the vehicle in world coordinates
-     */
-    Geometry::Polygon2d polygon() const { return _boundingPolygonWorld; }
-
-    /**
      * Returns the model type
      */
     virtual ModelType modelType() { return VEHICLE_MODEL; }
@@ -73,13 +69,26 @@ private:
      */
     static double wrapAngle(double val) { while (val > 2*M_PI) { val -= 2*M_PI; } while (val < 0) { val += 2*M_PI; } return val; }
 
-    Geometry::Polygon2d _boundingPolygon; // Bounding polygon of the vehicle in vehicle frame
-    Geometry::Polygon2d _boundingPolygonWorld; // Bounding polygon of the vehicle in world frame
-    double _elevatorBeltLength; // Need to enforce the carriage to stay bw 0 and this belt length (meters)
-    double _elevatorMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
+    Geometry::Polygon2d _boundingPolygonFrontLeft; // Front left bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonFrontRight; // Front right bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonRearLeft; // Rear left bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonRearRight; // Rear right bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonBumperFrontLeft; // Rear right bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonBumperFrontRight; // Rear right bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonBumperLeft; // Rear right bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonBumperRight; // Rear right bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonBumperRearLeft; // Rear left bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _boundingPolygonBumperRearRight; // Rear right bounding polygon of the vehicle in vehicle frame
+    Geometry::Polygon2d _ingestibleRegionCenter; // Bounding polygon of the center ingestible region in vehicle frame
+    Geometry::Polygon2d _tubeRegion; // Bounding polygon of the ingestion region in vehicle frame
+    Geometry::Polygon2d _ingestibleRegionLeft; // Bounding polygon of the left ingestible region in vehicle frame
+    Geometry::Polygon2d _ingestibleRegionRight; // Bounding polygon of the right ingestible region in vehicle frame
     double _leftDriveMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
     double _rightDriveMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
-    double _elevatorMotorRadius; // Needed to calculate travel of belt per unit time
+    double _intakeCenterMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
+    double _intakeLeftMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
+    double _intakeRightMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
+    double _tubeMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
     double _wheelRadius; // Needed to calculate travel of robot per unit time
     double _wheelTrack; // Needed to calculate arced turns
     double _drivetrainWidth; // Needed to calculate turning radius
@@ -93,10 +102,12 @@ private:
 
     struct VehicleState
     {
-        double elevatorMotorSpeed; // Rads/sec, 0-maxElevatorMotorSpeed
-        double elevatorCarriagePos; // Meters, 0-elevatorBeltLength
-        double leftDriveMotorSpeed; // Rads/sec, 0-maxDriveSpeed
-        double rightDriveMotorSpeed; // Rads/sec, 0-maxDriveSpeed
+        double leftDriveMotorSpeed; // Rads/sec, 0-leftDriveMotorMaxSpeed
+        double rightDriveMotorSpeed; // Rads/sec, 0-rightDriveMotorMaxSpeed
+        double intakeCenterMotorSpeed; // Rads/sec, 0-intakeCenterMotorMaxSpeed
+        double intakeLeftMotorSpeed; // Rads/sec, 0-intakeLeftMotorMaxSpeed
+        double intakeRightMotorSpeed; // Rads/sec, 0-intakeRightMotorMaxSpeed
+        double tubeMotorSpeed; // Rads/sec, 0-tubeMotorMaxSpeed
         struct
         {
             double x;     // Meters

@@ -102,7 +102,16 @@ private:
     b2Vec2 _gravity;
     std::unique_ptr<b2World> _world;
     b2Body* _vehicleBody;
+    b2PolygonShape _ingestibleRegionCenterShape;
+    b2PolygonShape _ingestibleRegionLeftShape;
+    b2PolygonShape _ingestibleRegionRightShape;
+    b2PolygonShape _tubeRegion;
+    b2CircleShape _gamePieceShape;
     std::vector<b2Body*> _gamePieceBodies;
+    std::vector<b2Body*> _ingestibleCenterGamePieceBodies; // Game pieces in the center ingestible region
+    std::vector<b2Body*> _ingestibleLeftGamePieceBodies; // Game pieces in the left ingestible region
+    std::vector<b2Body*> _ingestibleRightGamePieceBodies; // Game pieces in the right ingestible region
+    std::vector<b2Body*> _tubeGamePieceBodies; // Game pieces in the tube region
     int32 _velocityIterations;
     int32 _positionIterations;
     double _prevTimestamp;

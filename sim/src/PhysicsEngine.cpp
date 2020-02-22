@@ -2,6 +2,7 @@
  * Copyright (c) 2020 Team 3260
  */
 
+#include <GamePieceModel.h>
 #include "Geometry.h"
 #include "PhysicsEngine.h"
 
@@ -66,6 +67,51 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
         }
     }
 
+    // Manually move ingestible/tube game pieces
+    for (b2Body* gamePieceBody : _ingestibleCenterGamePieceBodies)
+    {
+        // Enter a slave state, move according to center intake motor and half the vehicle speed
+        float velocityMagnitude = vehicleModel._state.intakeCenterMotorSpeed;
+        b2Vec2 velocity = _vehicleBody->GetWorldVector(b2Vec2(-1, 0));
+        velocity *= velocityMagnitude;
+        b2Vec2 vehicleVelocity = _vehicleBody->GetLinearVelocityFromWorldPoint(gamePieceBody->GetPosition());
+        vehicleVelocity *= 0.5;
+        velocity += vehicleVelocity;
+        gamePieceBody->SetLinearVelocity(velocity);
+    }
+    for (b2Body* gamePieceBody : _ingestibleLeftGamePieceBodies)
+    {
+        // Enter a slave state, move according to left intake motor and half the vehicle speed
+        float velocityMagnitude = vehicleModel._state.intakeLeftMotorSpeed;
+        b2Vec2 velocity = _vehicleBody->GetWorldVector(b2Vec2(0, -1));
+        velocity *= velocityMagnitude;
+        b2Vec2 vehicleVelocity = _vehicleBody->GetLinearVelocityFromWorldPoint(gamePieceBody->GetPosition());
+        vehicleVelocity *= 0.5;
+        velocity += vehicleVelocity;
+        gamePieceBody->SetLinearVelocity(velocity);
+    }
+    for (b2Body* gamePieceBody : _ingestibleRightGamePieceBodies)
+    {
+        // Enter a slave state, move according to right intake motor and half the vehicle speed
+        float velocityMagnitude = vehicleModel._state.intakeRightMotorSpeed;
+        b2Vec2 velocity = _vehicleBody->GetWorldVector(b2Vec2(0, 1));
+        velocity *= velocityMagnitude;
+        b2Vec2 vehicleVelocity = _vehicleBody->GetLinearVelocityFromWorldPoint(gamePieceBody->GetPosition());
+        vehicleVelocity *= 0.5;
+        velocity += vehicleVelocity;
+        gamePieceBody->SetLinearVelocity(velocity);
+    }
+    for (b2Body* gamePieceBody : _tubeGamePieceBodies)
+    {
+        // Enter a slave state, move according to tube motor and the vehicle speed
+        float velocityMagnitude = vehicleModel._state.tubeMotorSpeed;
+        b2Vec2 velocity = _vehicleBody->GetWorldVector(b2Vec2(-1, 0));
+        velocity *= velocityMagnitude;
+        b2Vec2 vehicleVelocity = _vehicleBody->GetLinearVelocityFromWorldPoint(gamePieceBody->GetPosition());
+        velocity += vehicleVelocity;
+        gamePieceBody->SetLinearVelocity(velocity);
+    }
+
     // Instruct the world to perform a single step of simulation.
     // It is generally best to keep the time step and iterations fixed.
     _world->Step(elapsedTime, _velocityIterations, _positionIterations);
@@ -91,6 +137,56 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
 
             gamePieceModels[i]._state.pose.x = position.x;
             gamePieceModels[i]._state.pose.y = position.y;
+        }
+    }
+
+    // Determine the balls in each region
+    _ingestibleCenterGamePieceBodies.clear();
+    _ingestibleLeftGamePieceBodies.clear();
+    _ingestibleRightGamePieceBodies.clear();
+    _tubeGamePieceBodies.clear();
+    for (const auto& gamePieceBody : _gamePieceBodies)
+    {
+        b2Transform vehicleTf = _vehicleBody->GetTransform();
+        b2Vec2 gamePiecePosition = gamePieceBody->GetWorldCenter();
+        bool overlapCenter = _ingestibleRegionCenterShape.TestPoint(vehicleTf, gamePiecePosition);
+        bool overlapLeft = _ingestibleRegionLeftShape.TestPoint(vehicleTf, gamePiecePosition);
+        bool overlapRight = _ingestibleRegionRightShape.TestPoint(vehicleTf, gamePiecePosition);
+        bool overlapTube = _tubeRegion.TestPoint(vehicleTf, gamePiecePosition);
+        auto model = (GamePieceModel*) gamePieceBody->GetUserData();
+        if (overlapCenter)
+        {
+            _ingestibleCenterGamePieceBodies.push_back(gamePieceBody);
+            model->_state.ingestion = GamePieceModel::CENTER_INTAKE;
+        }
+        else if (overlapLeft)
+        {
+            _ingestibleLeftGamePieceBodies.push_back(gamePieceBody);
+            model->_state.ingestion = GamePieceModel::LEFT_INTAKE;
+        }
+        else if (overlapRight)
+        {
+            _ingestibleRightGamePieceBodies.push_back(gamePieceBody);
+            model->_state.ingestion = GamePieceModel::RIGHT_INTAKE;
+        }
+        else if (overlapTube)
+        {
+            _tubeGamePieceBodies.push_back(gamePieceBody);
+            b2Vec2 rearLeftCornerLocal(0.05, 0.11);
+            b2Vec2 rearRightCornerLocal(0.05, -0.11);
+            b2Vec2 rearEdge = rearLeftCornerLocal - rearRightCornerLocal;
+            b2Vec2 rearEdgePerp(rearEdge.y, rearEdge.x);
+            rearEdgePerp.Normalize();
+            b2Vec2 gamePiecePosLocal = _vehicleBody->GetLocalPoint(gamePieceBody->GetPosition());
+            b2Vec2 vecToGamePiece = gamePiecePosLocal - rearRightCornerLocal;
+            float dist = -b2Dot(rearEdgePerp, vecToGamePiece);
+            model->_state.pose.z = dist * (0.45 / 0.51);
+            model->_state.ingestion = GamePieceModel::TUBE;
+        }
+        else
+        {
+            model->_state.pose.z = 0;
+            model->_state.ingestion = GamePieceModel::NOT_INGESTED;
         }
     }
 
@@ -160,29 +256,289 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
     vehicleBodyDef.angle = vehicleModel._state.pose.theta;
     b2Body* vehicleBody = world->CreateBody(&vehicleBodyDef);
 
-    // Define a polygon shape for our dynamic body.
-    b2PolygonShape vehicleShape;
-    Polygon2d bounds = vehicleModel._boundingPolygon;
-    b2Vec2 vertices[bounds.numVertices()];
-    for (unsigned int i=0; i<bounds.numVertices(); i++)
+    // Define a front left polygon shape for our dynamic body
     {
-        Vertex2d v = bounds.vertices().at(i);
-        vertices[i] = b2Vec2(v.x, v.y);
+        b2FixtureDef vehicleFixtureDef;
+        b2PolygonShape vehicleShape;
+        Polygon2d bounds = vehicleModel._boundingPolygonFrontLeft;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        vehicleShape.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &vehicleShape;
+        vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
+        vehicleFixtureDef.friction = 0.3f;
+
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
     }
-    vehicleShape.Set(vertices, bounds.numVertices());
 
-    // Define the dynamic body fixture.
-    b2FixtureDef vehicleFixtureDef;
-    vehicleFixtureDef.shape = &vehicleShape;
+    // Define a rear left polygon shape for our dynamic body
+    {
+        b2FixtureDef vehicleFixtureDef;
+        b2PolygonShape vehicleShape;
+        Polygon2d bounds = vehicleModel._boundingPolygonRearLeft;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        vehicleShape.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &vehicleShape;
+        vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
+        vehicleFixtureDef.friction = 0.3f;
 
-    // Set the box density to be non-zero, so it will be dynamic.
-    vehicleFixtureDef.density = (vehicleModel._mass) / 0.53f;
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
 
-    // Override the default friction.
-    vehicleFixtureDef.friction = 0.3f;
+    // Define a front right polygon shape for our dynamic body
+    {
+        b2FixtureDef vehicleFixtureDef;
+        b2PolygonShape vehicleShape;
+        Polygon2d bounds = vehicleModel._boundingPolygonFrontRight;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        vehicleShape.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &vehicleShape;
+        vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
+        vehicleFixtureDef.friction = 0.3f;
 
-    // Add the shape to the body.
-    vehicleBody->CreateFixture(&vehicleFixtureDef);
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
+
+    // Define a rear right polygon shape for our dynamic body
+    {
+        b2FixtureDef vehicleFixtureDef;
+        b2PolygonShape vehicleShape;
+        Polygon2d bounds = vehicleModel._boundingPolygonRearRight;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        vehicleShape.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &vehicleShape;
+        vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
+        vehicleFixtureDef.friction = 0.3f;
+
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
+
+    // Define front left bumper fixture and shape
+    {
+        b2FixtureDef vehicleFixtureDef;
+        b2PolygonShape vehicleShape;
+        Polygon2d bounds = vehicleModel._boundingPolygonBumperFrontLeft;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        vehicleShape.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &vehicleShape;
+        vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
+        vehicleFixtureDef.friction = 0.3f;
+
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
+
+    // Define front right bumper fixture and shape
+    {
+        b2FixtureDef vehicleFixtureDef;
+        b2PolygonShape vehicleShape;
+        Polygon2d bounds = vehicleModel._boundingPolygonBumperFrontRight;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        vehicleShape.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &vehicleShape;
+        vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
+        vehicleFixtureDef.friction = 0.3f;
+
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
+
+    // Define left bumper fixture and shape
+    {
+        b2FixtureDef vehicleFixtureDef;
+        b2PolygonShape vehicleShape;
+        Polygon2d bounds = vehicleModel._boundingPolygonBumperLeft;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        vehicleShape.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &vehicleShape;
+        vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
+        vehicleFixtureDef.friction = 0.3f;
+
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
+
+    // Define right bumper fixture and shape
+    {
+        b2FixtureDef vehicleFixtureDef;
+        b2PolygonShape vehicleShape;
+        Polygon2d bounds = vehicleModel._boundingPolygonBumperRight;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        vehicleShape.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &vehicleShape;
+        vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
+        vehicleFixtureDef.friction = 0.3f;
+
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
+
+    // Define rear left bumper fixture and shape
+    {
+        b2FixtureDef vehicleFixtureDef;
+        b2PolygonShape vehicleShape;
+        Polygon2d bounds = vehicleModel._boundingPolygonBumperRearLeft;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        vehicleShape.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &vehicleShape;
+        vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
+        vehicleFixtureDef.friction = 0.3f;
+
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
+
+    // Define rear left bumper fixture and shape
+    {
+        b2FixtureDef vehicleFixtureDef;
+        b2PolygonShape vehicleShape;
+        Polygon2d bounds = vehicleModel._boundingPolygonBumperRearRight;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        vehicleShape.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &vehicleShape;
+        vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
+        vehicleFixtureDef.friction = 0.3f;
+
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
+
+    // Define center ingestible region
+    {
+        b2FixtureDef vehicleFixtureDef;
+        Polygon2d bounds = vehicleModel._ingestibleRegionCenter;
+        b2Vec2 verticesCenter[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            verticesCenter[i] = b2Vec2(v.x, v.y);
+        }
+        _ingestibleRegionCenterShape.Set(verticesCenter, bounds.numVertices());
+        vehicleFixtureDef.shape = &_ingestibleRegionCenterShape;
+        vehicleFixtureDef.density = 0;
+        vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = 0x0002;
+        vehicleFixtureDef.filter.maskBits = 0x0002;
+
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
+
+    // Define left ingestible region
+    {
+        b2FixtureDef vehicleFixtureDef;
+        Polygon2d bounds = vehicleModel._ingestibleRegionLeft;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        _ingestibleRegionLeftShape.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &_ingestibleRegionLeftShape;
+        vehicleFixtureDef.density = 0;
+        vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = 0x0002;
+        vehicleFixtureDef.filter.maskBits = 0x0002;
+
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
+
+    // Define right ingestible region
+    {
+        b2FixtureDef vehicleFixtureDef;
+        Polygon2d bounds = vehicleModel._ingestibleRegionRight;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        _ingestibleRegionRightShape.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &_ingestibleRegionRightShape;
+        vehicleFixtureDef.density = 0;
+        vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = 0x0002;
+        vehicleFixtureDef.filter.maskBits = 0x0002;
+
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
+
+    // Define ingested region
+    {
+        b2FixtureDef vehicleFixtureDef;
+        Polygon2d bounds = vehicleModel._tubeRegion;
+        b2Vec2 vertices[bounds.numVertices()];
+        for (unsigned int i=0; i<bounds.numVertices(); i++)
+        {
+            Vertex2d v = bounds.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        _tubeRegion.Set(vertices, bounds.numVertices());
+        vehicleFixtureDef.shape = &_tubeRegion;
+        vehicleFixtureDef.density = 0;
+        vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = 0x0002;
+        vehicleFixtureDef.filter.maskBits = 0x0002;
+
+        // Add the shape to the body
+        vehicleBody->CreateFixture(&vehicleFixtureDef);
+    }
 
     // Add user data
     vehicleBody->SetUserData((void*) &vehicleModel);
@@ -204,11 +560,10 @@ std::vector<b2Body*> PhysicsEngine::initGamePieceBodies(b2World* world, const st
         b2Body* gamePieceBody = world->CreateBody(&gamePieceBodyDef);
 
         // Define another box shape for our dynamic body.
-        b2CircleShape gamePieceDynamicCircle;
-        gamePieceDynamicCircle.m_radius = gamePieceModel._radius;
+        _gamePieceShape.m_radius = gamePieceModel._radius;
 
         b2FixtureDef gamePieceFixtureDef;
-        gamePieceFixtureDef.shape = &gamePieceDynamicCircle;
+        gamePieceFixtureDef.shape = &_gamePieceShape;
         gamePieceFixtureDef.restitution = 0.5f;
 
         gamePieceFixtureDef.density = 1.0f;

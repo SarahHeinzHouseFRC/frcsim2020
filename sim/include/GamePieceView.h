@@ -30,6 +30,7 @@ private:
     osg::ref_ptr<osg::Geode> makeView(const GamePieceModel& gamePieceModel);
 
     osg::ref_ptr<osg::Node> _node;
+    osg::ref_ptr<osg::ShapeDrawable> _shape;
     osg::ref_ptr<osg::Geode> _boundary;
 };
 

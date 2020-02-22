@@ -9,19 +9,27 @@ public class Main
 {
     public static void main(String[] args)
     {
-        JoystickAgent joystickAgent = new JoystickAgent(4000, "localhost", 2000);
-        SimAgent simAgent = new SimAgent(6000, "localhost", 8000);
+        int joystickRxPort = 4000;
+        int joystickTxPort = 2000;
+        String joystickTxIp = "localhost";
+        int simRxPort = 6000;
+        int simTxPort = 8000;
+        String simTxIp = "localhost";
+
+        JoystickAgent joystickAgent = new JoystickAgent(joystickRxPort, joystickTxIp, joystickTxPort);
+        SimAgent simAgent = new SimAgent(simRxPort, simTxIp, simTxPort);
 
         CommsThread commsThread = new CommsThread(simAgent, joystickAgent);
         commsThread.start();
 
+        System.out.println("Rx joystick at " + joystickTxIp + ":" + joystickTxPort);
+        System.out.println("Tx joystick at localhost:" + joystickRxPort);
+        System.out.println("Rx sim at " + simTxIp + ":" + simTxPort);
+        System.out.println("Tx sim at localhost:" + simRxPort);
         System.out.println("Core: Launched");
 
-        int elevatorMotorSpeed = 0;
-        int leftDriveMotorSpeed = 0;
-        int rightDriveMotorSpeed = 0;
-        int prevSelectButtonState = 0;
-        Boolean isTankDrive = false;
+        int prevBackButtonState = 0;
+        Boolean isTwoHandDrive = true;
 
         while (true)
         {
@@ -29,50 +37,50 @@ public class Main
             // Construct sim commands
             //
 
-            // Construct elevator command
-            elevatorMotorSpeed = 0;
-            if (joystickAgent.commands.upDpad == 1)
-            {
-                elevatorMotorSpeed = 512;
-            }
-            else if (joystickAgent.commands.downDpad == 1)
-            {
-                elevatorMotorSpeed = -511;
-            }
-
             // Toggle tank drive
             int currBackButtonState = joystickAgent.commands.back;
-            if (currBackButtonState == 0 && prevSelectButtonState == 1)
+            if (currBackButtonState == 0 && prevBackButtonState == 1)
             {
-                isTankDrive = !isTankDrive;
-                if (isTankDrive)
+                isTwoHandDrive = !isTwoHandDrive;
+                if (isTwoHandDrive)
                 {
-                    System.out.println("Tank drive enabled");
+                    System.out.println("Two-handed drive enabled");
                 }
                 else
                 {
-                    System.out.println("Tank drive disabled");
+                    System.out.println("One-handed drive enabled");
                 }
             }
-            prevSelectButtonState = currBackButtonState;
+            prevBackButtonState = currBackButtonState;
 
-            // Construct sim commands
-            if (isTankDrive)
+            // Construct intake motor commands
+            int intakeMotorSpeed = joystickAgent.commands.leftTrigger;
+
+            // Construct tube motor commands
+            int tubeMotorSpeed = joystickAgent.commands.rightTrigger;
+
+            // Construct drivetrain commands
+            int leftDriveMotorSpeed = 0;
+            int rightDriveMotorSpeed = 0;
+            if (isTwoHandDrive)
             {
-                simAgent.commands.leftDriveMotorSpeed = joystickAgent.commands.yLeftJoystick;
-                simAgent.commands.rightDriveMotorSpeed = joystickAgent.commands.yRightJoystick;
+                leftDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick + joystickAgent.commands.xRightJoystick/2, -512, 512);
+                rightDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick - joystickAgent.commands.xRightJoystick/2, -512, 512);
             }
             else
             {
-                leftDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick + joystickAgent.commands.xRightJoystick/2, -511, 512);
-                rightDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick - joystickAgent.commands.xRightJoystick/2, -511, 512);
-                simAgent.commands.leftDriveMotorSpeed = leftDriveMotorSpeed;
-                simAgent.commands.rightDriveMotorSpeed = rightDriveMotorSpeed;
+                leftDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick + joystickAgent.commands.xLeftJoystick/2, -512, 512);
+                rightDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick - joystickAgent.commands.xLeftJoystick/2, -512, 512);
             }
-            simAgent.commands.elevatorMotorSpeed = elevatorMotorSpeed;
-            simAgent.commands.back = joystickAgent.commands.back;
-            simAgent.commands.guide = joystickAgent.commands.guide;
-            simAgent.commands.start = joystickAgent.commands.start;
+
+            simAgent.commands.intakeCenterMotorSpeed = intakeMotorSpeed;
+            simAgent.commands.intakeLeftMotorSpeed = intakeMotorSpeed;
+            simAgent.commands.intakeRightMotorSpeed = intakeMotorSpeed;
+            simAgent.commands.tubeMotorSpeed = tubeMotorSpeed;
+            simAgent.commands.leftDriveMotorSpeed = leftDriveMotorSpeed;
+            simAgent.commands.rightDriveMotorSpeed = rightDriveMotorSpeed;
+            simAgent.commands.timerStartStop = joystickAgent.commands.start;
+            simAgent.commands.reset = joystickAgent.commands.guide;
 
             try
             {

@@ -13,6 +13,11 @@ class ViewUtils
 {
 public:
     /**
+     * Utility method for quickly drawing arrows
+     */
+    static osg::ref_ptr<osg::Geometry> makeArrow(const osg::Vec3d& center, float theta, float tailLength, const osg::Vec4& color);
+
+    /**
      * Utility method for quickly drawing lines. Pairs of vertices are interpreted as single lines
      */
     static osg::ref_ptr<osg::Geometry> makeLines(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);

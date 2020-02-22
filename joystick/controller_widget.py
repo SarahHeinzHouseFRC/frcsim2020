@@ -30,6 +30,10 @@ IMG_BUMPER_LEFT_RELEASED = "assets/xbox-bumper-left-released.svg"
 IMG_BUMPER_LEFT_PRESSED = "assets/xbox-bumper-left-pressed.svg"
 IMG_BUMPER_RIGHT_RELEASED = "assets/xbox-bumper-right-released.svg"
 IMG_BUMPER_RIGHT_PRESSED = "assets/xbox-bumper-right-pressed.svg"
+IMG_TRIGGER_LEFT_RELEASED = "assets/xbox-trigger-left-released.svg"
+IMG_TRIGGER_LEFT_PRESSED = "assets/xbox-trigger-left-pressed.svg"
+IMG_TRIGGER_RIGHT_RELEASED = "assets/xbox-trigger-right-released.svg"
+IMG_TRIGGER_RIGHT_PRESSED = "assets/xbox-trigger-right-pressed.svg"
 IMG_BUTTON_BACK_PRESSED = "assets/xbox-button-back-pressed.svg"
 IMG_BUTTON_BACK_RELEASED = "assets/xbox-button-back-released.svg"
 IMG_BUTTON_GUIDE_PRESSED = "assets/xbox-button-guide-pressed.svg"
@@ -53,25 +57,29 @@ class ControllerWidget(QSvgWidget):
         self.load(IMG_CONTROLLER)
         self.left_joystick = JoystickWidget(self.controller_state.left_joystick, 158, 141, self)
         self.right_joystick = JoystickWidget(self.controller_state.right_joystick, 387, 232, self)
-        self.a_button = ButtonWidget(IMG_BUTTON_A_RELEASED, IMG_BUTTON_A_PRESSED,
-                                     self.controller_state.a, 477, 196, self)
-        self.b_button = ButtonWidget(IMG_BUTTON_B_RELEASED, IMG_BUTTON_B_PRESSED,
-                                     self.controller_state.b, 517, 159, self)
-        self.x_button = ButtonWidget(IMG_BUTTON_X_RELEASED, IMG_BUTTON_X_PRESSED,
-                                     self.controller_state.x, 436, 158, self)
-        self.y_button = ButtonWidget(IMG_BUTTON_Y_RELEASED, IMG_BUTTON_Y_PRESSED,
-                                     self.controller_state.y, 477, 117, self)
         self.dpad = DpadWidget(self.controller_state.dpad, 218, 224, self)
+        self.trigger_left = TriggerWidget(IMG_TRIGGER_LEFT_RELEASED, IMG_TRIGGER_LEFT_PRESSED,
+                                          self.controller_state.left_trigger, 180, 39, self)
+        self.trigger_right = TriggerWidget(IMG_TRIGGER_RIGHT_RELEASED, IMG_TRIGGER_RIGHT_PRESSED,
+                                           self.controller_state.right_trigger, 472, 39, self)
         self.bumper_left = ButtonWidget(IMG_BUMPER_LEFT_RELEASED, IMG_BUMPER_LEFT_PRESSED,
-                                        self.controller_state.bumper_left, 138, 61, self)
+                                        self.controller_state.left_bumper, 138, 61, self)
         self.bumper_right = ButtonWidget(IMG_BUMPER_RIGHT_RELEASED, IMG_BUMPER_RIGHT_PRESSED,
-                                         self.controller_state.bumper_right, 430, 61, self)
-        self.back = ButtonWidget(IMG_BUTTON_BACK_RELEASED, IMG_BUTTON_BACK_PRESSED,
-                                 self.controller_state.back, 288, 162, self)
-        self.guide = ButtonWidget(IMG_BUTTON_GUIDE_RELEASED, IMG_BUTTON_GUIDE_PRESSED,
-                                 self.controller_state.guide, 321, 92, self)
-        self.start = ButtonWidget(IMG_BUTTON_START_RELEASED, IMG_BUTTON_START_PRESSED,
-                                 self.controller_state.start, 373, 162, self)
+                                         self.controller_state.right_bumper, 430, 61, self)
+        self.button_a = ButtonWidget(IMG_BUTTON_A_RELEASED, IMG_BUTTON_A_PRESSED,
+                                     self.controller_state.a, 477, 196, self)
+        self.button_b = ButtonWidget(IMG_BUTTON_B_RELEASED, IMG_BUTTON_B_PRESSED,
+                                     self.controller_state.b, 517, 159, self)
+        self.button_x = ButtonWidget(IMG_BUTTON_X_RELEASED, IMG_BUTTON_X_PRESSED,
+                                     self.controller_state.x, 436, 158, self)
+        self.button_y = ButtonWidget(IMG_BUTTON_Y_RELEASED, IMG_BUTTON_Y_PRESSED,
+                                     self.controller_state.y, 477, 117, self)
+        self.button_back = ButtonWidget(IMG_BUTTON_BACK_RELEASED, IMG_BUTTON_BACK_PRESSED,
+                                        self.controller_state.back, 288, 162, self)
+        self.button_guide = ButtonWidget(IMG_BUTTON_GUIDE_RELEASED, IMG_BUTTON_GUIDE_PRESSED,
+                                        self.controller_state.guide, 321, 92, self)
+        self.button_start = ButtonWidget(IMG_BUTTON_START_RELEASED, IMG_BUTTON_START_PRESSED,
+                                        self.controller_state.start, 373, 162, self)
         size_policy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         size_policy.setHeightForWidth(True)
         self.setSizePolicy(size_policy)
@@ -99,6 +107,18 @@ class ControllerWidget(QSvgWidget):
             self.left_joystick.set_x(-512)
         if event.key() == Qt.Key_D:
             self.left_joystick.set_x(512)
+        if event.key() == Qt.Key_Slash:
+            self.button_a.set(True)
+        if event.key() == Qt.Key_Apostrophe:
+            self.button_b.set(True)
+        if event.key() == Qt.Key_Period:
+            self.button_x.set(True)
+        if event.key() == Qt.Key_Semicolon:
+            self.button_y.set(True)
+        if event.key() == Qt.Key_CapsLock:
+            self.trigger_left.set(512)
+        if event.key() == Qt.Key_Shift:
+            self.trigger_right.set(512)
         event.accept()
 
     def keyReleaseEvent(self, event):
@@ -121,6 +141,18 @@ class ControllerWidget(QSvgWidget):
             self.left_joystick.set_x(0)
         if event.key() == Qt.Key_D:
             self.left_joystick.set_x(0)
+        if event.key() == Qt.Key_Slash:
+            self.button_a.set(False)
+        if event.key() == Qt.Key_Apostrophe:
+            self.button_b.set(False)
+        if event.key() == Qt.Key_Period:
+            self.button_x.set(False)
+        if event.key() == Qt.Key_Semicolon:
+            self.button_y.set(False)
+        if event.key() == Qt.Key_CapsLock:
+            self.trigger_left.set(0)
+        if event.key() == Qt.Key_Shift:
+            self.trigger_right.set(0)
         event.accept()
 
 
@@ -144,7 +176,8 @@ class JoystickWidget(QSvgWidget):
 
     def set_x(self, x):
         """
-        Sets the joystick's x-axis state to x and updates the visualization accordingly
+        Moves the joystick's x-axis state to x and updates the controller state accordingly
+        @param x -512 < x < 512
         """
         if x < -512:
             x = -512
@@ -155,7 +188,8 @@ class JoystickWidget(QSvgWidget):
 
     def set_y(self, y):
         """
-        Sets the joystick's y-axis state to x and updates the visualization accordingly
+        Moves the joystick's y-axis to y and updates the controller state accordingly
+        @param y -512 < x < 512
         """
         if y < -512:
             y = -512
@@ -185,6 +219,60 @@ class JoystickWidget(QSvgWidget):
         self.move(self.x, self.y)
         self.state.x = 0
         self.state.y = 0
+
+
+class TriggerWidget(QSvgWidget):
+    def __init__(self, released_img, pressed_img, trigger_state, x, y, parent=None):
+        """
+        @param released_img Image to show when mouse released
+        @param pressed_img Image to show when mouse clicked
+        @param trigger_state Container variable to place state into
+        @param x X-coord to draw joystick
+        @param y Y-coord to draw joystick
+        """
+        super(TriggerWidget, self).__init__(parent)
+
+        self.state = trigger_state
+        self.x = x
+        self.y = y
+        self.released_img = released_img
+        self.pressed_img = pressed_img
+        self.max_deflection = 15
+        self.clickX = 0
+        self.clickY = 0
+        self.load(released_img)
+        self.move(x, y)
+
+    def set(self, value):
+        """
+        Moves the trigger to the given y-position and updates the state accordingly
+        @param value 0 < value < 512
+        """
+        if value < 0:
+            value = 0
+        if value > 512:
+            value = 512
+        self.state.value = value
+        self.move(self.x, self.y + value / 512 * self.max_deflection)
+
+    def mousePressEvent(self, event):
+        self.load(self.pressed_img)
+        self.clickX = event.globalPos().x()
+        self.clickY = event.globalPos().y()
+
+    def mouseMoveEvent(self, event):
+        y = event.globalPos().y() - self.clickY
+        if y > self.max_deflection:
+            y = self.max_deflection
+        elif y < 0:
+            y = 0
+        self.move(self.x, y + self.y)
+        self.state.value = y * (512 / self.max_deflection)
+
+    def mouseReleaseEvent(self, event):
+        self.load(self.released_img)
+        self.move(self.x, self.y)
+        self.state.value = 0
 
 
 class DpadWidget(QSvgWidget):
@@ -284,15 +372,21 @@ class ButtonWidget(QSvgWidget):
         self.show_released()
 
     def mousePressEvent(self, event):
-        self.show_pressed()
-        self.button_state.pressed = 1
+        self.set(True)
 
     def mouseReleaseEvent(self, event):
-        self.show_released()
-        self.button_state.pressed = 0
+        self.set(False)
+
+    def show_pressed(self):
+        self.load(self.pressed_img)
 
     def show_released(self):
         self.load(self.released_img)
 
-    def show_pressed(self):
-        self.load(self.pressed_img)
+    def set(self, is_pressed):
+        if is_pressed:
+            self.show_pressed()
+            self.button_state.pressed = 1
+        else:
+            self.show_released()
+            self.button_state.pressed = 0

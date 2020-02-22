@@ -33,34 +33,30 @@ private:
      * Helper method for creating a default robot out of basic geometry
      */
 
-    osg::ref_ptr<osg::Geode> makeVehicle(const ConfigReader& config);
+    osg::ref_ptr<osg::Geode> drawVehicle(const ConfigReader& config);
 
     /**
      * Draws the collision boundary of the vehicle
      */
-    osg::ref_ptr<osg::Geode> makeVehicleBounds(const VehicleModel& vehicleModel);
+    osg::ref_ptr<osg::Geode> drawCollisionBoundary(const VehicleModel& vehicleModel);
 
     /**
-     * Helper method to create a robot carriage
+     * Draws the bumpers around the vehicle
      */
-    osg::ref_ptr<osg::PositionAttitudeTransform> makeVehicleElevator();
+    osg::ref_ptr<osg::Geode> drawBumpers(const VehicleModel& vehicleModel);
+
+    /**
+     * Draws the ingestible region of the vehicle
+     */
+    osg::ref_ptr<osg::Geode> drawIngestibleRegions(const VehicleModel& vehicleModel);
 
     osg::ref_ptr<osg::Node> _vehicleNode;
     osg::ref_ptr<osg::Geode> _vehicleBounds;
-    osg::ref_ptr<osg::PositionAttitudeTransform> _elevatorPat;
+    osg::ref_ptr<osg::Geometry> _ingestibleRegionCenterArrow;
+    osg::ref_ptr<osg::Geometry> _ingestibleRegionLeftArrow;
+    osg::ref_ptr<osg::Geometry> _ingestibleRegionRightArrow;
+    osg::ref_ptr<osg::Geometry> _tubeRegionArrow;
     float _wheelRadius;
-    float _beltRadius;
-    float _beltWidth;
-    float _beltLength;
-    float _motorShaftRadius;
-    float _motorShaftLength;
-    float _motorRadius;
-    float _motorLength;
-    float _encoderRadius;
-    float _encoderLength;
-    float _carriageLengthX;
-    float _carriageLengthY;
-    float _carriageLengthZ;
 };
 
 

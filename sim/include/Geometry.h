@@ -83,6 +83,11 @@ public:
     Polygon2d boundingBox();
 
     /**
+     * Returns the coordinates of the average of x and y vertices
+     */
+    Vertex2d center() const { return _center; }
+
+    /**
      * List of vertices
      */
     std::vector<Vertex2d> vertices() const { return _vertices; }
@@ -110,6 +115,7 @@ public:
 private:
     std::vector<Vertex2d> _vertices;
     std::vector<Edge2d> _edges;
+    Vertex2d _center;
 };
 
 bool collision(const Polygon2d& poly1, const Polygon2d& poly2);

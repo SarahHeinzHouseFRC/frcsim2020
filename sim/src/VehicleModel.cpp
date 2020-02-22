@@ -12,14 +12,15 @@ using namespace Geometry;
 VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
         _prevTimestamp(startTimestamp),
         _state{0},
-        _leftDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.motor.maxSpeed),
-        _rightDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.motor.maxSpeed),
+        _leftDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.leftMotorMaxSpeed),
+        _rightDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.rightMotorMaxSpeed),
+        _intakeCenterMotorMaxSpeed(config.sim.vehicle.intake.centerMotorMaxSpeed),
+        _intakeLeftMotorMaxSpeed(config.sim.vehicle.intake.leftMotorMaxSpeed),
+        _intakeRightMotorMaxSpeed(config.sim.vehicle.intake.rightMotorMaxSpeed),
+        _tubeMotorMaxSpeed(config.sim.vehicle.intake.tubeMotorMaxSpeed),
         _wheelRadius(config.sim.vehicle.drivetrain.wheelRadius),
         _drivetrainWidth(config.sim.vehicle.drivetrain.width),
         _wheelTrack(config.sim.vehicle.drivetrain.wheelTrack),
-        _elevatorBeltLength(config.sim.vehicle.elevator.belt.length),
-        _elevatorMotorMaxSpeed(config.sim.vehicle.elevator.motor.maxSpeed),
-        _elevatorMotorRadius(config.sim.vehicle.elevator.motor.radius),
         _mass(config.sim.vehicle.mass)
 {
     // Set initial state
@@ -27,12 +28,25 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
     _state.pose.x = _initialState.x;
     _state.pose.y = _initialState.y;
     _state.pose.theta = _initialState.theta;
-    _state.elevatorMotorSpeed = config.sim.vehicle.elevator.initialState.motorSpeed;
-    _state.elevatorCarriagePos = config.sim.vehicle.elevator.initialState.carriagePos;
 
-    // Make bounding polygon
-    _boundingPolygon = Polygon2d(config.sim.vehicle.polygon);
-    _boundingPolygonWorld = _boundingPolygon.transform(_state.pose.x, _state.pose.y, _state.pose.theta);
+    // Make bounding polygons
+    _boundingPolygonFrontLeft = std::vector<Vertex2d>{{0.20, 0.11}, {0.20, 0.31}, {0.05, 0.31}, {0.05, 0.11}};
+    _boundingPolygonFrontRight = std::vector<Vertex2d>{{0.20, -0.31}, {0.20, -0.11}, {0.05, -0.11}, {0.05, -0.31}};
+    _boundingPolygonRearLeft = std::vector<Vertex2d>{{0.05, 0.18}, {0.05, 0.31}, {-0.51, 0.31}, {-0.51, 0.18}};
+    _boundingPolygonRearRight = std::vector<Vertex2d>{{0.05, -0.31}, {0.05, -0.18}, {-0.51, -0.18}, {-0.51, -0.31}};
+
+    _boundingPolygonBumperFrontLeft = std::vector<Vertex2d>{ {0.30, 0.16}, {0.30, 0.31}, {0.20, 0.31}, {0.20, 0.16} };
+    _boundingPolygonBumperFrontRight = std::vector<Vertex2d>{ {0.30, -0.31}, {0.30, -0.16}, {0.20, -0.16}, {0.20, -0.31} };
+    _boundingPolygonBumperLeft = std::vector<Vertex2d>{ {0.30, 0.31}, {0.30, 0.40}, {-0.60, 0.40}, {-0.60, 0.31} };
+    _boundingPolygonBumperRight = std::vector<Vertex2d>{ {0.30, -0.40}, {0.30, -0.31}, {-0.60, -0.31}, {-0.60, -0.40} };
+    _boundingPolygonBumperRearLeft = std::vector<Vertex2d>{ {-0.51, 0.18}, {-0.51, 0.31}, {-0.60, 0.31}, {-0.60, 0.18} };
+    _boundingPolygonBumperRearRight = std::vector<Vertex2d>{ {-0.51, -0.31}, {-0.51, -0.18}, {-0.60, -0.18}, {-0.60, -0.31} };
+
+    // Make ingestible/ingested regions
+    _ingestibleRegionCenter = std::vector<Vertex2d>{{0.51, -0.11}, {0.51, 0.11}, {0.05, 0.11}, {0.05, -0.11}};
+    _ingestibleRegionLeft = std::vector<Vertex2d>{{0.51, 0.11}, {0.51, 0.26}, {0.30, 0.26}, {0.30, 0.11}};
+    _ingestibleRegionRight = std::vector<Vertex2d>{{0.51, -0.26}, {0.51, -0.11}, {0.30, -0.11}, {0.30, -0.26}};
+    _tubeRegion = std::vector<Vertex2d>{{0.05, -0.18}, {0.05, 0.18}, {-0.51, 0.18}, {-0.51, -0.18}};
 }
 
 
@@ -44,15 +58,6 @@ void VehicleModel::update(double currTimestamp)
     {
         return; // Nothing to update
     }
-
-    //
-    // Update elevator position based on elevator motor speed
-    //
-
-    // Move the carriage up by y = omega * r * t
-    double y = _state.elevatorMotorSpeed * _elevatorMotorRadius * elapsedTime;
-    _state.elevatorCarriagePos += y;
-    _state.elevatorCarriagePos = bound(_state.elevatorCarriagePos, 0, _elevatorBeltLength);
 
     //
     // Update pose based on drivetrain motor speeds
@@ -84,8 +89,6 @@ void VehicleModel::update(double currTimestamp)
         _state.pose.omega = (currTheta - prevTheta) / elapsedTime;
     }
 
-    _boundingPolygonWorld = _boundingPolygon.transform(_state.pose.x, _state.pose.y, _state.pose.theta);
-
     // Update the last timestamp
     _prevTimestamp = currTimestamp;
 }
@@ -94,12 +97,15 @@ void VehicleModel::update(double currTimestamp)
 
 void VehicleModel::processCommands(const CoreCommands& commands)
 {
-    // Update elevator motor speed
-    _state.elevatorMotorSpeed = (commands.elevatorMotorSpeed / 512.0) * _elevatorMotorMaxSpeed;
-
     // Update drivetrain
     _state.leftDriveMotorSpeed = (commands.leftDriveMotorSpeed / 512.0) * _leftDriveMotorMaxSpeed;
     _state.rightDriveMotorSpeed = (commands.rightDriveMotorSpeed / 512.0) * _rightDriveMotorMaxSpeed;
+
+    // Update intake motors
+    _state.intakeCenterMotorSpeed = (commands.intakeCenterMotorSpeed / 512.0) * _intakeCenterMotorMaxSpeed;
+    _state.intakeLeftMotorSpeed = (commands.intakeLeftMotorSpeed / 512.0) * _intakeLeftMotorMaxSpeed;
+    _state.intakeRightMotorSpeed = (commands.intakeRightMotorSpeed / 512.0) * _intakeRightMotorMaxSpeed;
+    _state.tubeMotorSpeed = (commands.tubeMotorSpeed / 512.0) * _tubeMotorMaxSpeed;
 }
 
 
@@ -107,10 +113,8 @@ void VehicleModel::processCommands(const CoreCommands& commands)
 SensorState VehicleModel::getSensorState()
 {
     SensorState state{0};
-    state.elevatorEncoderPosition = int (1023 * _state.elevatorCarriagePos / _elevatorBeltLength);
     return state;
 }
-
 
 
 

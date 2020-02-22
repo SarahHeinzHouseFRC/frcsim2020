@@ -81,16 +81,16 @@ Hud::Hud(const ConfigReader& config) : _width(225)
     _vehiclePoseState = new TopLabel("", height, P_FONT_SIZE, config.sim.assets.fontFile);
     _labelsGeode->addChild(_vehiclePoseState);
 
-    height -= 80;
-    _vehicleElevatorState = new TopLabel("", height, P_FONT_SIZE, config.sim.assets.fontFile);
-    _labelsGeode->addChild(_vehicleElevatorState);
-
     height -= 60;
     _vehicleDrivetrainState = new TopLabel("", height, P_FONT_SIZE, config.sim.assets.fontFile);
     _labelsGeode->addChild(_vehicleDrivetrainState);
 
-    _labelsGeode->addChild(new BottomLabel("[1] Top-down view", 40, P_FONT_SIZE, config.sim.assets.fontFile));
-    _labelsGeode->addChild(new BottomLabel("[2] Orbit view", 20, P_FONT_SIZE, config.sim.assets.fontFile));
+    height = 60;
+    _labelsGeode->addChild(new BottomLabel("[1] Top-down view", height, P_FONT_SIZE, config.sim.assets.fontFile));
+    height -= 20;
+    _labelsGeode->addChild(new BottomLabel("[2] Orbit view", height, P_FONT_SIZE, config.sim.assets.fontFile));
+    height -= 20;
+    _labelsGeode->addChild(new BottomLabel("[F] Toggle full screen", height, P_FONT_SIZE, config.sim.assets.fontFile));
 }
 
 
@@ -136,9 +136,6 @@ void Hud::displayVehicleState(const VehicleModel& vehicleModel)
 
     sprintf(tmp, "Pose: \n    X: %.1f ft \n    Y: %.1f ft \n    Theta: %.0f deg", vehicleModel._state.pose.x*M_TO_FT, vehicleModel._state.pose.y*M_TO_FT, vehicleModel._state.pose.theta*RADS_TO_DEG);
     _vehiclePoseState->setText(tmp);
-
-    sprintf(tmp, "Elevator: \n    Position: %.2f m \n    Motor: %.0f RPM", vehicleModel._state.elevatorCarriagePos, vehicleModel._state.elevatorMotorSpeed*RADS_PER_SEC_TO_RPM);
-    _vehicleElevatorState->setText(tmp);
 
     sprintf(tmp, "Drivetrain: \n    Left motor: %.0f RPM \n    Right motor: %.0f RPM", vehicleModel._state.leftDriveMotorSpeed*RADS_PER_SEC_TO_RPM, vehicleModel._state.rightDriveMotorSpeed*RADS_PER_SEC_TO_RPM);
     _vehicleDrivetrainState->setText(tmp);

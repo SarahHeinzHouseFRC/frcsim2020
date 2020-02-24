@@ -11,6 +11,30 @@ using namespace Geometry;
 /** Coefficient of friction of the game pieces */
 #define MU_GAME_PIECE 0.1
 
+enum CollisionCategory
+{
+    CATEGORY_A = 0x0001, // INGESTIBLE_REGION
+    CATEGORY_B = 0x0002, // TUBE_REGION
+    CATEGORY_C = 0x0004, // GOAL_REGION
+    CATEGORY_O = 0x0008, // BOUNDARY
+    CATEGORY_OMEGA = 0x0010, // UNINGESTED_GAME_PIECE
+    CATEGORY_ALPHA = 0x0020, // INGESTIBLE_GAME_PIECE
+    CATEGORY_BETA = 0x0040, // INGESTED_GAME_PIECE
+};
+
+
+
+enum CollisionMask
+{
+    MASK_A = CATEGORY_C | CATEGORY_O, // INGESTIBLE_REGION
+    MASK_B = CATEGORY_OMEGA | CATEGORY_O | CATEGORY_C, // TUBE_REGION
+    MASK_C = CATEGORY_A | CATEGORY_B | CATEGORY_O | CATEGORY_OMEGA | CATEGORY_ALPHA, // GOAL_REGION
+    MASK_O = CATEGORY_OMEGA | CATEGORY_ALPHA | CATEGORY_BETA | CATEGORY_A | CATEGORY_B | CATEGORY_O, // BOUNDARY
+    MASK_OMEGA = ~CATEGORY_A, // UNINGESTED_GAME_PIECE
+    MASK_ALPHA = CATEGORY_C | CATEGORY_O | CATEGORY_OMEGA | CATEGORY_ALPHA | CATEGORY_BETA, // INGESTIBLE_GAME_PIECE
+    MASK_BETA = CATEGORY_O | CATEGORY_ALPHA | CATEGORY_BETA, // INGESTED_GAME_PIECE
+};
+
 
 PhysicsEngine::PhysicsEngine(const FieldModel& fieldModel,
                              const VehicleModel& vehicleModel,
@@ -156,21 +180,41 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
         auto model = (GamePieceModel*) gamePieceBody->GetUserData();
         if (overlapCenter)
         {
+            b2Filter filter = gamePieceBody->GetFixtureList()[0].GetFilterData();
+            filter.categoryBits = CATEGORY_ALPHA;
+            filter.maskBits = MASK_ALPHA;
+            gamePieceBody->GetFixtureList()[0].SetFilterData(filter);
+
             _ingestibleCenterGamePieceBodies.push_back(gamePieceBody);
             model->_state.ingestion = GamePieceModel::CENTER_INTAKE;
         }
         else if (overlapLeft)
         {
+            b2Filter filter = gamePieceBody->GetFixtureList()[0].GetFilterData();
+            filter.categoryBits = CATEGORY_ALPHA;
+            filter.maskBits = MASK_ALPHA;
+            gamePieceBody->GetFixtureList()[0].SetFilterData(filter);
+
             _ingestibleLeftGamePieceBodies.push_back(gamePieceBody);
             model->_state.ingestion = GamePieceModel::LEFT_INTAKE;
         }
         else if (overlapRight)
         {
+            b2Filter filter = gamePieceBody->GetFixtureList()[0].GetFilterData();
+            filter.categoryBits = CATEGORY_ALPHA;
+            filter.maskBits = MASK_ALPHA;
+            gamePieceBody->GetFixtureList()[0].SetFilterData(filter);
+
             _ingestibleRightGamePieceBodies.push_back(gamePieceBody);
             model->_state.ingestion = GamePieceModel::RIGHT_INTAKE;
         }
         else if (overlapTube)
         {
+            b2Filter filter = gamePieceBody->GetFixtureList()[0].GetFilterData();
+            filter.categoryBits = CATEGORY_BETA;
+            filter.maskBits = MASK_BETA;
+            gamePieceBody->GetFixtureList()[0].SetFilterData(filter);
+
             _tubeGamePieceBodies.push_back(gamePieceBody);
             b2Vec2 rearLeftCornerLocal(0.05, 0.11);
             b2Vec2 rearRightCornerLocal(0.05, -0.11);
@@ -185,6 +229,11 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
         }
         else
         {
+            b2Filter filter = gamePieceBody->GetFixtureList()[0].GetFilterData();
+            filter.categoryBits = CATEGORY_OMEGA;
+            filter.maskBits = MASK_OMEGA;
+            gamePieceBody->GetFixtureList()[0].SetFilterData(filter);
+
             model->_state.pose.z = 0;
             model->_state.ingestion = GamePieceModel::NOT_INGESTED;
         }
@@ -224,7 +273,12 @@ void PhysicsEngine::initFieldBodies(b2World* world, const FieldModel& fieldModel
         b2Vec2 v2(edge.b.x, edge.b.y);
         b2EdgeShape wallShape;
         wallShape.Set(v1, v2);
-        wallBody->CreateFixture(&wallShape, 0);
+        b2FixtureDef fixtureDef;
+        fixtureDef.shape = &wallShape;
+        fixtureDef.density = 0;
+        fixtureDef.filter.categoryBits = CATEGORY_O;
+        fixtureDef.filter.maskBits = MASK_O;
+        wallBody->CreateFixture(&fixtureDef);
         wallBody->SetUserData((void*) &fieldModel);
     }
 
@@ -239,7 +293,12 @@ void PhysicsEngine::initFieldBodies(b2World* world, const FieldModel& fieldModel
             b2Vec2 v2(edge.b.x, edge.b.y);
             b2EdgeShape wallShape;
             wallShape.Set(v1, v2);
-            wallBody->CreateFixture(&wallShape, 0);
+            b2FixtureDef fixtureDef;
+            fixtureDef.shape = &wallShape;
+            fixtureDef.density = 0;
+            fixtureDef.filter.categoryBits = CATEGORY_O;
+            fixtureDef.filter.maskBits = MASK_O;
+            wallBody->CreateFixture(&fixtureDef);
             wallBody->SetUserData((void*) &fieldModel);
         }
     }
@@ -271,6 +330,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -291,6 +352,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -311,6 +374,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -331,6 +396,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -351,6 +418,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -371,6 +440,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -391,6 +462,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -411,6 +484,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -431,6 +506,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -451,6 +528,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -470,8 +549,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &_ingestibleRegionCenterShape;
         vehicleFixtureDef.density = 0;
         vehicleFixtureDef.friction = 0.3f;
-        vehicleFixtureDef.filter.categoryBits = 0x0002;
-        vehicleFixtureDef.filter.maskBits = 0x0002;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_A;
+        vehicleFixtureDef.filter.maskBits = MASK_A;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -491,8 +570,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &_ingestibleRegionLeftShape;
         vehicleFixtureDef.density = 0;
         vehicleFixtureDef.friction = 0.3f;
-        vehicleFixtureDef.filter.categoryBits = 0x0002;
-        vehicleFixtureDef.filter.maskBits = 0x0002;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_A;
+        vehicleFixtureDef.filter.maskBits = MASK_A;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -512,8 +591,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &_ingestibleRegionRightShape;
         vehicleFixtureDef.density = 0;
         vehicleFixtureDef.friction = 0.3f;
-        vehicleFixtureDef.filter.categoryBits = 0x0002;
-        vehicleFixtureDef.filter.maskBits = 0x0002;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_A;
+        vehicleFixtureDef.filter.maskBits = MASK_A;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -533,8 +612,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &_tubeRegion;
         vehicleFixtureDef.density = 0;
         vehicleFixtureDef.friction = 0.3f;
-        vehicleFixtureDef.filter.categoryBits = 0x0002;
-        vehicleFixtureDef.filter.maskBits = 0x0002;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_B;
+        vehicleFixtureDef.filter.maskBits = MASK_B;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -568,6 +647,8 @@ std::vector<b2Body*> PhysicsEngine::initGamePieceBodies(b2World* world, const st
 
         gamePieceFixtureDef.density = 1.0f;
         gamePieceFixtureDef.friction = 0.3f;
+        gamePieceFixtureDef.filter.categoryBits = CATEGORY_OMEGA;
+        gamePieceFixtureDef.filter.maskBits = MASK_OMEGA;
         gamePieceBody->CreateFixture(&gamePieceFixtureDef);
         gamePieceBody->SetUserData((void*) &gamePieceModel);
         gamePieceBodies.push_back(gamePieceBody);

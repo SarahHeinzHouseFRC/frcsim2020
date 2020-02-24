@@ -23,6 +23,9 @@ FieldView::FieldView(const ConfigReader& config, const FieldModel& fieldModel)
 
     _fieldBounds = makeFieldBounds(fieldModel);
     addChild(_fieldBounds);
+
+    osg::ref_ptr<osg::Geode> goalRegion = makeGoals(fieldModel);
+    addChild(goalRegion);
 }
 
 
@@ -46,7 +49,7 @@ void FieldView::update(const FieldModel& fieldModel)
 
 osg::ref_ptr<osg::Geode> FieldView::makeField(const FieldModel& fieldModel)
 {
-    Geometry::Polygon2d exteriorPolygon = fieldModel.exteriorPolygon();
+    Geometry::Polygon2d exteriorPolygon = fieldModel._exteriorPolygon;
 
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
     osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
@@ -73,7 +76,7 @@ osg::ref_ptr<osg::Geode> FieldView::makeFieldBounds(const FieldModel& fieldModel
     // Draw exterior bounds
     {
         osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-        for (const auto& edge : fieldModel.exteriorPolygon().edges())
+        for (const auto& edge : fieldModel._exteriorPolygon.edges())
         {
             vertices->push_back(osg::Vec3(edge.a.x, edge.a.y, 0));
             vertices->push_back(osg::Vec3(edge.b.x, edge.b.y, 0));
@@ -86,7 +89,7 @@ osg::ref_ptr<osg::Geode> FieldView::makeFieldBounds(const FieldModel& fieldModel
 
     // Draw interior bounds
     {
-        for (const auto& polygon: fieldModel.interiorPolygons())
+        for (const auto& polygon: fieldModel._interiorPolygons)
         {
             osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
             for (const auto& edge : polygon.edges())
@@ -100,6 +103,22 @@ osg::ref_ptr<osg::Geode> FieldView::makeFieldBounds(const FieldModel& fieldModel
             geode->addDrawable(geom);
         }
     }
+
+    return geode;
+}
+
+
+
+osg::ref_ptr<osg::Geode> FieldView::makeGoals(const FieldModel& fieldModel)
+{
+    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+    for (const auto& vertex : fieldModel._blueGoal.vertices())
+    {
+        vertices->push_back(osg::Vec3(vertex.x, vertex.y, 0.1));
+    }
+    osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeLineLoop(vertices, Color::Red);
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+    geode->addDrawable(geom);
 
     return geode;
 }

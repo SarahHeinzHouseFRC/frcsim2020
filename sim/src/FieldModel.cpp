@@ -2,8 +2,9 @@
  * Copyright (c) 2020 Team 3260
  */
 
-#include <ConfigReader.h>
 #include "FieldModel.h"
+
+#define IN_TO_M 0.0254f
 
 using namespace Geometry;
 
@@ -19,6 +20,8 @@ FieldModel::FieldModel(const ConfigReader& config, double startTimestamp) :
     {
         _interiorPolygons.emplace_back(interiorPolygon);
     }
+
+    _blueGoal = std::vector<Vertex2d>({ { -20*IN_TO_M, -314.96*IN_TO_M }, { -20*IN_TO_M, -344.96*IN_TO_M }, { 20*IN_TO_M, -344.96*IN_TO_M }, { 20*IN_TO_M, -314.96*IN_TO_M } });
 }
 
 

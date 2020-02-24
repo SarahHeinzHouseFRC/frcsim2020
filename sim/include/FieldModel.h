@@ -13,6 +13,7 @@
 class FieldModel : public BaseModel
 {
 friend class FieldView;
+friend class PhysicsEngine;
 public:
     /**
      * Constructor
@@ -25,17 +26,7 @@ public:
     void update(double currTimestamp);
 
     /**
-     * Returns exterior polygon
-     */
-    Geometry::Polygon2d exteriorPolygon() const { return _exteriorPolygon; }
-
-    /**
-     * Returns interior polygons
-     */
-    std::vector<Geometry::Polygon2d> interiorPolygons() const { return _interiorPolygons; }
-
-    /**
-     * Retuuns the model type
+     * Returns the model type
      */
     virtual ModelType modelType() { return FIELD_MODEL; }
 
@@ -61,6 +52,7 @@ private:
     int _collisionCount;
     Geometry::Polygon2d _exteriorPolygon;
     std::vector<Geometry::Polygon2d> _interiorPolygons;
+    Geometry::Polygon2d _blueGoal;
 };
 
 

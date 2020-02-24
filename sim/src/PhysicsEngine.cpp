@@ -11,6 +11,7 @@ using namespace Geometry;
 /** Coefficient of friction of the game pieces */
 #define MU_GAME_PIECE 0.1
 
+
 enum CollisionCategory
 {
     CATEGORY_A = 0x0001, // INGESTIBLE_REGION
@@ -28,12 +29,13 @@ enum CollisionMask
 {
     MASK_A = CATEGORY_C | CATEGORY_O, // INGESTIBLE_REGION
     MASK_B = CATEGORY_OMEGA | CATEGORY_O | CATEGORY_C, // TUBE_REGION
-    MASK_C = CATEGORY_A | CATEGORY_B | CATEGORY_O | CATEGORY_OMEGA | CATEGORY_ALPHA, // GOAL_REGION
-    MASK_O = CATEGORY_OMEGA | CATEGORY_ALPHA | CATEGORY_BETA | CATEGORY_A | CATEGORY_B | CATEGORY_O, // BOUNDARY
+    MASK_C = CATEGORY_ALPHA | CATEGORY_O | CATEGORY_A | CATEGORY_B | CATEGORY_C, // GOAL_REGION
+    MASK_O = CATEGORY_OMEGA | CATEGORY_ALPHA | CATEGORY_BETA | CATEGORY_O | CATEGORY_A | CATEGORY_B | CATEGORY_C, // BOUNDARY
     MASK_OMEGA = ~CATEGORY_A, // UNINGESTED_GAME_PIECE
     MASK_ALPHA = CATEGORY_C | CATEGORY_O | CATEGORY_OMEGA | CATEGORY_ALPHA | CATEGORY_BETA, // INGESTIBLE_GAME_PIECE
     MASK_BETA = CATEGORY_O | CATEGORY_ALPHA | CATEGORY_BETA, // INGESTED_GAME_PIECE
 };
+
 
 
 PhysicsEngine::PhysicsEngine(const FieldModel& fieldModel,
@@ -264,7 +266,7 @@ void PhysicsEngine::reset(const FieldModel& fieldModel, const VehicleModel& vehi
 void PhysicsEngine::initFieldBodies(b2World* world, const FieldModel& fieldModel)
 {
     // Field exterior static body
-    Polygon2d exteriorPolygon = fieldModel.exteriorPolygon();
+    Polygon2d exteriorPolygon = fieldModel._exteriorPolygon;
     for (const auto& edge : exteriorPolygon.edges())
     {
         b2BodyDef wallDef;
@@ -283,7 +285,7 @@ void PhysicsEngine::initFieldBodies(b2World* world, const FieldModel& fieldModel
     }
 
     // Field interior static bodies
-    for (const auto& interiorPolygon : fieldModel.interiorPolygons())
+    for (const auto& interiorPolygon : fieldModel._interiorPolygons)
     {
         for (const auto& edge : interiorPolygon.edges())
         {
@@ -301,6 +303,31 @@ void PhysicsEngine::initFieldBodies(b2World* world, const FieldModel& fieldModel
             wallBody->CreateFixture(&fixtureDef);
             wallBody->SetUserData((void*) &fieldModel);
         }
+    }
+
+    // Goal regions
+    {
+        b2BodyDef goalBodyDef;
+        b2Body* goalBody = world->CreateBody(&goalBodyDef);
+        int numVertices = fieldModel._blueGoal.numVertices();
+        b2Vec2 vertices[numVertices];
+        for (int i=0; i<numVertices; i++)
+        {
+            Vertex2d v = fieldModel._blueGoal.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        b2PolygonShape goalShape;
+        goalShape.Set(vertices, 4);
+        b2FixtureDef fixtureDef;
+        fixtureDef.shape = &goalShape;
+        fixtureDef.density = 0;
+        fixtureDef.friction = 0.3f;
+        fixtureDef.filter.categoryBits = CATEGORY_C;
+        fixtureDef.filter.maskBits = MASK_C;
+
+        // Add the shape to the body
+        goalBody->CreateFixture(&fixtureDef);
+        goalBody->SetUserData((void*) &fieldModel);
     }
 }
 

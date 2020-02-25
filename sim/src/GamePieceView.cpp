@@ -54,6 +54,14 @@ void GamePieceView::update(const GamePieceModel& gamePieceModel)
             case GamePieceModel::TUBE:
                 _shape->setColor(Color::Green);
                 break;
+
+            case GamePieceModel::BLUE_LOW_GOAL:
+                _shape->setColor(Color::Blue);
+                break;
+
+            case GamePieceModel::RED_LOW_GOAL:
+                _shape->setColor(Color::Red);
+                break;
         }
     }
 }

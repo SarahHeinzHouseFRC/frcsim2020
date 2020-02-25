@@ -53,6 +53,7 @@ private:
     Geometry::Polygon2d _exteriorPolygon;
     std::vector<Geometry::Polygon2d> _interiorPolygons;
     Geometry::Polygon2d _blueGoal;
+    Geometry::Polygon2d _redGoal;
 };
 
 

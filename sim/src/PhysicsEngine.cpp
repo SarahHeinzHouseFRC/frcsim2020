@@ -174,11 +174,14 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
     for (const auto& gamePieceBody : _gamePieceBodies)
     {
         b2Transform vehicleTf = _vehicleBody->GetTransform();
+        b2Transform fieldTf({ 0, 0 }, b2Rot(0));
         b2Vec2 gamePiecePosition = gamePieceBody->GetWorldCenter();
         bool overlapCenter = _ingestibleRegionCenterShape.TestPoint(vehicleTf, gamePiecePosition);
         bool overlapLeft = _ingestibleRegionLeftShape.TestPoint(vehicleTf, gamePiecePosition);
         bool overlapRight = _ingestibleRegionRightShape.TestPoint(vehicleTf, gamePiecePosition);
         bool overlapTube = _tubeRegion.TestPoint(vehicleTf, gamePiecePosition);
+        bool inBlueGoalRegion = _blueGoalRegion.TestPoint(fieldTf, gamePiecePosition);
+        bool inRedGoalRegion = _redGoalRegion.TestPoint(fieldTf, gamePiecePosition);
         auto model = (GamePieceModel*) gamePieceBody->GetUserData();
         if (overlapCenter)
         {
@@ -228,6 +231,16 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
             float dist = -b2Dot(rearEdgePerp, vecToGamePiece);
             model->_state.pose.z = dist * (0.45 / 0.51);
             model->_state.ingestion = GamePieceModel::TUBE;
+        }
+        else if (inBlueGoalRegion)
+        {
+            model->_state.pose.z = 0.45;
+            model->_state.ingestion = GamePieceModel::BLUE_LOW_GOAL;
+        }
+        else if (inRedGoalRegion)
+        {
+            model->_state.pose.z = 0.45;
+            model->_state.ingestion = GamePieceModel::RED_LOW_GOAL;
         }
         else
         {
@@ -316,10 +329,32 @@ void PhysicsEngine::initFieldBodies(b2World* world, const FieldModel& fieldModel
             Vertex2d v = fieldModel._blueGoal.vertices().at(i);
             vertices[i] = b2Vec2(v.x, v.y);
         }
-        b2PolygonShape goalShape;
-        goalShape.Set(vertices, 4);
+        _blueGoalRegion.Set(vertices, numVertices);
         b2FixtureDef fixtureDef;
-        fixtureDef.shape = &goalShape;
+        fixtureDef.shape = &_blueGoalRegion;
+        fixtureDef.density = 0;
+        fixtureDef.friction = 0.3f;
+        fixtureDef.filter.categoryBits = CATEGORY_C;
+        fixtureDef.filter.maskBits = MASK_C;
+
+        // Add the shape to the body
+        goalBody->CreateFixture(&fixtureDef);
+        goalBody->SetUserData((void*) &fieldModel);
+    }
+
+    {
+        b2BodyDef goalBodyDef;
+        b2Body* goalBody = world->CreateBody(&goalBodyDef);
+        int numVertices = fieldModel._redGoal.numVertices();
+        b2Vec2 vertices[numVertices];
+        for (int i=0; i<numVertices; i++)
+        {
+            Vertex2d v = fieldModel._redGoal.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        _redGoalRegion.Set(vertices, numVertices);
+        b2FixtureDef fixtureDef;
+        fixtureDef.shape = &_redGoalRegion;
         fixtureDef.density = 0;
         fixtureDef.friction = 0.3f;
         fixtureDef.filter.categoryBits = CATEGORY_C;

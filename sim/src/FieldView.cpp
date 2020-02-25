@@ -111,14 +111,25 @@ osg::ref_ptr<osg::Geode> FieldView::makeFieldBounds(const FieldModel& fieldModel
 
 osg::ref_ptr<osg::Geode> FieldView::makeGoals(const FieldModel& fieldModel)
 {
-    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-    for (const auto& vertex : fieldModel._blueGoal.vertices())
-    {
-        vertices->push_back(osg::Vec3(vertex.x, vertex.y, 0.1));
-    }
-    osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeLineLoop(vertices, Color::Red);
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
-    geode->addDrawable(geom);
+    {
+        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+        for (const auto& vertex : fieldModel._blueGoal.vertices())
+        {
+            vertices->push_back(osg::Vec3(vertex.x, vertex.y, 0.1));
+        }
+        osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeLineLoop(vertices, Color::Blue);
+        geode->addDrawable(geom);
+    }
+    {
+        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+        for (const auto& vertex : fieldModel._redGoal.vertices())
+        {
+            vertices->push_back(osg::Vec3(vertex.x, vertex.y, 0.1));
+        }
+        osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeLineLoop(vertices, Color::Red);
+        geode->addDrawable(geom);
+    }
 
     return geode;
 }

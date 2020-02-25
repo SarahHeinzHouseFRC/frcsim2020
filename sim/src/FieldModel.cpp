@@ -21,7 +21,8 @@ FieldModel::FieldModel(const ConfigReader& config, double startTimestamp) :
         _interiorPolygons.emplace_back(interiorPolygon);
     }
 
-    _blueGoal = std::vector<Vertex2d>({ { -20*IN_TO_M, -314.96*IN_TO_M }, { -20*IN_TO_M, -344.96*IN_TO_M }, { 20*IN_TO_M, -344.96*IN_TO_M }, { 20*IN_TO_M, -314.96*IN_TO_M } });
+    _redGoal = std::vector<Vertex2d>({ { 84*IN_TO_M, 314.96*IN_TO_M }, { 84*IN_TO_M, 344.96*IN_TO_M }, { 50*IN_TO_M, 344.96*IN_TO_M }, { 50*IN_TO_M, 314.96*IN_TO_M } });
+    _blueGoal = std::vector<Vertex2d>({ { -84*IN_TO_M, -314.96*IN_TO_M }, { -84*IN_TO_M, -344.96*IN_TO_M }, { -50*IN_TO_M, -344.96*IN_TO_M }, { -50*IN_TO_M, -314.96*IN_TO_M } });
 }
 
 

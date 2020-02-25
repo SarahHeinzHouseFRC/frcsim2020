@@ -106,6 +106,8 @@ private:
     b2PolygonShape _ingestibleRegionLeftShape;
     b2PolygonShape _ingestibleRegionRightShape;
     b2PolygonShape _tubeRegion;
+    b2PolygonShape _blueGoalRegion;
+    b2PolygonShape _redGoalRegion;
     b2CircleShape _gamePieceShape;
     std::vector<b2Body*> _gamePieceBodies;
     std::vector<b2Body*> _ingestibleCenterGamePieceBodies; // Game pieces in the center ingestible region

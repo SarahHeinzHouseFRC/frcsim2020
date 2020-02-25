@@ -20,7 +20,9 @@ public:
         CENTER_INTAKE,
         LEFT_INTAKE,
         RIGHT_INTAKE,
-        TUBE
+        TUBE,
+        BLUE_LOW_GOAL,
+        RED_LOW_GOAL
     };
 
     /**

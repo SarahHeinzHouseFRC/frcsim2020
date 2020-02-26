@@ -1,11 +1,13 @@
 # SHARP Team 3260 FRC Simulator #
-This project consists of core robot code (Java), a mock joystick controller (Python), and a vehicle simulator (C++)
-which communicate over fast UDP using JSON-ish strings. This code was tested and runs in Ubuntu 18.04.
+This project consists of the core robot code (Java), a mock Xbox controller (Python), and a vehicle simulator (C++)
+which communicate over UDP using JSON-ish strings (will be converted to proper JSON soon). This code was tested and run
+in Ubuntu 18.04.
 
-Among other benefits, this software allows the software team to rapidly develop and test their software independently of
-the hardware team, status of the robot, and availability of physical joysticks; game strategy development; driver
-tryouts; and more. The hope is to keep adding more functionality to this software, including log playback to allow log
-playback for debugging, races against your own "phantom" from a previous run, and multiplayer support.
+Among many other benefits, this software allows an FRC software team to rapidly develop and test their software
+independently of the hardware team, availability of hte robot, and availability of physical joysticks; game strategy
+development; driver tryouts; and more. The APIs to each component are intentionally made available to promote
+extensibility of this software, including support for log playback for debugging, racing against your own "phantom" from
+a previous run, and multiplayer support.
 
 For details on each of the three components included, please see the specific documentation for each:
   - [Joystick](joystick/README.md)
@@ -20,6 +22,21 @@ For details on each of the three components included, please see the specific do
       +----------------+     Heartbeat      +----------------+       State        +----------------+
 ```
 
+## Feature List ##
+  - [x] Fully-featured PyQt-based virtual Xbox controller that publishes commands over UDP as JSON.
+  - [x] Support for physical Xbox 360 controller over USB.
+  - [x] Simulated robot with working drivetrain, intake, and outtake using real-world motor velocities and gearing.
+  - [x] Easy YAML configuration.
+  - [x] Human-readable UDP comms using human-readable strings for easy debugging and extension.
+  - [x] OpenSceneGraph-based 3D visualization with included CAD models of the robot and field.
+  - [x] Realistic 2.5D physics built on top of the popular [Box2D](https://box2d.org/) physics library.
+  - [x] Match timer and reset functionality of field and robot for practicing matches/driver tryouts.
+  - [ ] Support for Xbox One, PS4, and other controllers.
+  - [ ] Support for up to 6 simultaneous robots.
+  - [ ] Log replay and mode to play against your own phantom.
+  - [ ] Move to a 3D physics engine (NVIDIA PhysX or ODE).
+
+
 ## Installation and Running ##
 ### Joystick ###
 The joystick uses Python 2.7 and is built on top of PyQt4. The physical controller support is provided by `xboxdrv`. To
@@ -28,7 +45,7 @@ install, run:
 sudo apt install python-pip
 pip install PyYAML
 sudo apt install python-qt4 # Needed for virtual controller
-sudo apt install xboxdrv # Needed for virtual controller
+sudo apt install xboxdrv # Needed for physical controller
 ```
 To launch the virtual controller, run:
 ```sh
@@ -77,10 +94,10 @@ one of these files:
 ```yaml
 sim:
   assets:
-    fieldModelFile: "/your/path/to/field2020.wrl"         # Path to 3D WRL model of the field
-    vehicleModelFile: "/your/path/to/vehicle2020.wrl"     # Path to 3D WRL model of the vehicle
-    gamePieceModelFile: "/your/path/to/gamepiece2020.wrl" # Path to 3D WRL model of the game piece
-    fontFile: "/your/path/to/helvetica.ttf"               # Path to font file for HUD text
+    fieldModelFile: "/your/path/to/field2020.wrl"         # Absolute path to 3D WRL model of the field
+    vehicleModelFile: "/your/path/to/vehicle2020.wrl"     # Absolute path to 3D WRL model of the vehicle
+    gamePieceModelFile: "/your/path/to/gamepiece2020.wrl" # Absolute path to 3D WRL model of the game piece
+    fontFile: "/your/path/to/helvetica.ttf"               # Absolute path to font file for HUD text
 ```
 
 To compile and run the sim, run:
@@ -90,10 +107,10 @@ mkdir build
 cd build/
 cmake ..
 make -j8
-./robot_sim # This can take >30s because the 3D models are so large
+./robot_sim # Note that this can take >30s to launch because the 3D models are so large, optionally use --debug-view
 ```
-Because the CAD models for the robot and field are so large, you can optionally launch the simulator with a lightweight
-visualization using:
+Because the CAD models for the robot and field are large and can slow down the launch time and runtime performance of
+the visualization, you can optionally launch the simulator with a lightweight visualization using:
 ```sh
 ./robot_sim --debug-view
 ```
@@ -104,9 +121,9 @@ To see all options available in the sim, use:
 
 
 ## Configuration File ##
-All three applications refer to the same config file at launch, which is located at `config/robotConfig.yml`. Options
-for changing the IPs and ports are available, as well as some configuration options to change the vehicle and field
-shapes.
+All three applications refer to the same YAML config file at launch, which is located at `config/robotConfig.yml`.
+Options for changing the IPs and ports are available, as well as some configuration options to change the vehicle and
+field shapes.
 
 
 ## Interface Control Document (ICD) ##

@@ -93,6 +93,10 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
         }
     }
 
+    // Instruct the world to perform a single step of simulation.
+    // It is generally best to keep the time step and iterations fixed.
+    _world->Step(elapsedTime, _velocityIterations, _positionIterations);
+
     // Manually move ingestible/tube game pieces
     for (b2Body* gamePieceBody : _ingestibleCenterGamePieceBodies)
     {
@@ -137,10 +141,6 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
         velocity += vehicleVelocity;
         gamePieceBody->SetLinearVelocity(velocity);
     }
-
-    // Instruct the world to perform a single step of simulation.
-    // It is generally best to keep the time step and iterations fixed.
-    _world->Step(elapsedTime, _velocityIterations, _positionIterations);
 
     // Update the vehicle model
     {

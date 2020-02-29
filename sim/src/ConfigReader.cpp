@@ -3,7 +3,6 @@
  */
 
 #include <iostream>
-#include <ConfigReader.h>
 #include "ConfigReader.h"
 
 #define RPM_TO_RADS_PER_SEC 0.1047f

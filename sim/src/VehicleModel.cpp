@@ -3,7 +3,6 @@
  */
 
 #include <cmath>
-#include <ConfigReader.h>
 #include "VehicleModel.h"
 
 using namespace Geometry;

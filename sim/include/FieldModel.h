@@ -5,6 +5,7 @@
 #ifndef ROBOT_SIM_FIELDMODEL_H
 #define ROBOT_SIM_FIELDMODEL_H
 
+#include <tuple>
 #include "ConfigReader.h"
 #include "Geometry.h"
 #include "BaseModel.h"
@@ -41,6 +42,11 @@ public:
     int getCollisionCount() { return _collisionCount; }
 
     /**
+     * Returns the current score
+     */
+    std::tuple<int, int> getScore() { return { _numBallsBlueGoal, _numBallsRedGoal }; }
+
+    /**
      * Resets the collision count
      */
     void reset() { _collisionCount = 0; _inCollision = false; }
@@ -54,6 +60,8 @@ private:
     std::vector<Geometry::Polygon2d> _interiorPolygons;
     Geometry::Polygon2d _blueGoal;
     Geometry::Polygon2d _redGoal;
+    int _numBallsBlueGoal;
+    int _numBallsRedGoal;
 };
 
 

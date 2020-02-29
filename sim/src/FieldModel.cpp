@@ -10,7 +10,12 @@ using namespace Geometry;
 
 
 FieldModel::FieldModel(const ConfigReader& config, double startTimestamp) :
-        _inCollision(false), _collisionCount(0), _currTimestamp(startTimestamp), _timeLastCollision(startTimestamp)
+        _inCollision(false),
+        _collisionCount(0),
+        _currTimestamp(startTimestamp),
+        _timeLastCollision(startTimestamp),
+        _numBallsBlueGoal(0),
+        _numBallsRedGoal(0)
 {
     // Exterior polygon
     _exteriorPolygon = Polygon2d(config.sim.field.exteriorPolygon);
@@ -21,8 +26,8 @@ FieldModel::FieldModel(const ConfigReader& config, double startTimestamp) :
         _interiorPolygons.emplace_back(interiorPolygon);
     }
 
-    _redGoal = std::vector<Vertex2d>({ { 84*IN_TO_M, 314.96*IN_TO_M }, { 84*IN_TO_M, 344.96*IN_TO_M }, { 50*IN_TO_M, 344.96*IN_TO_M }, { 50*IN_TO_M, 314.96*IN_TO_M } });
     _blueGoal = std::vector<Vertex2d>({ { -84*IN_TO_M, -314.96*IN_TO_M }, { -84*IN_TO_M, -344.96*IN_TO_M }, { -50*IN_TO_M, -344.96*IN_TO_M }, { -50*IN_TO_M, -314.96*IN_TO_M } });
+    _redGoal = std::vector<Vertex2d>({ { 84*IN_TO_M, 314.96*IN_TO_M }, { 84*IN_TO_M, 344.96*IN_TO_M }, { 50*IN_TO_M, 344.96*IN_TO_M }, { 50*IN_TO_M, 314.96*IN_TO_M } });
 }
 
 

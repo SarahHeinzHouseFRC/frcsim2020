@@ -2,7 +2,6 @@
  * Copyright (c) 2020 Team 3260
  */
 
-#include <ConfigReader.h>
 #include "WorldModel.h"
 
 

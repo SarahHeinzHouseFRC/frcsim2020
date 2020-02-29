@@ -171,6 +171,8 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
     _ingestibleLeftGamePieceBodies.clear();
     _ingestibleRightGamePieceBodies.clear();
     _tubeGamePieceBodies.clear();
+    int numBallsBlueGoal = 0;
+    int numBallsRedGoal = 0;
     for (const auto& gamePieceBody : _gamePieceBodies)
     {
         b2Transform vehicleTf = _vehicleBody->GetTransform();
@@ -236,11 +238,13 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
         {
             model->_state.pose.z = 0.45;
             model->_state.ingestion = GamePieceModel::BLUE_LOW_GOAL;
+            numBallsBlueGoal++;
         }
         else if (inRedGoalRegion)
         {
             model->_state.pose.z = 0.45;
             model->_state.ingestion = GamePieceModel::RED_LOW_GOAL;
+            numBallsRedGoal++;
         }
         else
         {
@@ -253,6 +257,9 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
             model->_state.ingestion = GamePieceModel::NOT_INGESTED;
         }
     }
+
+    fieldModel._numBallsBlueGoal = numBallsBlueGoal;
+    fieldModel._numBallsRedGoal = numBallsRedGoal;
 
     _prevTimestamp = currTimestamp;
 }

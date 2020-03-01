@@ -14,34 +14,37 @@ FieldView::FieldView(const ConfigReader& config, const FieldModel& fieldModel)
     {
         _fieldNode = makeField(fieldModel);
         addChild(_fieldNode);
+
+        _fieldBounds = makeFieldBounds(fieldModel);
+        addChild(_fieldBounds);
+
+        osg::ref_ptr<osg::Geode> goalRegion = makeGoals(fieldModel);
+        addChild(goalRegion);
     }
     else
     {
         _fieldNode = osgDB::readNodeFile(config.sim.assets.fieldModelFile);
         addChild(_fieldNode);
     }
-
-    _fieldBounds = makeFieldBounds(fieldModel);
-    addChild(_fieldBounds);
-
-    osg::ref_ptr<osg::Geode> goalRegion = makeGoals(fieldModel);
-    addChild(goalRegion);
 }
 
 
 
 void FieldView::update(const FieldModel& fieldModel)
 {
-    for (int i=0; i<_fieldBounds->getNumDrawables(); i++)
+    if (_fieldBounds)
     {
-        osg::Drawable* drawable = _fieldBounds->getDrawable(i);
-        osg::Geometry* geom = dynamic_cast<osg::Geometry*>(drawable);
-        osg::Vec4Array* colorArray = dynamic_cast<osg::Vec4Array*>(geom->getColorArray());
-        colorArray->clear();
-        colorArray->push_back(fieldModel._inCollision ? Color(Color::Red, 127) : Color(Color::Green, 127));
-        geom->setColorArray(colorArray);
-        geom->setColorBinding(osg::Geometry::BIND_OVERALL);
-        geom->dirtyBound();
+        for (int i=0; i<_fieldBounds->getNumDrawables(); i++)
+        {
+            osg::Drawable* drawable = _fieldBounds->getDrawable(i);
+            osg::Geometry* geom = dynamic_cast<osg::Geometry*>(drawable);
+            osg::Vec4Array* colorArray = dynamic_cast<osg::Vec4Array*>(geom->getColorArray());
+            colorArray->clear();
+            colorArray->push_back(fieldModel._inCollision ? Color(Color::Red, 127) : Color(Color::Green, 127));
+            geom->setColorArray(colorArray);
+            geom->setColorBinding(osg::Geometry::BIND_OVERALL);
+            geom->dirtyBound();
+        }
     }
 }
 

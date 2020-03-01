@@ -48,11 +48,6 @@ public:
     void displayTimerStatus(bool running, double timerValue);
 
     /**
-     * Displays number of collisions
-     */
-    void displayNumCollisions(int numCollisions);
-
-    /**
      * Displays score
      */
     void displayFieldScore(std::tuple<int, int> score);
@@ -72,7 +67,6 @@ private:
     int _width;
     osg::ref_ptr<HudLabel> _connected;
     osg::ref_ptr<HudLabel> _timer;
-    osg::ref_ptr<HudLabel> _numCollisions;
     osg::ref_ptr<HudLabel> _blueScore;
     osg::ref_ptr<HudLabel> _redScore;
     osg::ref_ptr<HudLabel> _vehiclePoseState;

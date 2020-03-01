@@ -73,12 +73,7 @@ Hud::Hud(const ConfigReader& config) : _width(225)
     subtitle->setColor(osg::Vec4(0.8, 0.8, 1, 1));
     _labelsGeode->addChild(subtitle);
 
-    y -= 100;
-
-    _numCollisions = new HudTopLabel("Collisions: 0", _padding, y, H2_FONT_SIZE, config.sim.assets.fontFile);
-    _labelsGeode->addChild(_numCollisions);
-
-    y -= 40;
+    y -= 110;
     osg::ref_ptr<HudBox> yellowScoreboard = new HudBox(_padding, y, _width - 2 * _padding, P_FONT_SIZE * 2, Color(Color::Yellow, 127));
     _labelsGeode->addDrawable(yellowScoreboard);
 
@@ -117,12 +112,16 @@ Hud::Hud(const ConfigReader& config) : _width(225)
     _vehicleDrivetrainState = new HudTopLabel("", _padding, y, P_FONT_SIZE, config.sim.assets.fontFile);
     _labelsGeode->addChild(_vehicleDrivetrainState);
 
-    y = 60;
+    y = 100;
     _labelsGeode->addChild(new HudBottomLabel("[1] Top-down view", _padding, y, P_FONT_SIZE, config.sim.assets.fontFile));
     y -= 20;
     _labelsGeode->addChild(new HudBottomLabel("[2] Orbit view", _padding, y, P_FONT_SIZE, config.sim.assets.fontFile));
     y -= 20;
     _labelsGeode->addChild(new HudBottomLabel("[F] Toggle full screen", _padding, y, P_FONT_SIZE, config.sim.assets.fontFile));
+    y -= 20;
+    _labelsGeode->addChild(new HudBottomLabel("[S] Toggle stats", _padding, y, P_FONT_SIZE, config.sim.assets.fontFile));
+    y -= 20;
+    _labelsGeode->addChild(new HudBottomLabel("[Space] Reset view", _padding, y, P_FONT_SIZE, config.sim.assets.fontFile));
 }
 
 
@@ -183,15 +182,6 @@ void Hud::displayTimerStatus(bool running, double timerValue)
     char tmp[1024];
     sprintf(tmp, "%d:%02d", (int) timerValue / 60, (int) timerValue % 60);
     _timer->setText(tmp);
-}
-
-
-
-void Hud::displayNumCollisions(int numCollisions)
-{
-    char tmp[1024];
-    sprintf(tmp, "Collisions: %d", numCollisions);
-    _numCollisions->setText(tmp);
 }
 
 

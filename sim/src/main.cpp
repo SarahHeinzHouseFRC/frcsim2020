@@ -120,7 +120,6 @@ int main(int argc, char** argv)
             // Update the hud
             hud.displayConnectionStatus(coreAgent.isConnected());
             hud.displayTimerStatus(timer.isRunning(), timer.getValue());
-            hud.displayNumCollisions(wm.fieldModel().getCollisionCount());
             hud.displayFieldScore(wm.getScore());
             hud.displayVehicleState(wm.vehicleModel());
 

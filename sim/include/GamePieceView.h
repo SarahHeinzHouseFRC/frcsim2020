@@ -25,13 +25,12 @@ public:
 
 private:
     /**
-     * Builds a visualization of the game piece
+     * Draws the game piece as a yellow sphere
      */
-    osg::ref_ptr<osg::Geode> makeView(const GamePieceModel& gamePieceModel);
+    osg::ref_ptr<osg::Geode> drawGamePiece(const GamePieceModel& gamePieceModel);
 
-    osg::ref_ptr<osg::Node> _node;
+    osg::ref_ptr<osg::Node> _gamePieceNode;
     osg::ref_ptr<osg::ShapeDrawable> _shape;
-    osg::ref_ptr<osg::Geode> _boundary;
 };
 
 

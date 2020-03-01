@@ -46,7 +46,7 @@ void VehicleView::update(const VehicleModel& vehicleModel)
     // Update arrows
     {
         double percent = vehicleModel._state.intakeCenterMotorSpeed / vehicleModel._intakeCenterMotorMaxSpeed;
-        osg::ref_ptr<osg::Geometry> ingestibleRegionCenterArrow = ViewUtils::makeArrow(osg::Vec3(
+        osg::ref_ptr<osg::Geometry> ingestibleRegionCenterArrow = ViewUtils::drawArrow(osg::Vec3(
                 vehicleModel._ingestibleRegionCenter.center().x,
                 vehicleModel._ingestibleRegionCenter.center().y,
                 -vehicleModel._wheelRadius + 0.1), M_PI, 0.05 * percent, Color(Color::Orange, 127));
@@ -58,7 +58,7 @@ void VehicleView::update(const VehicleModel& vehicleModel)
     }
     {
         double percent = vehicleModel._state.intakeLeftMotorSpeed / vehicleModel._intakeLeftMotorMaxSpeed;
-        osg::ref_ptr<osg::Geometry> ingestibleRegionLeftArrow = ViewUtils::makeArrow(osg::Vec3(
+        osg::ref_ptr<osg::Geometry> ingestibleRegionLeftArrow = ViewUtils::drawArrow(osg::Vec3(
                 vehicleModel._ingestibleRegionLeft.center().x,
                 vehicleModel._ingestibleRegionLeft.center().y,
                 -vehicleModel._wheelRadius + 0.1), -M_PI/2, 0.05 * percent, Color(Color::Orange, 127));
@@ -70,7 +70,7 @@ void VehicleView::update(const VehicleModel& vehicleModel)
     }
     {
         double percent = vehicleModel._state.intakeRightMotorSpeed / vehicleModel._intakeRightMotorMaxSpeed;
-        osg::ref_ptr<osg::Geometry> ingestibleRegionRightArrow = ViewUtils::makeArrow(osg::Vec3(
+        osg::ref_ptr<osg::Geometry> ingestibleRegionRightArrow = ViewUtils::drawArrow(osg::Vec3(
                 vehicleModel._ingestibleRegionRight.center().x,
                 vehicleModel._ingestibleRegionRight.center().y,
                 -vehicleModel._wheelRadius + 0.1), M_PI/2, 0.05 * percent, Color(Color::Orange, 127));
@@ -82,7 +82,7 @@ void VehicleView::update(const VehicleModel& vehicleModel)
     }
     {
         double percent = vehicleModel._state.tubeMotorSpeed / vehicleModel._tubeMotorMaxSpeed;
-        osg::ref_ptr<osg::Geometry> tubeRegionArrow = ViewUtils::makeArrow(osg::Vec3(
+        osg::ref_ptr<osg::Geometry> tubeRegionArrow = ViewUtils::drawArrow(osg::Vec3(
                 vehicleModel._tubeRegion.center().x,
                 vehicleModel._tubeRegion.center().y,
                 -vehicleModel._wheelRadius + 0.1), M_PI, 0.05 * percent, Color(Color::Orange, 127));
@@ -113,26 +113,26 @@ osg::ref_ptr<osg::Geode> VehicleView::drawVehicle(const ConfigReader &config)
     float wheelBase = config.sim.vehicle.drivetrain.wheelBase;
     float wheelTrack = config.sim.vehicle.drivetrain.wheelTrack;
 
-    osg::ref_ptr<osg::ShapeDrawable> outerLeftEdge = ViewUtils::makeBox(osg::Vec3(0, widthChassis/2 - widthChannel/2, 0), depthChassis, widthChannel, heightChannel, Color::Gray);
+    osg::ref_ptr<osg::ShapeDrawable> outerLeftEdge = ViewUtils::drawBox(osg::Vec3(0, widthChassis/2 - widthChannel/2, 0), depthChassis, widthChannel, heightChannel, Color::Gray);
     robotGeode->addDrawable(outerLeftEdge);
-    osg::ref_ptr<osg::ShapeDrawable> innerLeftEdge = ViewUtils::makeBox(osg::Vec3(0, widthChassis/2 - 1.5*widthChannel - wheelWidth, 0), depthChassis, widthChannel, heightChannel, Color::Gray);
+    osg::ref_ptr<osg::ShapeDrawable> innerLeftEdge = ViewUtils::drawBox(osg::Vec3(0, widthChassis/2 - 1.5*widthChannel - wheelWidth, 0), depthChassis, widthChannel, heightChannel, Color::Gray);
     robotGeode->addDrawable(innerLeftEdge);
-    osg::ref_ptr<osg::ShapeDrawable> outerRightEdge = ViewUtils::makeBox(osg::Vec3(0, -widthChassis/2 + widthChannel/2, 0), depthChassis, widthChannel, heightChannel, Color::Gray);
+    osg::ref_ptr<osg::ShapeDrawable> outerRightEdge = ViewUtils::drawBox(osg::Vec3(0, -widthChassis/2 + widthChannel/2, 0), depthChassis, widthChannel, heightChannel, Color::Gray);
     robotGeode->addDrawable(outerRightEdge);
-    osg::ref_ptr<osg::ShapeDrawable> innerRightEdge = ViewUtils::makeBox(osg::Vec3(0, -widthChassis/2 + 1.5*widthChannel + wheelWidth, 0), depthChassis, widthChannel, heightChannel, Color::Gray);
+    osg::ref_ptr<osg::ShapeDrawable> innerRightEdge = ViewUtils::drawBox(osg::Vec3(0, -widthChassis/2 + 1.5*widthChannel + wheelWidth, 0), depthChassis, widthChannel, heightChannel, Color::Gray);
     robotGeode->addDrawable(innerRightEdge);
-    osg::ref_ptr<osg::ShapeDrawable> frontEdge = ViewUtils::makeBox(osg::Vec3(depthChassis/2, 0, 0), widthChannel, widthChassis, heightChannel, Color::Gray);
+    osg::ref_ptr<osg::ShapeDrawable> frontEdge = ViewUtils::drawBox(osg::Vec3(depthChassis/2, 0, 0), widthChannel, widthChassis, heightChannel, Color::Gray);
     robotGeode->addDrawable(frontEdge);
-    osg::ref_ptr<osg::ShapeDrawable> backEdge = ViewUtils::makeBox(osg::Vec3(-depthChassis/2, 0, 0), widthChannel, widthChassis, heightChannel, Color::Gray);
+    osg::ref_ptr<osg::ShapeDrawable> backEdge = ViewUtils::drawBox(osg::Vec3(-depthChassis/2, 0, 0), widthChannel, widthChassis, heightChannel, Color::Gray);
     robotGeode->addDrawable(backEdge);
 
-    osg::ref_ptr<osg::ShapeDrawable> frontLeftWheel = ViewUtils::makeCylinder(osg::Vec3(wheelBase/2, wheelTrack/2, 0), wheelRadius, wheelWidth, Color::White);
+    osg::ref_ptr<osg::ShapeDrawable> frontLeftWheel = ViewUtils::drawCylinder(osg::Vec3(wheelBase/2, wheelTrack/2, 0), wheelRadius, wheelWidth, Color::White);
     robotGeode->addDrawable(frontLeftWheel);
-    osg::ref_ptr<osg::ShapeDrawable> rearLeftWheel = ViewUtils::makeCylinder(osg::Vec3(-wheelBase/2, wheelTrack/2, 0), wheelRadius, wheelWidth, Color::White);
+    osg::ref_ptr<osg::ShapeDrawable> rearLeftWheel = ViewUtils::drawCylinder(osg::Vec3(-wheelBase/2, wheelTrack/2, 0), wheelRadius, wheelWidth, Color::White);
     robotGeode->addDrawable(rearLeftWheel);
-    osg::ref_ptr<osg::ShapeDrawable> frontRightWheel = ViewUtils::makeCylinder(osg::Vec3(wheelBase/2, -wheelTrack/2, 0), wheelRadius, wheelWidth, Color::White);
+    osg::ref_ptr<osg::ShapeDrawable> frontRightWheel = ViewUtils::drawCylinder(osg::Vec3(wheelBase/2, -wheelTrack/2, 0), wheelRadius, wheelWidth, Color::White);
     robotGeode->addDrawable(frontRightWheel);
-    osg::ref_ptr<osg::ShapeDrawable> rearRightWheel = ViewUtils::makeCylinder(osg::Vec3(-wheelBase/2, -wheelTrack/2, 0), wheelRadius, wheelWidth, Color::White);
+    osg::ref_ptr<osg::ShapeDrawable> rearRightWheel = ViewUtils::drawCylinder(osg::Vec3(-wheelBase/2, -wheelTrack/2, 0), wheelRadius, wheelWidth, Color::White);
     robotGeode->addDrawable(rearRightWheel);
 
     return robotGeode;
@@ -150,7 +150,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawCollisionBoundary(const VehicleModel& 
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeQuads(vertices, Color(Color::Green, 127));
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(Color::Green, 127));
         geode->addDrawable(boundingPolygon);
     }
     {
@@ -160,7 +160,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawCollisionBoundary(const VehicleModel& 
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeQuads(vertices, Color(Color::Green, 127));
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(Color::Green, 127));
         geode->addDrawable(boundingPolygon);
     }
     {
@@ -170,7 +170,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawCollisionBoundary(const VehicleModel& 
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeQuads(vertices, Color(Color::Green, 127));
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(Color::Green, 127));
         geode->addDrawable(boundingPolygon);
     }
     {
@@ -180,7 +180,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawCollisionBoundary(const VehicleModel& 
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeQuads(vertices, Color(Color::Green, 127));
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(Color::Green, 127));
         geode->addDrawable(boundingPolygon);
     }
     return geode;
@@ -198,7 +198,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawBumpers(const VehicleModel& vehicleMod
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeQuads(vertices, Color(Color::Blue, 127));
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(Color::Blue, 127));
         geode->addDrawable(boundingPolygon);
     }
     {
@@ -208,7 +208,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawBumpers(const VehicleModel& vehicleMod
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeQuads(vertices, Color(Color::Blue, 127));
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(Color::Blue, 127));
         geode->addDrawable(boundingPolygon);
     }
     {
@@ -218,7 +218,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawBumpers(const VehicleModel& vehicleMod
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeQuads(vertices, Color(Color::Blue, 127));
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(Color::Blue, 127));
         geode->addDrawable(boundingPolygon);
     }
     {
@@ -228,7 +228,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawBumpers(const VehicleModel& vehicleMod
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeQuads(vertices, Color(Color::Blue, 127));
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(Color::Blue, 127));
         geode->addDrawable(boundingPolygon);
     }
     {
@@ -238,7 +238,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawBumpers(const VehicleModel& vehicleMod
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeQuads(vertices, Color(Color::Blue, 127));
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(Color::Blue, 127));
         geode->addDrawable(boundingPolygon);
     }
     {
@@ -248,7 +248,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawBumpers(const VehicleModel& vehicleMod
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::makeQuads(vertices, Color(Color::Blue, 127));
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(Color::Blue, 127));
         geode->addDrawable(boundingPolygon);
     }
     return geode;
@@ -267,10 +267,10 @@ osg::ref_ptr<osg::Geode> VehicleView::drawIngestibleRegions(const VehicleModel& 
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeLineLoop(vertices, Color::Orange);
+        osg::ref_ptr<osg::Geometry> geom = ViewUtils::drawLineLoop(vertices, Color::Orange);
         geode->addDrawable(geom);
         _ingestibleRegionCenterArrow = new osg::Geometry;
-        _ingestibleRegionCenterArrow = ViewUtils::makeArrow(osg::Vec3(
+        _ingestibleRegionCenterArrow = ViewUtils::drawArrow(osg::Vec3(
                 vehicleModel._ingestibleRegionCenter.center().x,
                 vehicleModel._ingestibleRegionCenter.center().y,
                 -vehicleModel._wheelRadius + 0.1), M_PI, 0.05, Color(Color::Orange, 127));
@@ -284,9 +284,9 @@ osg::ref_ptr<osg::Geode> VehicleView::drawIngestibleRegions(const VehicleModel& 
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeLineLoop(vertices, Color::Orange);
+        osg::ref_ptr<osg::Geometry> geom = ViewUtils::drawLineLoop(vertices, Color::Orange);
         geode->addDrawable(geom);
-        _ingestibleRegionLeftArrow = ViewUtils::makeArrow(osg::Vec3(
+        _ingestibleRegionLeftArrow = ViewUtils::drawArrow(osg::Vec3(
                 vehicleModel._ingestibleRegionLeft.center().x,
                 vehicleModel._ingestibleRegionLeft.center().y,
                 -vehicleModel._wheelRadius + 0.1), -M_PI/2, 0.05, Color(Color::Orange, 127));
@@ -300,9 +300,9 @@ osg::ref_ptr<osg::Geode> VehicleView::drawIngestibleRegions(const VehicleModel& 
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeLineLoop(vertices, Color::Orange);
+        osg::ref_ptr<osg::Geometry> geom = ViewUtils::drawLineLoop(vertices, Color::Orange);
         geode->addDrawable(geom);
-        _ingestibleRegionRightArrow = ViewUtils::makeArrow(osg::Vec3(
+        _ingestibleRegionRightArrow = ViewUtils::drawArrow(osg::Vec3(
                 vehicleModel._ingestibleRegionRight.center().x,
                 vehicleModel._ingestibleRegionRight.center().y,
                 -vehicleModel._wheelRadius + 0.1), M_PI/2, 0.05, Color(Color::Orange, 127));
@@ -316,9 +316,9 @@ osg::ref_ptr<osg::Geode> VehicleView::drawIngestibleRegions(const VehicleModel& 
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> geom = ViewUtils::makeLineLoop(vertices, Color::Green);
+        osg::ref_ptr<osg::Geometry> geom = ViewUtils::drawLineLoop(vertices, Color::Green);
         geode->addDrawable(geom);
-        _tubeRegionArrow = ViewUtils::makeArrow(osg::Vec3(
+        _tubeRegionArrow = ViewUtils::drawArrow(osg::Vec3(
                 vehicleModel._tubeRegion.center().x,
                 vehicleModel._tubeRegion.center().y,
                 -vehicleModel._wheelRadius + 0.1), M_PI, 0.05, Color(Color::Green, 127));

@@ -25,19 +25,19 @@ public:
 
 private:
     /**
-     * Builds the visualization of the field
+     * Draws the ground plane as a gray rectangle
      */
-    osg::ref_ptr<osg::Geode> makeField(const FieldModel& fieldModel);
+    osg::ref_ptr<osg::Geode> drawGround(const FieldModel& fieldModel);
 
     /**
-     * Draws the bounding collision polygon of the field
+     * Draws the bounding collision polygon of the field as green walls
      */
-    osg::ref_ptr<osg::Geode> makeFieldBounds(const FieldModel& fieldModel);
+    osg::ref_ptr<osg::Geode> drawBoundary(const FieldModel& fieldModel);
 
     /**
-     * Draws the goal regions
+     * Draws the goal regions as red and blue outlined regions
      */
-    osg::ref_ptr<osg::Geode> makeGoals(const FieldModel& fieldModel);
+    osg::ref_ptr<osg::Geode> drawGoals(const FieldModel& fieldModel);
 
 private:
     osg::ref_ptr<osg::Node> _fieldNode;

@@ -36,7 +36,7 @@ public:
 
     /**
      * Receive over UDP (max 1024 bytes)
-     * @return
+     * @return Received message
      */
     std::string receive();
 

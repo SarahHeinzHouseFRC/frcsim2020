@@ -15,6 +15,7 @@
 #include "WorldModel.h"
 
 #define DEFAULT_CONFIG_FILE "../../config/robotConfig.yml"
+#define NUM_VEHICLES 2
 
 
 int main(int argc, char** argv)
@@ -52,13 +53,19 @@ int main(int argc, char** argv)
 
     // Initialize vehicle and field models
     double t = Time::now();
-    WorldModel wm(config, t);
+    WorldModel wm(config, NUM_VEHICLES, t);
 
     // Initialize a timer to countdown 2m 15s
     Timer timer(t, 135);
 
     // Initialize comms with core
-    CoreAgent coreAgent(config);
+    std::vector<CoreAgent> coreAgents;
+    for (int i=0; i<NUM_VEHICLES; i++)
+    {
+        config.sim.comms.port = 8000 + 10*i;
+        config.core.vehiclePort = 6000 + 10*i;
+        coreAgents.emplace_back(config);
+    }
 
     // Visualize vehicle and field
     Scene scene(config, wm);
@@ -73,30 +80,35 @@ int main(int argc, char** argv)
     {
         while (!vis.done())
         {
-            // Receive commands
-            bool rx = coreAgent.rxCoreCommands();
-
-            if (rx)
+            for (int i=0; i<coreAgents.size(); i++)
             {
-                // Update the vehicle's control surfaces based on the commands from core
-                auto rxCommands = coreAgent.getCoreCommands();
+                CoreAgent& coreAgent = coreAgents.at(i);
 
-                // If the user hits "start" on the joystick, then start/stop the countdown timer
-                timer.processCommand(rxCommands.timerStartStop, Time::now());
+                // Receive commands
+                bool rx = coreAgent.rxCoreCommands();
 
-                // If the user hits "guide" on the joystick, then reset the world
-                if (rxCommands.reset)
+                if (rx)
                 {
-                    reset = true;
-                }
+                    // Update the vehicle's control surfaces based on the commands from core
+                    auto rxCommands = coreAgent.getCoreCommands();
 
-                // If the timer hits zero, stop allowing the controller to update the vehicle
-                if (timer.getValue() <= 0)
-                {
-                    rxCommands.clear();
+                    // If the user hits "start" on the joystick, then start/stop the countdown timer
+                    timer.processCommand(rxCommands.timerStartStop, Time::now());
+
+                    // If the user hits "guide" on the joystick, then reset the world
+                    if (rxCommands.reset)
+                    {
+                        reset = true;
+                    }
+
+                    // If the timer hits zero, stop allowing the controllers to update the vehicle
+                    if (timer.getValue() <= 0)
+                    {
+                        rxCommands.clear();
+                    }
+                    wm.vehicleModel(i).processCommands(rxCommands);
+                    wm.fieldModel().processCommands(rxCommands);
                 }
-                wm.vehicleModel().processCommands(rxCommands);
-                wm.fieldModel().processCommands(rxCommands);
             }
         }
     });
@@ -106,8 +118,13 @@ int main(int argc, char** argv)
     {
         while (!vis.done())
         {
-            coreAgent.setSensorState(wm.vehicleModel().getSensorState());
-            coreAgent.txSensorState();
+            for (int i=0; i<coreAgents.size(); i++)
+            {
+                CoreAgent& coreAgent = coreAgents.at(i);
+                coreAgent.setSensorState(wm.vehicleModel(i).getSensorState());
+                coreAgent.txSensorState();
+            }
+            usleep(1e4);
         }
     });
 
@@ -119,10 +136,15 @@ int main(int argc, char** argv)
             scene.update(wm);
 
             // Update the hud
-            hud.displayConnectionStatus(coreAgent.isConnected());
+            bool connected = true;
+            for (const auto& coreAgent : coreAgents)
+            {
+                if (!coreAgent.isConnected()) { connected = false; }
+            }
+            hud.displayConnectionStatus(connected);
             hud.displayTimerStatus(timer.isRunning(), timer.getValue());
             hud.displayFieldScore(wm.getScore());
-            hud.displayVehicleState(wm.vehicleModel());
+//            hud.displayVehicleState(wm.vehicleModel(i));
 
             // Step the visualizer
             vis.step();

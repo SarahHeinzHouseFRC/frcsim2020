@@ -20,7 +20,7 @@ public:
     /**
      * Constructor
      */
-    WorldModel(const ConfigReader& configReader, double timestamp);
+    WorldModel(ConfigReader& configReader, int numVehicles, double timestamp);
 
     /**
      * Updates the field, vehicle, and game piece models
@@ -35,7 +35,7 @@ public:
     /**
      * Getter for vehicle model
      */
-    VehicleModel& vehicleModel() { return _vehicleModel; }
+    VehicleModel& vehicleModel(unsigned int i) { return _vehicleModels.at(i); }
 
     /**
      * Getter for field model
@@ -49,7 +49,7 @@ public:
 
 private:
     FieldModel _fieldModel;
-    VehicleModel _vehicleModel;
+    std::vector<VehicleModel> _vehicleModels;
     PhysicsEngine _physicsEngine;
     std::vector<GamePieceModel> _gamePieceModels;
 };

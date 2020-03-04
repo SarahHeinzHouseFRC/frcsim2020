@@ -22,6 +22,11 @@ friend class Hud;
 friend class PhysicsEngine;
 public:
     /**
+     * Default constructor
+     */
+    VehicleModel() = default;
+
+    /**
      * Constructor
      */
     VehicleModel(const ConfigReader& config, double startTimestamp);

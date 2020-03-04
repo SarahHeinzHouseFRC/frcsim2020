@@ -9,7 +9,7 @@
 CoreAgent::CoreAgent(const ConfigReader& config) :
         _sensorState{0}, _coreCommands{}, _numDroppedPackets(0), _verbose(config.verbose)
 {
-    _comms = new UdpNode(config.sim.comms.port, config.core.ip, config.core.vehiclePort);
+    _comms = std::make_unique<UdpNode>(config.sim.comms.port, config.core.ip, config.core.vehiclePort);
 }
 
 
@@ -27,7 +27,7 @@ void CoreAgent::txSensorState()
 bool CoreAgent::rxCoreCommands()
 {
     std::string msg = _comms->receive();
-    if (msg[0] == '{')
+    if (msg.length() > 0 && msg[0] == '{')
     {
         if (_verbose)
         {
@@ -52,7 +52,7 @@ bool CoreAgent::rxCoreCommands()
 
 
 
-bool CoreAgent::isConnected()
+bool CoreAgent::isConnected() const
 {
     // As long as we've heard from the controls <= 100 packets ago, we're still connected
     return _numDroppedPackets < 100;

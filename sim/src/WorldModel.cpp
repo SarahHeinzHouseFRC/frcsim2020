@@ -5,17 +5,23 @@
 #include "WorldModel.h"
 
 
-WorldModel::WorldModel(const ConfigReader& configReader, double timestamp) :
-        _fieldModel(configReader, timestamp),
-        _vehicleModel(configReader, timestamp)
+WorldModel::WorldModel(ConfigReader& configReader, int numVehicles, double timestamp) :
+        _fieldModel(configReader, timestamp)
 {
-    // Initialize all game pieces
+    // Initialize all vehicle models
+    for (int i=0; i<numVehicles; i++)
+    {
+        configReader.sim.vehicle.initialState.y += 1.5;
+        _vehicleModels.emplace_back(configReader, timestamp);
+    }
+
+    // Initialize all game piece models
     for (const auto& initialPosition : configReader.sim.gamePiece.initialPositions)
     {
         _gamePieceModels.emplace_back(configReader.sim.gamePiece.radius, initialPosition.x, initialPosition.y);
     }
 
-    _physicsEngine = PhysicsEngine(_fieldModel, _vehicleModel, _gamePieceModels, timestamp);
+    _physicsEngine = PhysicsEngine(_fieldModel, _vehicleModels, _gamePieceModels, timestamp);
 }
 
 
@@ -24,10 +30,13 @@ void WorldModel::update(double timestamp)
 {
     // Update external forces on field and vehicle
     _fieldModel.update(timestamp);
-    _vehicleModel.update(timestamp);
+    for (auto& vehicleModel : _vehicleModels)
+    {
+        vehicleModel.update(timestamp);
+    }
 
     // Apply collisions and constraints
-    _physicsEngine.update(_fieldModel, _vehicleModel, _gamePieceModels, timestamp);
+    _physicsEngine.update(_fieldModel, _vehicleModels, _gamePieceModels, timestamp);
 }
 
 
@@ -38,7 +47,10 @@ void WorldModel::reset()
     _fieldModel.reset();
 
     // Vehicle
-    _vehicleModel.reset();
+    for (auto& vehicleModel : _vehicleModels)
+    {
+        vehicleModel.reset();
+    }
 
     // Game pieces
     for (auto& gamePiece : _gamePieceModels)
@@ -47,5 +59,5 @@ void WorldModel::reset()
     }
 
     // Physics engine
-    _physicsEngine.reset(_fieldModel, _vehicleModel, _gamePieceModels);
+    _physicsEngine.reset(_fieldModel, _vehicleModels, _gamePieceModels);
 }

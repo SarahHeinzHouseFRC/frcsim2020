@@ -10,8 +10,12 @@ Scene::Scene(const ConfigReader& config, const WorldModel& wm)
 {
     _root = new osg::Group;
 
-    _vehicleView = new VehicleView(config, wm._vehicleModel);
-    _root->addChild(_vehicleView);
+    for (const auto & _vehicleModel : wm._vehicleModels)
+    {
+        osg::ref_ptr<VehicleView> vehicleView = new VehicleView(config, _vehicleModel);
+        _vehicleViews.push_back(vehicleView);
+        _root->addChild(vehicleView);
+    }
 
     _fieldView = new FieldView(config, wm._fieldModel);
     _root->addChild(_fieldView);
@@ -28,7 +32,10 @@ Scene::Scene(const ConfigReader& config, const WorldModel& wm)
 
 void Scene::update(const WorldModel& wm)
 {
-    _vehicleView->update(wm._vehicleModel);
+    for (unsigned int i=0; i<wm._vehicleModels.size(); i++)
+    {
+        _vehicleViews[i]->update(wm._vehicleModels[i]);
+    }
     _fieldView->update(wm._fieldModel);
     for (unsigned int i=0; i<wm._gamePieceModels.size(); i++)
     {

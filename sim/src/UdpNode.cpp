@@ -61,12 +61,19 @@ std::string UdpNode::receive()
     struct sockaddr_in cliaddr;
     memset(&cliaddr, 0, sizeof(cliaddr));
     char buffer[MAXLINE];
-    int len, n;
-    n = recvfrom(_sockfd, (char *) buffer, MAXLINE, MSG_DONTWAIT, ( struct sockaddr *) &cliaddr, (socklen_t*) &len);
-    if (n >= MAXLINE)
+    int len = sizeof(struct sockaddr_in);
+    int n = recvfrom(_sockfd, (char *) buffer, MAXLINE, MSG_DONTWAIT, ( struct sockaddr *) &cliaddr, (socklen_t*) &len);
+    if (cliaddr.sin_port == _txAddr.sin_port)
     {
-        printf("UdpNode: Large message received, buffer overflow!\n");
+        if (n >= MAXLINE)
+        {
+            printf("UdpNode: Large message received, buffer overflow!\n");
+        }
+        buffer[n] = '\0';
+        return buffer;
     }
-    buffer[n] = '\0';
-    return buffer;
+    else
+    {
+        return "";
+    }
 }

@@ -19,6 +19,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("controller_type", help='"virtual" for onscreen controller or "physical" for USB controller')
     parser.add_argument("--verbose", help="increase output verbosity", action="store_true")
+    parser.add_argument("--player", help="player 1-6", type=int, default=1)
     args = parser.parse_args()
 
     # Read config file
@@ -26,9 +27,9 @@ def main():
         data = yaml.load(f)
         comms_config = {
             "rx_ip": "127.0.0.1",
-            "rx_port": data['joystick']['port'],
+            "rx_port": data['joystick']['port'] + 10 * (args.player-1),
             "tx_ip": data['core']['ip'],
-            "tx_port": data['core']['joystickPort']
+            "tx_port": data['core']['joystickPort'] + 10 * (args.player-1)
         }
     print "Rx at {}:{}".format(comms_config["rx_ip"], comms_config["rx_port"])
     print "Tx to {}:{}".format(comms_config["tx_ip"], comms_config["tx_port"])
@@ -36,11 +37,11 @@ def main():
     # Launch main window
     if args.controller_type == "virtual":
         app = QApplication(sys.argv)
-        window = VirtualXboxController(comms_config, args.verbose)
+        window = VirtualXboxController(args.player, comms_config, args.verbose)
         window.show()
         sys.exit(app.exec_())
     elif args.controller_type == "physical":
-        xbox_controller = PhysicalXboxController(comms_config, args.verbose)
+        xbox_controller = PhysicalXboxController(args.player, comms_config, args.verbose)
 
 
 if __name__ == '__main__':

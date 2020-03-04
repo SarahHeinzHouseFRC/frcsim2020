@@ -32,7 +32,7 @@ class CommsThread(Thread):
 
 
 class PhysicalXboxController:
-    def __init__(self, comms_config, verbose):
+    def __init__(self, player, comms_config, verbose):
         self.joystick = Joystick()
         self.controller_state = ControllerState()
 
@@ -40,7 +40,7 @@ class PhysicalXboxController:
         self.comms = CommsThread(comms_config, self.controller_state, verbose)
         self.comms.daemon = True
         self.comms.start()
-        print "Controller: Launched"
+        print "Controller: Launched player", player
 
         # Run indefinitely
         self.run()

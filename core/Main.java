@@ -9,11 +9,18 @@ public class Main
 {
     public static void main(String[] args)
     {
-        int joystickRxPort = 4000;
-        int joystickTxPort = 2000;
+        // Parse command line options
+        int player = 1;
+        if (args.length == 2)
+        {
+            player = Integer.parseInt(args[1]);
+        }
+
+        int joystickRxPort = 4000 + 10 * (player - 1);
+        int joystickTxPort = 2000 + 10 * (player - 1);
         String joystickTxIp = "localhost";
-        int simRxPort = 6000;
-        int simTxPort = 8000;
+        int simRxPort = 6000 + 10 * (player - 1);
+        int simTxPort = 8000 + 10 * (player - 1);
         String simTxIp = "localhost";
 
         JoystickAgent joystickAgent = new JoystickAgent(joystickRxPort, joystickTxIp, joystickTxPort);
@@ -22,11 +29,11 @@ public class Main
         CommsThread commsThread = new CommsThread(simAgent, joystickAgent);
         commsThread.start();
 
-        System.out.println("Rx joystick at " + joystickTxIp + ":" + joystickTxPort);
-        System.out.println("Tx joystick at localhost:" + joystickRxPort);
-        System.out.println("Rx sim at " + simTxIp + ":" + simTxPort);
-        System.out.println("Tx sim at localhost:" + simRxPort);
-        System.out.println("Core: Launched");
+        System.out.println("Tx joystick at " + joystickTxIp + ":" + joystickTxPort);
+        System.out.println("Rx joystick at localhost:" + joystickRxPort);
+        System.out.println("Tx sim at " + simTxIp + ":" + simTxPort);
+        System.out.println("Rx sim at localhost:" + simRxPort);
+        System.out.println("Core: Launched player " + player);
 
         int prevBackButtonState = 0;
         Boolean isTwoHandDrive = true;

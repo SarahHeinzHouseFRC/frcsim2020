@@ -15,7 +15,6 @@
 #include "WorldModel.h"
 
 #define DEFAULT_CONFIG_FILE "../../config/robotConfig.yml"
-#define NUM_VEHICLES 2
 
 
 int main(int argc, char** argv)
@@ -25,6 +24,7 @@ int main(int argc, char** argv)
     std::string configPath = (args.contains("--config") ? args.getValue("--config") : DEFAULT_CONFIG_FILE);
     bool verbose = args.contains("--verbose") || args.contains("-v");
     bool debugView = args.contains("--debug-view");
+    int numPlayers = args.contains("--players") ? std::stoi(args.getValue("--players")) : 1;
     if (args.contains("--help") || args.contains("-h"))
     {
         std::cout << "\nUsage: ./robot_sim [flags]\n"
@@ -32,8 +32,9 @@ int main(int argc, char** argv)
                      "Optional arguments:\n"
                      "  -h, --help               Show this help message and exit\n"
                      "  --config <config_file>   Use the given config file instead of the default\n"
-                     "  --verbose                Increase output verbosity\n"
-                     "  --debug-view             Launch with a lightweight view\n";
+                     "  --debug-view             Launch with a lightweight view\n"
+                     "  --players <num>          Number of players (1-6)\n"
+                     "  --verbose                Increase output verbosity\n";
         return 0;
     }
 
@@ -53,14 +54,14 @@ int main(int argc, char** argv)
 
     // Initialize vehicle and field models
     double t = Time::now();
-    WorldModel wm(config, NUM_VEHICLES, t);
+    WorldModel wm(config, numPlayers, t);
 
     // Initialize a timer to countdown 2m 15s
     Timer timer(t, 135);
 
     // Initialize comms with core
     std::vector<CoreAgent> coreAgents;
-    for (int i=0; i<NUM_VEHICLES; i++)
+    for (int i=0; i<numPlayers; i++)
     {
         config.sim.comms.port = 8000 + 10*i;
         config.core.vehiclePort = 6000 + 10*i;

@@ -8,7 +8,9 @@
 using namespace Geometry;
 
 
-VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
+VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp, int player, const std::string& alliance) :
+        _player(player),
+        _alliance(alliance),
         _prevTimestamp(startTimestamp),
         _state{0},
         _leftDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.leftMotorMaxSpeed),

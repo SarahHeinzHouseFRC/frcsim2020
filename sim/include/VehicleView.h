@@ -50,6 +50,11 @@ private:
      */
     osg::ref_ptr<osg::Geode> drawIngestibleRegions(const VehicleModel& vehicleModel);
 
+    /**
+     * Draws info about the vehicle, player number, etc.
+     */
+    osg::ref_ptr<osg::Geode> drawInfo(const VehicleModel& vehicleModel, const std::string& fontFile);
+
     osg::ref_ptr<osg::Node> _vehicleNode;
     osg::ref_ptr<osg::Geode> _vehicleBounds;
     osg::ref_ptr<osg::Geometry> _ingestibleRegionCenterArrow;

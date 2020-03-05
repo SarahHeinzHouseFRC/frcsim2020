@@ -3,7 +3,9 @@
  */
 
 #include <osgDB/ReadFile>
+#include <osgText/Text>
 #include <iostream>
+#include <ConfigReader.h>
 #include "VehicleView.h"
 #include "ViewUtils.h"
 #include "Color.h"
@@ -30,6 +32,9 @@ VehicleView::VehicleView(const ConfigReader& config, const VehicleModel& vehicle
 
     osg::ref_ptr<osg::Geode> ingestibleRegions = drawIngestibleRegions(vehicleModel);
     addChild(ingestibleRegions);
+
+    osg::ref_ptr<osg::Geode> info = drawInfo(vehicleModel, config.sim.assets.fontFile);
+    addChild(info);
 }
 
 
@@ -190,6 +195,8 @@ osg::ref_ptr<osg::Geode> VehicleView::drawCollisionBoundary(const VehicleModel& 
 
 osg::ref_ptr<osg::Geode> VehicleView::drawBumpers(const VehicleModel& vehicleModel)
 {
+    Color color = vehicleModel._alliance == "Blue" ? Color::Blue : Color::Red;
+
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
     {
         // Front left
@@ -198,7 +205,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawBumpers(const VehicleModel& vehicleMod
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(Color::Blue, 127));
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(color, 127));
         geode->addDrawable(boundingPolygon);
     }
     {
@@ -208,7 +215,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawBumpers(const VehicleModel& vehicleMod
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(Color::Blue, 127));
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(color, 127));
         geode->addDrawable(boundingPolygon);
     }
     {
@@ -218,7 +225,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawBumpers(const VehicleModel& vehicleMod
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(Color::Blue, 127));
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(color, 127));
         geode->addDrawable(boundingPolygon);
     }
     {
@@ -228,7 +235,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawBumpers(const VehicleModel& vehicleMod
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(Color::Blue, 127));
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(color, 127));
         geode->addDrawable(boundingPolygon);
     }
     {
@@ -238,7 +245,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawBumpers(const VehicleModel& vehicleMod
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(Color::Blue, 127));
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(color, 127));
         geode->addDrawable(boundingPolygon);
     }
     {
@@ -248,7 +255,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawBumpers(const VehicleModel& vehicleMod
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, -vehicleModel._wheelRadius + 0.1));
         }
-        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(Color::Blue, 127));
+        osg::ref_ptr<osg::Geometry> boundingPolygon = ViewUtils::drawQuads(vertices, Color(color, 127));
         geode->addDrawable(boundingPolygon);
     }
     return geode;
@@ -324,5 +331,34 @@ osg::ref_ptr<osg::Geode> VehicleView::drawIngestibleRegions(const VehicleModel& 
                 -vehicleModel._wheelRadius + 0.1), M_PI, 0.05, Color(Color::Green, 127));
         geode->addDrawable(_tubeRegionArrow);
     }
+    return geode;
+}
+
+
+
+osg::ref_ptr<osg::Geode> VehicleView::drawInfo(const VehicleModel& vehicleModel, const std::string& fontFile)
+{
+    Color color = vehicleModel._alliance == "Blue" ? Color::Blue : Color::Red;
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+
+    // Draw stalk
+    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+    vertices->push_back(osg::Vec3(0, 0, 1));
+    vertices->push_back(osg::Vec3(0, 0, 2.75));
+    osg::ref_ptr<osg::Geometry> geom = ViewUtils::drawLines(vertices, color);
+    geode->addDrawable(geom);
+
+    // Draw text
+    osg::ref_ptr<osgText::Text> text = new osgText::Text;
+    text->setText("Player " + std::to_string(vehicleModel._player) + "\n" + vehicleModel._alliance + " Alliance");
+    text->setFont(fontFile);
+    text->setCharacterSize(0.2);
+    text->setAlignment(osgText::TextBase::CENTER_BOTTOM);
+    text->setAxisAlignment(osgText::TextBase::SCREEN);
+    text->setPosition({ 0, 0, 3 });
+    text->setColor(color);
+    text->setAutoRotateToScreen(true);
+    geode->addDrawable(text);
+
     return geode;
 }

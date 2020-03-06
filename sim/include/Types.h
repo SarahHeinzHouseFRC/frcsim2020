@@ -37,6 +37,7 @@ struct CoreCommands
     int tubeMotorSpeed;         // -512 - 512
     int timerStartStop;         // 0 or 1
     int reset;                  // 0 or 1
+    int outtake;                // 0 or 1
 
     /**
      * Default constructor
@@ -59,6 +60,7 @@ struct CoreCommands
         tubeMotorSpeed = std::stoi(json.substr(172, 4));
         timerStartStop = std::stoi(json.substr(196, 1));
         reset = std::stoi(json.substr(208, 1));
+        outtake = std::stoi(json.substr(222, 1));
     }
 
     void clear()

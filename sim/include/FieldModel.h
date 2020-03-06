@@ -9,6 +9,7 @@
 #include "ConfigReader.h"
 #include "Geometry.h"
 #include "BaseModel.h"
+#include "Types.h"
 
 
 class FieldModel : public BaseModel
@@ -25,6 +26,12 @@ public:
      * Updates the field to reflect the current time
      */
     void update(double currTimestamp);
+
+    /**
+     * Updates the field's internal parameters given new commands
+     * @param commands New commands
+     */
+    void processCommands(const CoreCommands& commands);
 
     /**
      * Returns the model type
@@ -44,7 +51,7 @@ public:
     /**
      * Returns the current score
      */
-    std::tuple<int, int> getScore() { return { _numBallsBlueGoal, _numBallsRedGoal }; }
+    std::tuple<int, int> getScore() { return { _blueScore, _redScore }; }
 
     /**
      * Resets the collision count
@@ -52,6 +59,7 @@ public:
     void reset() { _collisionCount = 0; _inCollision = false; }
 
 private:
+    int _prevOuttakeButtonState;
     double _currTimestamp;
     double _timeLastCollision;
     bool _inCollision;
@@ -60,8 +68,9 @@ private:
     std::vector<Geometry::Polygon2d> _interiorPolygons;
     Geometry::Polygon2d _blueGoal;
     Geometry::Polygon2d _redGoal;
-    int _numBallsBlueGoal;
-    int _numBallsRedGoal;
+    int _blueScore;
+    int _redScore;
+    bool _outtake; // Signals to physics engine to outtake a ball
 };
 
 

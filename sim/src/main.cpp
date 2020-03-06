@@ -96,6 +96,7 @@ int main(int argc, char** argv)
                     rxCommands.clear();
                 }
                 wm.vehicleModel().processCommands(rxCommands);
+                wm.fieldModel().processCommands(rxCommands);
             }
         }
     });

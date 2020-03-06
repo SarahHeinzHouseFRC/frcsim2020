@@ -174,7 +174,7 @@ The core logic performs whatever logic (PID, traction control, etc.) given the c
 vehicle's state from the sim and then construct new commands to send to the vehicle. The message sent to the vehicle has
 the following form:
 ```json
-{ 'leftDriveMotorSpeed': 0000, 'rightDriveMotorSpeed': 0000, 'intakeCenterMotorSpeed': 0000, 'intakeLeftMotorSpeed': 0000, 'intakeRightMotorSpeed': 0000, 'tubeMotorSpeed': 0000, 'timerStartStop': 0, 'reset': 0 }
+{ 'leftDriveMotorSpeed': 0000, 'rightDriveMotorSpeed': 0000, 'intakeCenterMotorSpeed': 0000, 'intakeLeftMotorSpeed': 0000, 'intakeRightMotorSpeed': 0000, 'tubeMotorSpeed': 0000, 'timerStartStop': 0, 'reset': 0, 'outtake': 0 }
 ```
 
 | Character(s)  | Description                     | Range      |
@@ -187,6 +187,7 @@ the following form:
 | 172-176       | Tube motor speed                | -512 - 512 |
 | 196-197       | Timer start/stop                | 0 or 1     |
 | 208-209       | Reset                           | 0 or 1     |
+| 222-223       | Outtake                         | 0 or 1     |
 
 ### Sim -> Core ###
 The vehicle continuously sends state information back to the controls logic. This message has the following form:

@@ -44,7 +44,8 @@ PhysicsEngine::PhysicsEngine(const FieldModel& fieldModel,
                              double timestamp) :
         _prevTimestamp(timestamp),
         _gravity(0.0f, 0.0f),
-        _muGamePiece(MU_GAME_PIECE)
+        _muGamePiece(MU_GAME_PIECE),
+        _outtaken(0)
 {
     _world = std::make_unique<b2World>(_gravity);
 
@@ -78,18 +79,27 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
     _vehicleBody->SetLinearVelocity(b2Vec2(vehicleModel._state.pose.vx, vehicleModel._state.pose.vy));
     _vehicleBody->SetAngularVelocity(vehicleModel._state.pose.omega);
 
-    // Manually apply friction to the game pieces
+    // Outtake one ball if field calls for it
+    if (fieldModel._outtake && !_blueGoalGamePieceBodies.empty())
     {
-        for (const auto& gamePieceBody : _gamePieceBodies)
+        // TODO: This framework is really starting to break down, should the physics engine really be handling this?
+        auto* gamePieceBody = _blueGoalGamePieceBodies.front();
+        gamePieceBody->SetTransform(b2Vec2(-37.25*0.0254, 314.96*0.0254), 0);
+        gamePieceBody->SetLinearVelocity({ 0, -1 });
+        _outtaken++;
+    }
+    fieldModel._outtake = false;
+
+    // Manually apply friction to the game pieces
+    for (const auto& gamePieceBody : _gamePieceBodies)
+    {
+        b2Vec2 velocity = gamePieceBody->GetLinearVelocity();
+        if (velocity.LengthSquared() > 0)
         {
-            b2Vec2 velocity = gamePieceBody->GetLinearVelocity();
-            if (velocity.LengthSquared() > 0)
-            {
-                b2Vec2 frictionForce = -velocity;
-                frictionForce.Normalize();
-                frictionForce *= _muGamePiece;
-                gamePieceBody->ApplyForceToCenter(frictionForce, true);
-            }
+            b2Vec2 frictionForce = -velocity;
+            frictionForce.Normalize();
+            frictionForce *= _muGamePiece;
+            gamePieceBody->ApplyForceToCenter(frictionForce, true);
         }
     }
 
@@ -171,8 +181,8 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
     _ingestibleLeftGamePieceBodies.clear();
     _ingestibleRightGamePieceBodies.clear();
     _tubeGamePieceBodies.clear();
-    int numBallsBlueGoal = 0;
-    int numBallsRedGoal = 0;
+    _blueGoalGamePieceBodies.clear();
+    _redGoalGamePieceBodies.clear();
     for (const auto& gamePieceBody : _gamePieceBodies)
     {
         b2Transform vehicleTf = _vehicleBody->GetTransform();
@@ -238,13 +248,13 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
         {
             model->_state.pose.z = 0.45;
             model->_state.ingestion = GamePieceModel::BLUE_LOW_GOAL;
-            numBallsBlueGoal++;
+            _blueGoalGamePieceBodies.push_back(gamePieceBody);
         }
         else if (inRedGoalRegion)
         {
             model->_state.pose.z = 0.45;
             model->_state.ingestion = GamePieceModel::RED_LOW_GOAL;
-            numBallsRedGoal++;
+            _redGoalGamePieceBodies.push_back(gamePieceBody);
         }
         else
         {
@@ -258,8 +268,8 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
         }
     }
 
-    fieldModel._numBallsBlueGoal = numBallsBlueGoal;
-    fieldModel._numBallsRedGoal = numBallsRedGoal;
+    fieldModel._blueScore = _blueGoalGamePieceBodies.size() + _outtaken;
+    fieldModel._redScore = _redGoalGamePieceBodies.size();
 
     _prevTimestamp = currTimestamp;
 }

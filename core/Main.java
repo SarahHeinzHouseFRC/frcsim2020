@@ -81,6 +81,7 @@ public class Main
             simAgent.commands.rightDriveMotorSpeed = rightDriveMotorSpeed;
             simAgent.commands.timerStartStop = joystickAgent.commands.start;
             simAgent.commands.reset = joystickAgent.commands.guide;
+            simAgent.commands.outtake = joystickAgent.commands.a;
 
             try
             {

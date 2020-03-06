@@ -114,10 +114,13 @@ private:
     std::vector<b2Body*> _ingestibleLeftGamePieceBodies; // Game pieces in the left ingestible region
     std::vector<b2Body*> _ingestibleRightGamePieceBodies; // Game pieces in the right ingestible region
     std::vector<b2Body*> _tubeGamePieceBodies; // Game pieces in the tube region
+    std::vector<b2Body*> _redGoalGamePieceBodies; // Game pieces in the red goal region
+    std::vector<b2Body*> _blueGoalGamePieceBodies; // Game pieces in the blue goal region
     int32 _velocityIterations;
     int32 _positionIterations;
     double _prevTimestamp;
     float _muGamePiece;
+    int _outtaken; // Count of how many balls have been outtaken (so we can calculate score)
 };
 
 

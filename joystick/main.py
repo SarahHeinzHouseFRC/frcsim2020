@@ -10,11 +10,14 @@ import yaml
 from virtual_xbox_controller import VirtualXboxController
 from physical_xbox_controller import PhysicalXboxController
 from PyQt4.QtGui import QApplication
+import signal
 
 CONFIG_FILE = "../config/robotConfig.yml"
 
 
 def main():
+    signal.signal(signal.SIGINT, signal.SIG_DFL)  # Need this so we can kill PyQt with Ctrl+C
+
     # Read command line args
     parser = argparse.ArgumentParser()
     parser.add_argument("controller_type", help='"virtual" for onscreen controller or "physical" for USB controller')

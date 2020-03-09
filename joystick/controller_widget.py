@@ -212,8 +212,8 @@ class JoystickWidget(QSvgWidget):
         x = r * math.cos(theta)
         y = r * math.sin(theta)
         self.move(x + self.x, y + self.y)
-        self.state.x = x * (512 / self.max_deflection)
-        self.state.y = -y * (512 / self.max_deflection)
+        self.state.x = int(x * (512 / self.max_deflection))
+        self.state.y = int(-y * (512 / self.max_deflection))
 
     def mouseReleaseEvent(self, event):
         self.move(self.x, self.y)

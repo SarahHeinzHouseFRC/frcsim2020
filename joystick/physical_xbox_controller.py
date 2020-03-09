@@ -50,16 +50,16 @@ class PhysicalXboxController:
             while True:
                 (left_joystick_x, left_joystick_y) = self.joystick.leftStick()
                 (right_joystick_x, right_joystick_y) = self.joystick.rightStick()
-                self.controller_state.left_joystick.x = left_joystick_x * 512
-                self.controller_state.left_joystick.y = left_joystick_y * 512
-                self.controller_state.right_joystick.x = right_joystick_x * 512
-                self.controller_state.right_joystick.y = right_joystick_y * 512
+                self.controller_state.left_joystick.x = int(left_joystick_x * 512)
+                self.controller_state.left_joystick.y = int(left_joystick_y * 512)
+                self.controller_state.right_joystick.x = int(right_joystick_x * 512)
+                self.controller_state.right_joystick.y = int(right_joystick_y * 512)
                 self.controller_state.dpad.up.pressed = self.joystick.dpadUp()
                 self.controller_state.dpad.down.pressed = self.joystick.dpadDown()
                 self.controller_state.dpad.left.pressed = self.joystick.dpadLeft()
                 self.controller_state.dpad.right.pressed = self.joystick.dpadRight()
-                self.controller_state.left_trigger.value = self.joystick.leftTrigger() * 512
-                self.controller_state.right_trigger.value = self.joystick.rightTrigger() * 512
+                self.controller_state.left_trigger.value = int(self.joystick.leftTrigger() * 512)
+                self.controller_state.right_trigger.value = int(self.joystick.rightTrigger() * 512)
                 self.controller_state.left_bumper.pressed = self.joystick.leftBumper()
                 self.controller_state.right_bumper.pressed = self.joystick.rightBumper()
                 self.controller_state.a.pressed = self.joystick.A()

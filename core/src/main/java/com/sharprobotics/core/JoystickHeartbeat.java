@@ -10,9 +10,5 @@ package com.sharprobotics.core;
  */
 public class JoystickHeartbeat
 {
-    public String toJson()
-    {
-        String msg = "{}";
-        return msg;
-    }
+
 }

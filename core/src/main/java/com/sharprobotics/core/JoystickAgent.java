@@ -6,6 +6,7 @@ package com.sharprobotics.core;
 
 import java.io.*;
 import java.net.*;
+import com.google.gson.*;
 import com.sharprobotics.io.UdpNode;
 
 
@@ -15,12 +16,14 @@ import com.sharprobotics.io.UdpNode;
  */
 public class JoystickAgent
 {
+    private Gson gson;
+    private UdpNode comms;
     public JoystickHeartbeat heartbeat;
     public JoystickCommands commands;
-    private UdpNode comms;
 
     public JoystickAgent(int rxPort, String txIp, int txPort)
     {
+        gson = new GsonBuilder().setPrettyPrinting().create();
         heartbeat = new JoystickHeartbeat();
         commands = new JoystickCommands();
         try
@@ -38,13 +41,13 @@ public class JoystickAgent
      */
     public void txHeartbeat()
     {
-        String msg = heartbeat.toJson();
+        String msg = gson.toJson(heartbeat);
 
         // Send string
         try
         {
             comms.send(msg);
-            // System.out.println("JoystickAgent: Transmit state " + msg);
+            // System.out.println("JoystickAgent: Received " + msg);
         }
         catch (IOException e)
         {
@@ -63,8 +66,8 @@ public class JoystickAgent
             String msg = comms.receive();
 
             // Parse received command from JSON to state
-            commands.fromJson(msg);
-            // System.out.println("JoystickAgent: Received " + msg);
+            commands = gson.fromJson(msg, JoystickCommands.class);
+            // System.out.println("JoystickAgent: Received " + gson.toJson(commands));
 
         }
         catch (IOException e)

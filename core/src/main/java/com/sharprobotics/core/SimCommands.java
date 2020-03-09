@@ -19,11 +19,4 @@ public class SimCommands
     public int timerStartStop; // Integer 0 or 1
     public int reset; // Integer 0 or 1
     public int outtake; // Integer 0 or 1
-
-    public String toJson()
-    {
-        String str = String.format("{ 'leftDriveMotorSpeed': %04d, 'rightDriveMotorSpeed': %04d, 'intakeCenterMotorSpeed': %04d, 'intakeLeftMotorSpeed': %04d, 'intakeRightMotorSpeed': %04d, 'tubeMotorSpeed': %04d, 'timerStartStop': %01d, 'reset': %01d, 'outtake': %01d }",
-                leftDriveMotorSpeed, rightDriveMotorSpeed, intakeCenterMotorSpeed, intakeLeftMotorSpeed, intakeRightMotorSpeed, tubeMotorSpeed, timerStartStop, reset, outtake);
-        return str;
-    }
 }

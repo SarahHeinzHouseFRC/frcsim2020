@@ -4,10 +4,11 @@
 
 package com.sharprobotics.core;
 
-
 import java.io.*;
 import java.net.*;
+import com.google.gson.*;
 import com.sharprobotics.io.UdpNode;
+
 
 /**
  * Comms agent responsible for communicating with the sim. Continuously sends commands to the sim to update the vehicle
@@ -15,12 +16,14 @@ import com.sharprobotics.io.UdpNode;
  */
 public class SimAgent
 {
+    private Gson gson;
     public SimCommands commands;
     public SimState state;
     private UdpNode comms;
 
     public SimAgent(int rxPort, String txIp, int txPort)
     {
+        gson = new GsonBuilder().setPrettyPrinting().create();
         state = new SimState();
         commands = new SimCommands();
         try
@@ -39,7 +42,7 @@ public class SimAgent
     public void txSimCommands()
     {
         // Translate commands to JSON
-        String msg = commands.toJson();
+        String msg = gson.toJson(commands);
 
         // Send string
         try
@@ -64,7 +67,7 @@ public class SimAgent
             String msg = comms.receive();
 
             // Parse received command from JSON to state
-            state.fromJson(msg);
+            state = gson.fromJson(msg, SimState.class);
             // System.out.println("SimAgent: Received " + msg);
         }
         catch (IOException e)

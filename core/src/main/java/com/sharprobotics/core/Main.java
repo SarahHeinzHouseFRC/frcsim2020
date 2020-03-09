@@ -39,7 +39,7 @@ public class Main
         System.out.println("Core: Launched player " + player);
 
         int prevBackButtonState = 0;
-        Boolean isTwoHandDrive = true;
+        boolean isTwoHandDrive = true;
 
         while (true)
         {
@@ -74,13 +74,13 @@ public class Main
             int rightDriveMotorSpeed = 0;
             if (isTwoHandDrive)
             {
-                leftDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick + joystickAgent.commands.xRightJoystick/2, -512, 512);
-                rightDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick - joystickAgent.commands.xRightJoystick/2, -512, 512);
+                leftDriveMotorSpeed = wrap(joystickAgent.commands.leftJoystick[1] + joystickAgent.commands.rightJoystick[0]/2, -512, 512);
+                rightDriveMotorSpeed = wrap(joystickAgent.commands.leftJoystick[1] - joystickAgent.commands.rightJoystick[0]/2, -512, 512);
             }
             else
             {
-                leftDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick + joystickAgent.commands.xLeftJoystick/2, -512, 512);
-                rightDriveMotorSpeed = wrap(joystickAgent.commands.yLeftJoystick - joystickAgent.commands.xLeftJoystick/2, -512, 512);
+                leftDriveMotorSpeed = wrap(joystickAgent.commands.leftJoystick[1] + joystickAgent.commands.leftJoystick[0]/2, -512, 512);
+                rightDriveMotorSpeed = wrap(joystickAgent.commands.leftJoystick[1] - joystickAgent.commands.leftJoystick[0]/2, -512, 512);
             }
 
             simAgent.commands.intakeCenterMotorSpeed = intakeMotorSpeed;
@@ -97,7 +97,7 @@ public class Main
             {
                 Thread.sleep(10);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
 
             }

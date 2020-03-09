@@ -6,22 +6,43 @@
 #define ROBOT_SIM_TYPES_H
 
 #include <string>
+#include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
 
 
 struct SensorState
 {
-    int leftDriveEncoderPosition; // 0-1023
-    int rightDriveEncoderPosition; // 0-1023
-    int elevatorEncoderPosition; // 0-1023
+    int leftDriveEncoder;  // 0-1023
+    int rightDriveEncoder; // 0-1023
+    int elevatorEncoder;   // 0-1023
 
     /**
-     * Returns this state's information in JSON form
+     * Returns the sensor state as a JSON string
      */
-    std::string asJson()
+    std::string toJson()
     {
-        char tmp[1024];
-        sprintf(tmp, "{ 'leftDriveEncoder': %04d, 'rightDriveEncoder': %04d, 'elevatorEncoder': %04d }", leftDriveEncoderPosition, rightDriveEncoderPosition, elevatorEncoderPosition);
-        return tmp;
+        const char msg[] = R"({ "leftDriveEncoder": 0, "rightDriveEncoder": 0, "elevatorEncoder": 0 })";
+        rapidjson::Document d;
+        d.Parse(msg);
+        d["leftDriveEncoder"] = leftDriveEncoder;
+        d["rightDriveEncoder"] = rightDriveEncoder;
+        d["elevatorEncoder"] = elevatorEncoder;
+
+        rapidjson::StringBuffer sb;
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+        d.Accept(writer);
+        return sb.GetString();
+    }
+
+    /**
+     * Resets all fields to default values
+     */
+    void clear()
+    {
+        leftDriveEncoder = 0;
+        rightDriveEncoder = 0;
+        elevatorEncoder = 0;
     }
 };
 
@@ -50,19 +71,23 @@ struct CoreCommands
     /**
      * Constructor from JSON string
      */
-    explicit CoreCommands(const std::string& json)
+    void fromJson(const std::string& json)
     {
-        leftDriveMotorSpeed = std::stoi(json.substr(25, 4));
-        rightDriveMotorSpeed = std::stoi(json.substr(55, 4));
-        intakeCenterMotorSpeed = std::stoi(json.substr(87, 4));
-        intakeLeftMotorSpeed = std::stoi(json.substr(117, 4));
-        intakeRightMotorSpeed = std::stoi(json.substr(148, 4));
-        tubeMotorSpeed = std::stoi(json.substr(172, 4));
-        timerStartStop = std::stoi(json.substr(196, 1));
-        reset = std::stoi(json.substr(208, 1));
-        outtake = std::stoi(json.substr(222, 1));
+        rapidjson::Document d;
+        d.Parse(json.c_str());
+        leftDriveMotorSpeed    = d["leftDriveMotorSpeed"].GetInt();
+        rightDriveMotorSpeed   = d["rightDriveMotorSpeed"].GetInt();
+        intakeCenterMotorSpeed = d["intakeCenterMotorSpeed"].GetInt();
+        intakeLeftMotorSpeed   = d["intakeLeftMotorSpeed"].GetInt();
+        intakeRightMotorSpeed  = d["intakeRightMotorSpeed"].GetInt();
+        tubeMotorSpeed         = d["tubeMotorSpeed"].GetInt();
+        timerStartStop         = d["timerStartStop"].GetInt();
+        reset                  = d["reset"].GetInt();
     }
 
+    /**
+     * Resets all fields to default values
+     */
     void clear()
     {
         leftDriveMotorSpeed = 0;

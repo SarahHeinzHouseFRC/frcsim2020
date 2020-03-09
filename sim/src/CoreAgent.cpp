@@ -17,7 +17,12 @@ CoreAgent::CoreAgent(const ConfigReader& config) :
 void CoreAgent::txSensorState()
 {
     // Transmit state
-    std::string msg = _sensorState.asJson();
+    std::string msg = _sensorState.toJson();
+
+    if (_verbose)
+    {
+        printf("CoreAgent: Sent %s\n", msg.c_str());
+    }
 
     _comms->send(msg);
 }
@@ -26,6 +31,7 @@ void CoreAgent::txSensorState()
 
 bool CoreAgent::rxCoreCommands()
 {
+    _coreCommands.clear();
     std::string msg = _comms->receive();
     if (msg.length() > 0 && msg[0] == '{')
     {
@@ -35,7 +41,7 @@ bool CoreAgent::rxCoreCommands()
         }
 
         // Translate received commands from JSON and store into _coreCommands
-        _coreCommands = CoreCommands(msg);
+        _coreCommands.fromJson(msg);
 
         // Reset dropped packets count
         _numDroppedPackets = 0;

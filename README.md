@@ -44,18 +44,18 @@ install, run:
 ```sh
 sudo apt install python-pip
 pip install PyYAML
-sudo apt install python-qt4 # Needed for virtual controller
-sudo apt install xboxdrv # Needed for physical controller
+sudo apt install python-qt4 # Can skip this if only running virtual controller
+sudo apt install xboxdrv    # Can skip this if only running physical controller
 ```
 To launch the virtual controller, run:
 ```sh
 cd joystick/
-python main.py virtual
+python main.py virtual --player $N # Replace $N with a number 1-6
 ```
 To launch with a physical controller, plug in the controller to a USB port and run:
 ```sh
 cd joystick/
-sudo python main.py physical # Sudo is an unfortunate side effect of xboxdrv, hopefully remove this soon
+sudo python main.py physical --player $N # Sudo is an unfortunate side effect of xboxdrv, hopefully remove this soon
 ```
 Unfortunately, the Xbox controller library currently used in this application requires sudo permissions to launch. This
 will hopefully be fixed soon by using the xbox360controller Python package instead, which supports more controllers,
@@ -67,15 +67,14 @@ python main.py virtual --help
 ```
 
 ### Core ###
-JDK is required to compile the core. To install it, run
+JDK and Gradle are required to compile the core. To install them, run
 ```sh
-sudo apt install default-jdk
+sudo apt install openjdk-8-jdk-headless
 ```
 To compile and run the core, run:
 ```sh
 cd core/
-javac *.java
-java Main
+./gradlew run --args='--player $N' # Replace $N with a number 1-6
 ```
 
 ### Sim ###
@@ -113,6 +112,10 @@ Because the CAD models for the robot and field are large and can slow down the l
 the visualization, you can optionally launch the simulator with a lightweight visualization using:
 ```sh
 ./robot_sim --debug-view
+```
+To launch with more players, use:
+```sh
+./robot_sim --players $N # Replace $N with a number 1-6
 ```
 To see all options available in the sim, use:
 ```sh

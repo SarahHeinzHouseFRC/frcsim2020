@@ -2,6 +2,9 @@
  * Copyright (c) 2020 Team 3260
  */
 
+package com.sharprobotics.core;
+
+
 /**
  * Background thread for handling rx/tx with the joystick and sim
  */

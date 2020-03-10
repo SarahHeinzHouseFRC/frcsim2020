@@ -69,7 +69,7 @@ struct CoreCommands
     };
 
     /**
-     * Constructor from JSON string
+     * Deserialization from JSON string
      */
     void fromJson(const std::string& json)
     {
@@ -100,6 +100,107 @@ struct CoreCommands
         timerStartStop = 0;
         reset = 0;
         outtake = 0;
+    }
+};
+
+
+
+struct SimState
+{
+    struct VehicleState
+    {
+        int player;           // 1-6
+        std::string team;     // Team number
+        std::string alliance; // "Blue" or "Red"
+        float x;              // Meters
+        float y;              // Meters
+        float theta;          // Radians
+    };
+
+    struct GamePieceState
+    {
+        float x; // Meters
+        float y; // Meters
+        float z; // Meters
+    };
+
+    int blueScore;
+    int redScore;
+    bool isTimerRunning;
+    double timer;
+    std::vector<VehicleState> vehicles;
+    std::vector<GamePieceState> gamePieces;
+
+    /**
+     * Default constructor
+     */
+    SimState()
+    {
+        clear();
+    };
+
+    /**
+     * Serialization to JSON string
+     */
+    std::string toJson()
+    {
+        rapidjson::StringBuffer s;
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+
+        writer.StartObject();
+        writer.Key("blueScore");
+        writer.Int(blueScore);
+        writer.Key("redScore");
+        writer.Int(redScore);
+        writer.Key("isTimerRunning");
+        writer.Bool(isTimerRunning);
+        writer.Key("timer");
+        writer.Double(timer);
+        writer.Key("vehicles");
+        writer.StartArray();
+        for (const auto& v : vehicles)
+        {
+            writer.StartObject();
+            writer.Key("player");
+            writer.Int(v.player);
+            writer.Key("team");
+            writer.String(v.team.c_str());
+            writer.Key("alliance");
+            writer.String(v.alliance.c_str());
+            writer.Key("x");
+            writer.Double(v.x);
+            writer.Key("y");
+            writer.Double(v.y);
+            writer.Key("theta");
+            writer.Double(v.theta);
+            writer.EndObject();
+        }
+        writer.EndArray();
+        writer.Key("gamePieces");
+        writer.StartArray();
+        for (const auto& g : gamePieces)
+        {
+            writer.StartObject();
+            writer.Key("x");
+            writer.Double(g.x);
+            writer.Key("y");
+            writer.Double(g.y);
+            writer.Key("z");
+            writer.Double(g.z);
+            writer.EndObject();
+        }
+        writer.EndArray();
+        writer.EndObject();
+        return s.GetString();
+    }
+
+    /**
+     * Resets all fields to default values
+     */
+    void clear()
+    {
+        vehicles.clear();
+        gamePieces.clear();
     }
 };
 

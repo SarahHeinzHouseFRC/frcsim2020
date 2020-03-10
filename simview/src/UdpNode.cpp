@@ -4,7 +4,7 @@
 
 #include "UdpNode.h"
 
-#define MAXLINE 1024
+#define MAXLINE 4096
 
 
 UdpNode::UdpNode(uint16_t rxPort, const std::string& txIp, uint16_t txPort) : _rxAddr{0}, _txAddr{0}
@@ -32,7 +32,7 @@ UdpNode::UdpNode(uint16_t rxPort, const std::string& txIp, uint16_t txPort) : _r
     if (bind(_sockfd, (const struct sockaddr *)&_rxAddr,
     sizeof(_rxAddr)) < 0)
     {
-        printf("UdpNode: Bind failed on port %d\n", rxPort);
+        perror("UdpNode: Bind failed");
         exit(EXIT_FAILURE);
     }
 }

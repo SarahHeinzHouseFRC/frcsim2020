@@ -8,12 +8,13 @@ joystick:
 core:
   ip: "127.0.0.1"                                        # IP address where core is running
   joystickPort: 4000                                     # Port where joystick should send its commands
-  vehiclePort: 6000                                      # Port where vehicle should send its state
+  simPort: 6000                                          # Port where sim should send its state
 
 sim:
   comms:
     ip: "127.0.0.1"                                      # IP address where sim is running
-    port: 8000                                           # Port where vehicle should send its commands
+    corePort: 8000                                       # Port where core should send its commands
+    simViewPort: 10000                                   # Port where simView should send its state
   assets:
     fieldModelFile: "/data/models/field2020.wrl"         # Path to 3D WRL model of the field
     vehicleModelFile: "/data/models/vehicle2020.wrl"     # Path to 3D WRL model of the vehicle
@@ -127,3 +128,7 @@ sim:
       - { x: -133.86, y: -0.0 }
       - { x: -133.86, y: -35.83 }
       - { x: -133.86, y: -72.05 }
+
+simView:
+  ip: "127.0.0.1"                                        # IP address where joystick is running
+  port: 12000                                            # Port where sim should send its status

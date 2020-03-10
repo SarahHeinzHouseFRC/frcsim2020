@@ -3,13 +3,17 @@
  */
 
 #include <string>
+#include <ConfigReader.h>
 #include "CoreAgent.h"
 
 
 CoreAgent::CoreAgent(const ConfigReader& config) :
         _sensorState{0}, _coreCommands{}, _numDroppedPackets(0), _verbose(config.verbose)
 {
-    _comms = std::make_unique<UdpNode>(config.sim.comms.port, config.core.ip, config.core.vehiclePort);
+    _comms = std::make_unique<UdpNode>(config.sim.comms.corePort, config.core.ip, config.core.simPort);
+
+    std::cout << "Rx from core at 127.0.0.1:" << config.sim.comms.corePort << std::endl;
+    std::cout << "Tx to core at " << config.core.ip << ":" << config.core.simPort << std::endl;
 }
 
 

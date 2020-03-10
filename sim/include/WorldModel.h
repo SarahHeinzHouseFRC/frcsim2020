@@ -11,6 +11,7 @@
 #include "VehicleModel.h"
 #include "GamePieceModel.h"
 #include "PhysicsEngine.h"
+#include "Types.h"
 
 
 class WorldModel
@@ -31,6 +32,11 @@ public:
      * Resets the field
      */
     void reset();
+
+    /**
+     * Returns the world state of the sim
+     */
+    SimState getSimState();
 
     /**
      * Getter for vehicle model

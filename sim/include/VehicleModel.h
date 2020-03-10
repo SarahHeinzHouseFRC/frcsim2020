@@ -20,6 +20,7 @@ class VehicleModel : public BaseModel
 friend class VehicleView;
 friend class Hud;
 friend class PhysicsEngine;
+friend class WorldModel;
 public:
     /**
      * Default constructor

@@ -14,11 +14,12 @@ For details on each of the three components included, please see the specific do
   - [Sim](sim/README.md)
 
 ```
-      +----------------+      Commands      +----------------+     Commands       +----------------+
-      |                | -----------------> |                | -----------------> |                |
-      |   Joystick     |                    |      Core      |                    |     Vehicle    |
-      |                | <----------------- |                | <----------------- |                |
-      +----------------+     Heartbeat      +----------------+       State        +----------------+
+                     2000             4000             6000             8000             10000           12000
+      +----------------+    Commands    +----------------+   Commands     +----------------+     State      +----------------+
+      |                | -------------> |                | -------------> |                | -------------> |                |
+      |   Joystick     |                |      Core      |                |   Vehicle Sim  |                |    Sim View    |
+      |                | <------------- |                | <------------- |                | <------------- |                |
+      +----------------+    Heartbeat   +----------------+     State      +----------------+   Heartbeat    +----------------+
 ```
 
 
@@ -32,7 +33,7 @@ For details on each of the three components included, please see the specific do
   - [x] Realistic 2.5D physics built on top of the popular [Box2D](https://box2d.org/) physics library.
   - [x] Match timer and reset functionality of field and robot for practicing matches/driver tryouts.
   - [ ] Support for Xbox One, PS4, and other controllers.
-  - [ ] Support for up to 6 simultaneous robots.
+  - [x] Support for up to 6 simultaneous robots.
   - [ ] Log replay and mode to play against your own phantom.
   - [ ] Move to a 3D physics engine (NVIDIA PhysX or ODE).
 
@@ -201,5 +202,28 @@ The vehicle continuously sends state information back to the controls logic. Thi
     "leftDriveEncoder": 0,  // Left drive encoder ticks (0 - 1024)
     "rightDriveEncoder": 0, // Right drive encoder ticks (0 - 1024)
     "elevatorEncoder": 0    // Elevator encoder ticks (0 - 1024)
+}
+```
+
+### Sim -> Sim View ###
+```json5
+{
+    "vehicles": [
+        {
+            "player": 1,        // 1-6
+            "team": "3260",
+            "alliance": "Blue", // "Blue" or "Red"
+            "x": 0,             // Meters
+            "y": 0,             // Meters
+            "theta": 0          // Radians (not wrapped)
+        }
+    ],
+    "gamePieces": [
+        {
+            "x": 0, // Meters
+            "y": 0, // Meters
+            "z": 0  // Meters
+        }
+    ]
 }
 ```

@@ -12,6 +12,7 @@
 #include "Time.h"
 #include "Timer.h"
 #include "CoreAgent.h"
+#include "SimViewAgent.h"
 #include "WorldModel.h"
 
 #define DEFAULT_CONFIG_FILE "../../config/robotConfig.yml"
@@ -61,14 +62,15 @@ int main(int argc, char** argv)
     // Initialize a timer to countdown 2m 15s
     Timer timer(t, 135);
 
-    // Initialize comms with core
+    // Initialize comms with core and simviews
     std::vector<CoreAgent> coreAgents;
     for (int i=0; i<numPlayers; i++)
     {
-        config.sim.comms.port = 8000 + 10*i;
-        config.core.vehiclePort = 6000 + 10*i;
+        config.sim.comms.corePort = 8000 + 10*i;
+        config.core.simPort = 6000 + 10*i;
         coreAgents.emplace_back(config);
     }
+    SimViewAgent simViewAgent(config);
 
     // Visualize vehicle and field
     Scene scene(config, wm);
@@ -126,6 +128,13 @@ int main(int argc, char** argv)
                 coreAgent.setSensorState(wm.vehicleModel(i).getSensorState());
                 coreAgent.txSensorState();
             }
+
+            SimState s = wm.getSimState();
+            s.isTimerRunning = timer.isRunning();
+            s.timer = timer.getValue();
+            simViewAgent.setSimState(s);
+            simViewAgent.txSimState();
+
             usleep(1e4);
         }
     });

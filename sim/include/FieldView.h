@@ -39,6 +39,11 @@ private:
      */
     osg::ref_ptr<osg::Geode> drawGoals(const FieldModel& fieldModel);
 
+    /**
+     * Draws the outtakes as red and blue squares on the field walls
+     */
+    osg::ref_ptr<osg::Geode> drawOuttakes(const FieldModel& fieldModel);
+
 private:
     osg::ref_ptr<osg::Node> _fieldNode;
     osg::ref_ptr<osg::Geode> _fieldBounds;

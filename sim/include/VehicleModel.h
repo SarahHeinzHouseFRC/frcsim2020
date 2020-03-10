@@ -101,6 +101,8 @@ private:
     double _drivetrainWidth; // Needed to calculate turning radius
     double _mass; // Needed to calculate density for collision checker
     double _prevTimestamp; // Needed to calculate how much time has passed since last update()
+    bool _outtake; // Whether or not this vehicle has requested the field to outtake
+    bool _prevOuttakeButtonState; // Whether or not the controller was previously requesting an outtake
 
     struct
     {

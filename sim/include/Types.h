@@ -83,6 +83,7 @@ struct CoreCommands
         tubeMotorSpeed         = d["tubeMotorSpeed"].GetInt();
         timerStartStop         = d["timerStartStop"].GetInt();
         reset                  = d["reset"].GetInt();
+        outtake                = d["outtake"].GetInt();
     }
 
     /**
@@ -98,6 +99,7 @@ struct CoreCommands
         tubeMotorSpeed = 0;
         timerStartStop = 0;
         reset = 0;
+        outtake = 0;
     }
 };
 

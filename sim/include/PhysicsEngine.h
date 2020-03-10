@@ -129,7 +129,8 @@ private:
     int32 _positionIterations;
     double _prevTimestamp;
     float _muGamePiece;
-    int _outtaken; // Count of how many balls have been outtaken (so we can calculate score)
+    int _blueOuttaken; // Count of how many balls have been outtaken from blue goal (so we can calculate score)
+    int _redOuttaken; // Count of how many balls have been outtaken from red goal (so we can calculate score)
 };
 
 

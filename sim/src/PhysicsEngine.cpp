@@ -45,7 +45,8 @@ PhysicsEngine::PhysicsEngine(const FieldModel& fieldModel,
         _prevTimestamp(timestamp),
         _gravity(0.0f, 0.0f),
         _muGamePiece(MU_GAME_PIECE),
-        _outtaken(0)
+        _blueOuttaken(0),
+        _redOuttaken(0)
 {
     _world = std::make_unique<b2World>(_gravity);
 
@@ -85,16 +86,29 @@ void PhysicsEngine::update(FieldModel& fieldModel, std::vector<VehicleModel>& ve
         _vehiclePhysicsModels.at(i).body->SetAngularVelocity(vehicleModels.at(i)._state.pose.omega);
     }
 
-    // Outtake one ball if field calls for it
-    if (fieldModel._outtake && !_blueGoalGamePieceBodies.empty())
+    // Outtake balls if the vehicles call for it
+    for (auto& vehicleModel : vehicleModels)
     {
         // TODO: This framework is really starting to break down, should the physics engine really be handling this?
-        auto* gamePieceBody = _blueGoalGamePieceBodies.front();
-        gamePieceBody->SetTransform(b2Vec2(-37.25*0.0254, 314.96*0.0254), 0);
-        gamePieceBody->SetLinearVelocity({ 0, -1 });
-        _outtaken++;
+        if (vehicleModel._outtake)
+        {
+            if (vehicleModel._alliance == "Blue" && !_blueGoalGamePieceBodies.empty())
+            {
+                auto* gamePieceBody = _blueGoalGamePieceBodies.front();
+                gamePieceBody->SetTransform(b2Vec2(fieldModel._blueOuttake.x, fieldModel._blueOuttake.y), 0);
+                gamePieceBody->SetLinearVelocity({ 0, -1 });
+                _blueOuttaken++;
+            }
+            if (vehicleModel._alliance == "Red" && !_redGoalGamePieceBodies.empty())
+            {
+                auto* gamePieceBody = _redGoalGamePieceBodies.front();
+                gamePieceBody->SetTransform(b2Vec2(fieldModel._redOuttake.x, fieldModel._redOuttake.y), 0);
+                gamePieceBody->SetLinearVelocity({ 0, 1 });
+                _redOuttaken++;
+            }
+            vehicleModel._outtake = false;
+        }
     }
-    fieldModel._outtake = false;
 
     // Manually apply friction to the game pieces
     for (const auto& gamePieceBody : _gamePieceBodies)
@@ -327,8 +341,8 @@ void PhysicsEngine::update(FieldModel& fieldModel, std::vector<VehicleModel>& ve
         }
     }
 
-    fieldModel._blueScore = _blueGoalGamePieceBodies.size() + _outtaken;
-    fieldModel._redScore = _redGoalGamePieceBodies.size();
+    fieldModel._blueScore = _blueGoalGamePieceBodies.size() + _blueOuttaken;
+    fieldModel._redScore = _redGoalGamePieceBodies.size() + _redOuttaken;
 
     _prevTimestamp = currTimestamp;
 }

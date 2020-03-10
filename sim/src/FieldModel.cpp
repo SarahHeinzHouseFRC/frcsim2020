@@ -17,7 +17,8 @@ FieldModel::FieldModel(const ConfigReader& config, double startTimestamp) :
         _blueScore(0),
         _redScore(0),
         _prevOuttakeButtonState(0),
-        _outtake(false)
+        _blueOuttake(-61.00*0.0254, 314.96*0.0254),
+        _redOuttake(61.00*0.0254, -314.96*0.0254)
 {
     // Exterior polygon
     _exteriorPolygon = Polygon2d(config.sim.field.exteriorPolygon);
@@ -37,20 +38,6 @@ FieldModel::FieldModel(const ConfigReader& config, double startTimestamp) :
 void FieldModel::update(double currTimestamp)
 {
     _currTimestamp = currTimestamp;
-}
-
-
-
-void FieldModel::processCommands(const CoreCommands& commands)
-{
-    // Outtake a ball when outtake button switches from low to high
-    int currOuttakeButtonState = commands.outtake;
-    if (currOuttakeButtonState && !_prevOuttakeButtonState)
-    {
-        _outtake = true;
-    }
-
-    _prevOuttakeButtonState = currOuttakeButtonState;
 }
 
 

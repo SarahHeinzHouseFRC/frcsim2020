@@ -20,6 +20,9 @@ FieldView::FieldView(const ConfigReader& config, const FieldModel& fieldModel)
 
         osg::ref_ptr<osg::Geode> goalRegion = drawGoals(fieldModel);
         addChild(goalRegion);
+
+        osg::ref_ptr<osg::Geode> outtakes = drawOuttakes(fieldModel);
+        addChild(outtakes);
     }
     else
     {
@@ -139,6 +142,33 @@ osg::ref_ptr<osg::Geode> FieldView::drawGoals(const FieldModel& fieldModel)
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, 0.1));
         }
+        osg::ref_ptr<osg::Geometry> geom = ViewUtils::drawLineLoop(vertices, Color::Red);
+        geode->addDrawable(geom);
+    }
+
+    return geode;
+}
+
+
+
+osg::ref_ptr<osg::Geode> FieldView::drawOuttakes(const FieldModel& fieldModel)
+{
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+    {
+        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+        vertices->push_back(osg::Vec3(fieldModel._blueOuttake.x - 0.1, fieldModel._blueOuttake.y - 0.01, 0));
+        vertices->push_back(osg::Vec3(fieldModel._blueOuttake.x + 0.1, fieldModel._blueOuttake.y - 0.01, 0));
+        vertices->push_back(osg::Vec3(fieldModel._blueOuttake.x + 0.1, fieldModel._blueOuttake.y - 0.01, 0.2));
+        vertices->push_back(osg::Vec3(fieldModel._blueOuttake.x - 0.1, fieldModel._blueOuttake.y - 0.01, 0.2));
+        osg::ref_ptr<osg::Geometry> geom = ViewUtils::drawLineLoop(vertices, Color::Blue);
+        geode->addDrawable(geom);
+    }
+    {
+        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+        vertices->push_back(osg::Vec3(fieldModel._redOuttake.x - 0.1, fieldModel._redOuttake.y + 0.01, 0));
+        vertices->push_back(osg::Vec3(fieldModel._redOuttake.x + 0.1, fieldModel._redOuttake.y + 0.01, 0));
+        vertices->push_back(osg::Vec3(fieldModel._redOuttake.x + 0.1, fieldModel._redOuttake.y + 0.01, 0.2));
+        vertices->push_back(osg::Vec3(fieldModel._redOuttake.x - 0.1, fieldModel._redOuttake.y + 0.01, 0.2));
         osg::ref_ptr<osg::Geometry> geom = ViewUtils::drawLineLoop(vertices, Color::Red);
         geode->addDrawable(geom);
     }

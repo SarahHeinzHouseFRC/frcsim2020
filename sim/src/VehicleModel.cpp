@@ -22,7 +22,9 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp, in
         _wheelRadius(config.sim.vehicle.drivetrain.wheelRadius),
         _drivetrainWidth(config.sim.vehicle.drivetrain.width),
         _wheelTrack(config.sim.vehicle.drivetrain.wheelTrack),
-        _mass(config.sim.vehicle.mass)
+        _mass(config.sim.vehicle.mass),
+        _outtake(false),
+        _prevOuttakeButtonState(false)
 {
     // Set initial state
     _initialState = { config.sim.vehicle.initialState.x, config.sim.vehicle.initialState.y, config.sim.vehicle.initialState.theta };
@@ -107,6 +109,15 @@ void VehicleModel::processCommands(const CoreCommands& commands)
     _state.intakeLeftMotorSpeed = (commands.intakeLeftMotorSpeed / 512.0) * _intakeLeftMotorMaxSpeed;
     _state.intakeRightMotorSpeed = (commands.intakeRightMotorSpeed / 512.0) * _intakeRightMotorMaxSpeed;
     _state.tubeMotorSpeed = (commands.tubeMotorSpeed / 512.0) * _tubeMotorMaxSpeed;
+
+    // Request the world to outtake a ball when outtake button switches from high to low
+    int currOuttakeButtonState = commands.outtake;
+    if (currOuttakeButtonState && !_prevOuttakeButtonState)
+    {
+        _outtake = true;
+    }
+
+    _prevOuttakeButtonState = currOuttakeButtonState;
 }
 
 

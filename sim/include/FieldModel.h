@@ -28,12 +28,6 @@ public:
     void update(double currTimestamp);
 
     /**
-     * Updates the field's internal parameters given new commands
-     * @param commands New commands
-     */
-    void processCommands(const CoreCommands& commands);
-
-    /**
      * Returns the model type
      */
     virtual ModelType modelType() { return FIELD_MODEL; }
@@ -68,9 +62,10 @@ private:
     std::vector<Geometry::Polygon2d> _interiorPolygons;
     Geometry::Polygon2d _blueGoal;
     Geometry::Polygon2d _redGoal;
+    Geometry::Vertex2d _blueOuttake;
+    Geometry::Vertex2d _redOuttake;
     int _blueScore;
     int _redScore;
-    bool _outtake; // Signals to physics engine to outtake a ball
 };
 
 

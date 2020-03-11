@@ -5,7 +5,7 @@
 #ifndef ROBOT_SIM_PHYSICSENGINE_H
 #define ROBOT_SIM_PHYSICSENGINE_H
 
-#include "box2d/box2d.h"
+#include "Box2D/Box2D.h"
 #include "FieldModel.h"
 #include "VehicleModel.h"
 #include "GamePieceModel.h"

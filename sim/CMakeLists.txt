@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 3.0)
 project(robot_sim)
 
 find_package(OpenSceneGraph REQUIRED COMPONENTS osgViewer osgDB osgGA osgText)
-
-add_subdirectory(lib/box2d)
+find_package(Box2D)
 
 include_directories(
         include
         ${OPENSCENEGRAPH_INCLUDE_DIRS}
+        ${BOX2D_INCLUDE_DIR}
         /usr/include/rapidjson
 )
 
@@ -38,7 +38,7 @@ add_executable(robot_sim ${SRCS})
 
 target_link_libraries(robot_sim
         ${OPENSCENEGRAPH_LIBRARIES}
+        ${BOX2D_LIBRARY}
         yaml-cpp
         pthread
-        box2d
 )

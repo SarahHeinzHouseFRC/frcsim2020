@@ -80,7 +80,7 @@ cd core/
 ### Sim ###
 To install the dependencies for the sim, run:
 ```sh
-sudo apt install cmake libopenscenegraph-3.4-dev libyaml-cpp-dev rapidjson-dev
+sudo apt install cmake libopenscenegraph-3.4-dev libyaml-cpp-dev rapidjson-dev libbox2d-dev
 ```
 To download the (optional) visual assets, download each from here:
   - [Field 3D model](https://www.dropbox.com/s/1p1i1cbpkj8jp9x/field2020.wrl?dl=0)

@@ -23,6 +23,7 @@ int main(int argc, char** argv)
     ArgumentParser args(argc, argv);
     std::string configPath = (args.contains("--config") ? args.getValue("--config") : DEFAULT_CONFIG_FILE);
     bool verbose = args.contains("--verbose") || args.contains("-v");
+    bool headless = args.contains("--headless");
     bool debugView = args.contains("--debug-view");
     int numPlayers = args.contains("--players") ? std::stoi(args.getValue("--players")) : 1;
     if (args.contains("--help") || args.contains("-h"))
@@ -33,6 +34,7 @@ int main(int argc, char** argv)
                      "  -h, --help               Show this help message and exit\n"
                      "  --config <config_file>   Use the given config file instead of the default\n"
                      "  --debug-view             Launch with a lightweight view\n"
+                     "  --headless               Launch without visualization\n"
                      "  --players <num>          Number of players (1-6)\n"
                      "  --verbose                Increase output verbosity\n";
         return 0;
@@ -73,7 +75,7 @@ int main(int argc, char** argv)
     Hud hud(config);
 
     // Visualize the scene
-    Visualizer vis(scene, hud);
+    Visualizer vis(scene, hud, headless);
 
     // Launch rx comms in background thread
     bool reset = false;
@@ -132,6 +134,8 @@ int main(int argc, char** argv)
     {
         while (!vis.done())
         {
+            if (headless) { break; }
+
             // Update the vehicle and field visualizations based on their models
             scene.update(wm);
 

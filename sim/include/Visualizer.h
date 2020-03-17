@@ -20,7 +20,7 @@ public:
     /**
      * Constructor
      */
-    Visualizer(Scene& scene, Hud& hud);
+    Visualizer(Scene& scene, Hud& hud, bool headless=false);
 
     /**
      * Steps the visualizer forward

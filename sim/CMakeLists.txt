@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(robot_sim)
+project(sim)
 
 find_package(OpenSceneGraph REQUIRED COMPONENTS osgViewer osgDB osgGA osgText)
 find_package(Box2D)
@@ -11,8 +11,8 @@ include_directories(
         /usr/include/rapidjson
 )
 
-set(SRCS
-        src/main.cpp
+set(SIM_SRCS
+        src/mainSim.cpp
         src/WorldModel.cpp
         src/FieldModel.cpp
         src/VehicleModel.cpp
@@ -33,13 +33,39 @@ set(SRCS
         src/PhysicsEngine.cpp
         src/Geometry.cpp
         src/ArgumentParser.cpp
-        )
+)
 
-add_executable(robot_sim ${SRCS})
+add_executable(sim ${SIM_SRCS})
 
-target_link_libraries(robot_sim
+target_link_libraries(sim
         ${OPENSCENEGRAPH_LIBRARIES}
         ${BOX2D_LIBRARY}
+        yaml-cpp
+        pthread
+)
+
+set(SIM_VIEW_SRCS
+        src/mainSimView.cpp
+        src/FieldView.cpp
+        src/VehicleView.cpp
+        src/GamePieceView.cpp
+        src/ViewUtils.cpp
+        src/SimAgent.cpp
+        src/ConfigReader.cpp
+        src/Scene.cpp
+        src/Hud.cpp
+        src/HudElement.cpp
+        src/Visualizer.cpp
+        src/Color.cpp
+        src/UdpNode.cpp
+        src/Geometry.cpp
+        src/ArgumentParser.cpp
+        )
+
+add_executable(simView ${SIM_VIEW_SRCS})
+
+target_link_libraries(simView
+        ${OPENSCENEGRAPH_LIBRARIES}
         yaml-cpp
         pthread
 )

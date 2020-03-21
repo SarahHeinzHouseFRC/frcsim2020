@@ -1,11 +1,18 @@
-# Vehicle Simulation #
+# Vehicle Simulator and View #
 
-This component of the project attempts to simulate the vehicle, field, and game pieces of the 2020 FRC game. The
-simulation is the largest and most complicated application in this project, so it also attempts to be the most
+The simulator component of the project attempts to simulate the vehicle, field, and game pieces of the 2020 FRC game.
+The simulation is the largest and most complicated application in this project, so it also attempts to be the most
 performant.
+
+The sim view is an optional component of the simulator which is useful for multiplayer. If multiple users want to play
+competitively using the simulator, they would each launch their own joystick, core, and view, then connect to a common
+simulator. The sole purpose of the view is to allow each player to have a unique perspective of the same game, similar
+to a windowed multiplayer view in a videogame.
 
 The sim runs three threads: one for the field, game pieces, and vehicle simulation, one for the 3D visualization, and
 one for the UDP comms layer.
+
+The sim view runs two threads: one for the 3D visualization and one for the UDP comms layer.
 
 The visualization is rendered using OpenSceneGraph (OSG), which is a lightweight C++ wrapper on top of OpenGL, but there
 has been some exploration into switching to something more powerful like Unreal Engine, which has the additional

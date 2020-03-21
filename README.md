@@ -1,6 +1,7 @@
 # SHARP Team 3260 FRC Simulator #
-This project consists of the core robot code (Java), a mock Xbox controller (Python), and a vehicle simulator (C++)
-which communicate over UDP using JSON strings. This code was tested and run in Ubuntu 18.04.
+This project consists of the core robot code (Java), a mock Xbox controller (Python), a vehicle simulator (C++), and
+additional views of the field (C++), which communicate over UDP using JSON strings. This code was tested and run in
+Ubuntu 18.04.
 
 Among many other benefits, this software allows an FRC software team to rapidly develop and test their software
 independently of the hardware team, availability of hte robot, and availability of physical joysticks; game strategy
@@ -12,14 +13,14 @@ For details on each of the three components included, please see the specific do
   - [Joystick](joystick/README.md)
   - [Core](core/README.md)
   - [Sim](sim/README.md)
+  - [Sim View](sim/README.md)
 
 ```
-                     2000             4000             6000             8000             10000           12000
-      +----------------+    Commands    +----------------+   Commands     +----------------+     State      +----------------+
-      |                | -------------> |                | -------------> |                | -------------> |                |
-      |   Joystick     |                |      Core      |                |   Vehicle Sim  |                |    Sim View    |
-      |                | <------------- |                | <------------- |                | <------------- |                |
-      +----------------+    Heartbeat   +----------------+     State      +----------------+   Heartbeat    +----------------+
++----------------+    Commands    +----------------+   Commands     +----------------+     State      +----------------+
+|                | -------------> |                | -------------> |                | -------------> |                |
+|   Joystick     |                |      Core      |                |   Vehicle Sim  |                |    Sim View    |
+|                | <------------- |                | <------------- |                | <------------- |                |
++----------------+    Heartbeat   +----------------+     State      +----------------+   Heartbeat    +----------------+
 ```
 
 
@@ -32,8 +33,8 @@ For details on each of the three components included, please see the specific do
   - [x] OpenSceneGraph-based 3D visualization with included CAD models of the robot and field.
   - [x] Realistic 2.5D physics built on top of the popular [Box2D](https://box2d.org/) physics library.
   - [x] Match timer and reset functionality of field and robot for practicing matches/driver tryouts.
-  - [ ] Support for Xbox One, PS4, and other controllers.
   - [x] Support for up to 6 simultaneous robots.
+  - [ ] Support for Xbox One, PS4, and other controllers.
   - [ ] Log replay and mode to play against your own phantom.
   - [ ] Move to a 3D physics engine (NVIDIA PhysX or ODE).
 
@@ -107,27 +108,44 @@ mkdir build
 cd build/
 cmake ..
 make -j8
-./robot_sim # Note that this can take >30s to launch because the 3D models are so large, optionally use --debug-view
+./sim # Adding --debug-view will allow faster launching, but with simpler graphics
 ```
 Because the CAD models for the robot and field are large and can slow down the launch time and runtime performance of
 the visualization, you can optionally launch the simulator with a lightweight visualization using:
 ```sh
-./robot_sim --debug-view
-```
-To launch with more players, use:
-```sh
-./robot_sim --players $N # Replace $N with a number 1-6
+./sim --debug-view
 ```
 To see all options available in the sim, use:
 ```sh
-./robot_sim --help
+./sim --help
+```
+
+
+## Sim View ##
+The sim view is built using most of the same files as the sim. Therefore, the dependencies are the same as above,
+including the CAD models and font file.
+
+To compile and run the sim view, run:
+```sh
+cd sim/build
+make -j8
+./simView # Adding --debug-view will allow faster launching, but with simpler graphics
+```
+Because the CAD models for the robot and field are large and can slow down the launch time and runtime performance of
+the visualization, you can optionally launch the simulator with a lightweight visualization using:
+```sh
+./sim --debug-view
+```
+To launch as a different player, use:
+```sh
+./sim --player $N # Replace $N with a number 1-6
 ```
 
 
 ## Configuration File ##
 All three applications refer to the same YAML config file at launch, which is located at `config/robotConfig.yml`.
-Options for changing the IPs and ports are available, as well as some configuration options to change the vehicle and
-field shapes.
+Options for changing the team numbers, alliance numbers, and IPs and ports are available, as well as some configuration
+options to change the vehicle and field shapes.
 
 
 ## Interface Control Document (ICD) ##

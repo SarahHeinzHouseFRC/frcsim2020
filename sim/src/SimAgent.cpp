@@ -3,7 +3,6 @@
  */
 
 #include <string>
-#include <ConfigReader.h>
 #include "SimAgent.h"
 
 

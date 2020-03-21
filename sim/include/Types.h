@@ -218,6 +218,52 @@ struct SimState
     }
 
     /**
+     * Constructor from JSON string
+     */
+    void fromJson(const std::string& json)
+    {
+        using namespace rapidjson;
+
+        clear();
+
+        Document d;
+        d.Parse(json.c_str());
+        isTimerRunning = d["isTimerRunning"].GetBool();
+        timer = d["timer"].GetFloat();
+        blueScore = d["blueScore"].GetInt();
+        redScore = d["redScore"].GetInt();
+
+        field.inCollision = d["field"]["inCollision"].GetBool();
+
+        const Value& v = d["vehicles"];
+        for (auto itr = v.Begin(); itr != v.End(); ++itr)
+        {
+            VehicleState vehicle{};
+            vehicle.team = (*itr)["team"].GetString();
+            vehicle.alliance = (*itr)["alliance"].GetString();
+            vehicle.x = (*itr)["x"].GetFloat();
+            vehicle.y = (*itr)["y"].GetFloat();
+            vehicle.theta = (*itr)["theta"].GetFloat();
+            vehicle.intakeCenterMotorSpeed = (*itr)["intakeCenterMotorSpeed"].GetFloat();
+            vehicle.intakeLeftMotorSpeed = (*itr)["intakeLeftMotorSpeed"].GetFloat();
+            vehicle.intakeRightMotorSpeed = (*itr)["intakeRightMotorSpeed"].GetFloat();
+            vehicle.tubeMotorSpeed = (*itr)["tubeMotorSpeed"].GetFloat();
+            vehicles.push_back(vehicle);
+        }
+
+        const Value& g = d["gamePieces"];
+        for (auto itr = g.Begin(); itr != g.End(); ++itr)
+        {
+            GamePieceState gamePiece{};
+            gamePiece.x = (*itr)["x"].GetFloat();
+            gamePiece.y = (*itr)["y"].GetFloat();
+            gamePiece.z = (*itr)["z"].GetFloat();
+            gamePiece.ingestionState = (*itr)["ingestionState"].GetFloat();
+            gamePieces.push_back(gamePiece);
+        }
+    }
+
+    /**
      * Resets all fields to default values
      */
     void clear()

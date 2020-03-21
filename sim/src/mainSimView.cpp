@@ -21,7 +21,7 @@ int main(int argc, char** argv)
     std::string configPath = (args.contains("--config") ? args.getValue("--config") : DEFAULT_CONFIG_FILE);
     bool verbose = args.contains("--verbose") || args.contains("-v");
     bool debugView = args.contains("--debug-view");
-    int numPlayers = args.contains("--player") ? std::stoi(args.getValue("--players")) : 1;
+    int player = args.contains("--player") ? std::stoi(args.getValue("--player")) : 1;
     if (args.contains("--help") || args.contains("-h"))
     {
         std::cout << "\nUsage: ./robot_sim [flags]\n"
@@ -37,8 +37,6 @@ int main(int argc, char** argv)
 
     // Read config file
     ConfigReader config;
-    config.verbose = verbose;
-    config.debugView = debugView;
     try
     {
         config.parse(configPath);
@@ -48,8 +46,13 @@ int main(int argc, char** argv)
         std::cout << e.what() << std::endl;
         return 1;
     }
+    config.verbose = verbose;
+    config.debugView = debugView;
+    config.headless = false;
 
     // Initialize comms with core
+    config.sim.comms.simViewPort = 10000 + 10*(player-1);
+    config.simView.port = 12000 + 10*(player-1);
     SimAgent simAgent(config);
 
     // Visualize vehicle and field

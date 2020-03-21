@@ -69,7 +69,13 @@ int main(int argc, char** argv)
         config.core.simPort = 6000 + 10*i;
         coreAgents.emplace_back(config);
     }
-    SimViewAgent simViewAgent(config);
+    std::vector<SimViewAgent> simViewAgents;
+    for (int i=0; i<config.players.size(); i++)
+    {
+        config.simView.port = 12000 + 10*(i);
+        config.sim.comms.simViewPort = 10000 + 10*(i);
+        simViewAgents.emplace_back(config);
+    }
 
     // Visualize vehicle and field
     Scene scene(config);
@@ -131,8 +137,13 @@ int main(int argc, char** argv)
             SimState s = wm.getSimState();
             s.isTimerRunning = timer.isRunning();
             s.timer = timer.getValue();
-            simViewAgent.setSimState(s);
-            simViewAgent.txSimState();
+
+            for (int i=0; i<simViewAgents.size(); i++)
+            {
+                SimViewAgent& simViewAgent = simViewAgents.at(i);
+                simViewAgent.setSimState(s);
+                simViewAgent.txSimState();
+            }
 
             usleep(1e4);
         }
@@ -144,9 +155,12 @@ int main(int argc, char** argv)
         {
             if (headless) { break; }
 
+            SimState s = wm.getSimState();
+            s.isTimerRunning = timer.isRunning();
+            s.timer = timer.getValue();
+
             // Update the vehicle and field visualizations based on their models
-            SimState state = wm.getSimState();
-            scene.update(state);
+            scene.update(s);
 
             // Update the hud
             bool connected = true;
@@ -155,8 +169,8 @@ int main(int argc, char** argv)
                 if (!coreAgent.isConnected()) { connected = false; }
             }
             hud.displayConnectionStatus(connected);
-            hud.displayTimerStatus(state.isTimerRunning, state.timer);
-            hud.displayFieldScore(state.blueScore, state.redScore);
+            hud.displayTimerStatus(s.isTimerRunning, s.timer);
+            hud.displayFieldScore(s.blueScore, s.redScore);
 //            hud.displayVehicleState(wm.vehicleModel(i));
 
             // Step the visualizer

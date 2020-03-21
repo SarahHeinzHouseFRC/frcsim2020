@@ -4,7 +4,7 @@
 
 #include "UdpNode.h"
 
-#define MAXLINE 1024
+#define MAXLINE 8192
 
 
 UdpNode::UdpNode(uint16_t rxPort, const std::string& txIp, uint16_t txPort) : _rxAddr{0}, _txAddr{0}

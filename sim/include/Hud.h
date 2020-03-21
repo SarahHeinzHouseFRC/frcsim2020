@@ -50,7 +50,7 @@ public:
     /**
      * Displays score
      */
-    void displayFieldScore(std::tuple<int, int> score);
+    void displayFieldScore(int blueScore, int redScore);
 
     /**
      * Displays robot state

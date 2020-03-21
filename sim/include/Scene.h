@@ -24,12 +24,12 @@ public:
     /**
      * Constructs the scene
      */
-    Scene(const ConfigReader& config, const WorldModel& wm);
+    Scene(const ConfigReader& config);
 
     /**
      * Updates the scene given the robot's current state
      */
-    void update(const WorldModel& wm);
+    void update(const SimState& simState);
 
     /**
      * Returns the root node of the scene

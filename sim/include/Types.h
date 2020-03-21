@@ -109,12 +109,20 @@ struct SimState
 {
     struct VehicleState
     {
-        int player;           // 1-6
-        std::string team;     // Team number
-        std::string alliance; // "Blue" or "Red"
-        float x;              // Meters
-        float y;              // Meters
-        float theta;          // Radians
+        std::string team;             // Team number
+        std::string alliance;         // "Blue" or "Red"
+        float x;                      // Meters
+        float y;                      // Meters
+        float theta;                  // Radians
+        float intakeCenterMotorSpeed; // Meters/sec
+        float intakeLeftMotorSpeed;   // Meters/sec
+        float intakeRightMotorSpeed;  // Meters/sec
+        float tubeMotorSpeed;         // Meters/sec
+    };
+
+    struct FieldState
+    {
+        bool inCollision;
     };
 
     struct GamePieceState
@@ -122,12 +130,14 @@ struct SimState
         float x; // Meters
         float y; // Meters
         float z; // Meters
+        int ingestionState;
     };
 
     int blueScore;
     int redScore;
     bool isTimerRunning;
     double timer;
+    FieldState field;
     std::vector<VehicleState> vehicles;
     std::vector<GamePieceState> gamePieces;
 
@@ -156,13 +166,16 @@ struct SimState
         writer.Bool(isTimerRunning);
         writer.Key("timer");
         writer.Double(timer);
+        writer.Key("field");
+        writer.StartObject();
+        writer.Key("inCollision");
+        writer.Bool(field.inCollision);
+        writer.EndObject();
         writer.Key("vehicles");
         writer.StartArray();
         for (const auto& v : vehicles)
         {
             writer.StartObject();
-            writer.Key("player");
-            writer.Int(v.player);
             writer.Key("team");
             writer.String(v.team.c_str());
             writer.Key("alliance");
@@ -173,6 +186,14 @@ struct SimState
             writer.Double(v.y);
             writer.Key("theta");
             writer.Double(v.theta);
+            writer.Key("intakeCenterMotorSpeed");
+            writer.Double(v.intakeCenterMotorSpeed);
+            writer.Key("intakeLeftMotorSpeed");
+            writer.Double(v.intakeLeftMotorSpeed);
+            writer.Key("intakeRightMotorSpeed");
+            writer.Double(v.intakeRightMotorSpeed);
+            writer.Key("tubeMotorSpeed");
+            writer.Double(v.tubeMotorSpeed);
             writer.EndObject();
         }
         writer.EndArray();
@@ -187,6 +208,8 @@ struct SimState
             writer.Double(g.y);
             writer.Key("z");
             writer.Double(g.z);
+            writer.Key("ingestionState");
+            writer.Int(g.ingestionState);
             writer.EndObject();
         }
         writer.EndArray();

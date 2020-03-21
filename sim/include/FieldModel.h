@@ -16,6 +16,7 @@ class FieldModel : public BaseModel
 {
 friend class FieldView;
 friend class PhysicsEngine;
+friend class WorldModel;
 public:
     /**
      * Constructor

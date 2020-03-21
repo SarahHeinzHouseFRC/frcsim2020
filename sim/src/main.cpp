@@ -26,7 +26,6 @@ int main(int argc, char** argv)
     bool verbose = args.contains("--verbose") || args.contains("-v");
     bool headless = args.contains("--headless");
     bool debugView = args.contains("--debug-view");
-    int numPlayers = args.contains("--players") ? std::stoi(args.getValue("--players")) : 1;
     if (args.contains("--help") || args.contains("-h"))
     {
         std::cout << "\nUsage: ./robot_sim [flags]\n"
@@ -36,15 +35,12 @@ int main(int argc, char** argv)
                      "  --config <config_file>   Use the given config file instead of the default\n"
                      "  --debug-view             Launch with a lightweight view\n"
                      "  --headless               Launch without visualization\n"
-                     "  --players <num>          Number of players (1-6)\n"
                      "  --verbose                Increase output verbosity\n";
         return 0;
     }
 
     // Read config file
     ConfigReader config;
-    config.verbose = verbose;
-    config.debugView = debugView;
     try
     {
         config.parse(configPath);
@@ -54,21 +50,20 @@ int main(int argc, char** argv)
         std::cout << e.what() << std::endl;
         return 1;
     }
-    if (numPlayers > config.players.size())
-    {
-        throw std::runtime_error("Requested " + std::to_string(numPlayers) + " players, but only " + std::to_string(config.players.size()) + " are configured");
-    }
+    config.verbose = verbose;
+    config.debugView = debugView;
+    config.headless = headless;
 
     // Initialize vehicle and field models
     double t = Time::now();
-    WorldModel wm(config, numPlayers, t);
+    WorldModel wm(config, t);
 
     // Initialize a timer to countdown 2m 15s
     Timer timer(t, 135);
 
     // Initialize comms with core and simviews
     std::vector<CoreAgent> coreAgents;
-    for (int i=0; i<numPlayers; i++)
+    for (int i=0; i<config.players.size(); i++)
     {
         config.sim.comms.corePort = 8000 + 10*i;
         config.core.simPort = 6000 + 10*i;
@@ -77,7 +72,7 @@ int main(int argc, char** argv)
     SimViewAgent simViewAgent(config);
 
     // Visualize vehicle and field
-    Scene scene(config, wm);
+    Scene scene(config);
     Hud hud(config);
 
     // Visualize the scene
@@ -150,7 +145,8 @@ int main(int argc, char** argv)
             if (headless) { break; }
 
             // Update the vehicle and field visualizations based on their models
-            scene.update(wm);
+            SimState state = wm.getSimState();
+            scene.update(state);
 
             // Update the hud
             bool connected = true;
@@ -159,8 +155,8 @@ int main(int argc, char** argv)
                 if (!coreAgent.isConnected()) { connected = false; }
             }
             hud.displayConnectionStatus(connected);
-            hud.displayTimerStatus(timer.isRunning(), timer.getValue());
-            hud.displayFieldScore(wm.getScore());
+            hud.displayTimerStatus(state.isTimerRunning, state.timer);
+            hud.displayFieldScore(state.blueScore, state.redScore);
 //            hud.displayVehicleState(wm.vehicleModel(i));
 
             // Step the visualizer

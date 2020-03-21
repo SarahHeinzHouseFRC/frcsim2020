@@ -43,7 +43,7 @@ public:
         Pose initialPosition; // Initial pose
     };
 
-    std::vector<Player> players; // List of all players
+    std::vector<Player> players; // List of all possible players
     struct
     {
         std::string ip;   // IP address
@@ -125,6 +125,7 @@ public:
     } simView;
     bool verbose;
     bool debugView;
+    bool headless;
 
 private:
     /**

@@ -186,12 +186,12 @@ void Hud::displayTimerStatus(bool running, double timerValue)
 
 
 
-void Hud::displayFieldScore(std::tuple<int, int> score)
+void Hud::displayFieldScore(int blueScore, int redScore)
 {
     char tmp[1024];
-    sprintf(tmp, "%d", std::get<0>(score));
+    sprintf(tmp, "%d", blueScore);
     _blueScore->setText(tmp);
-    sprintf(tmp, "%d", std::get<1>(score));
+    sprintf(tmp, "%d", redScore);
     _redScore->setText(tmp);
 }
 

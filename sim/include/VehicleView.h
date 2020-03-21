@@ -6,8 +6,8 @@
 #define ROBOT_SIM_VEHICLEVIEW_H
 
 #include <osg/PositionAttitudeTransform>
-#include "VehicleModel.h"
 #include "ConfigReader.h"
+#include "Types.h"
 
 
 class VehicleView : public osg::PositionAttitudeTransform
@@ -16,12 +16,12 @@ public:
     /**
      * Constructor
      */
-    VehicleView(const ConfigReader& config, const VehicleModel& vehicleModel);
+    VehicleView(const ConfigReader& config, int id);
 
     /**
      * Updates the vehicle view based on the vehicle model
      */
-    void update(const VehicleModel& vehicleModel);
+    void update(const SimState::VehicleState& state);
 
     /**
      * Returns vehicle node (for Visualizer to center view on)
@@ -38,26 +38,34 @@ private:
     /**
      * Draws the collision boundary of the vehicle
      */
-    osg::ref_ptr<osg::Geode> drawCollisionBoundary(const VehicleModel& vehicleModel);
+    osg::ref_ptr<osg::Geode> drawCollisionBoundary(const ConfigReader& config, int id);
 
     /**
      * Draws the bumpers around the vehicle
      */
-    osg::ref_ptr<osg::Geode> drawBumpers(const VehicleModel& vehicleModel);
+    osg::ref_ptr<osg::Geode> drawBumpers(const ConfigReader& config, int id);
 
     /**
      * Draws the ingestible region of the vehicle
      */
-    osg::ref_ptr<osg::Geode> drawIngestibleRegions(const VehicleModel& vehicleModel);
+    osg::ref_ptr<osg::Geode> drawIngestibleRegions(const ConfigReader& config, int id);
 
     /**
      * Draws info about the vehicle, player number, etc.
      */
-    osg::ref_ptr<osg::Geode> drawInfo(const VehicleModel& vehicleModel, const std::string& fontFile);
+    osg::ref_ptr<osg::Geode> drawInfo(const ConfigReader& config, int id, const std::string& fontFile);
 
     osg::ref_ptr<osg::Node> _vehicleNode;
     osg::ref_ptr<osg::Geode> _vehicleBounds;
     osg::ref_ptr<osg::Geometry> _ingestibleRegionCenterArrow;
+    Geometry::Vertex2d _centerIngestibleRegionCenter;
+    Geometry::Vertex2d _centerIngestibleRegionLeft;
+    Geometry::Vertex2d _centerIngestibleRegionRight;
+    Geometry::Vertex2d _centerTubeRegion;
+    float _intakeCenterMotorMaxSpeed;
+    float _intakeLeftMotorMaxSpeed;
+    float _intakeRightMotorMaxSpeed;
+    float _tubeMotorMaxSpeed;
     osg::ref_ptr<osg::Geometry> _ingestibleRegionLeftArrow;
     osg::ref_ptr<osg::Geometry> _ingestibleRegionRightArrow;
     osg::ref_ptr<osg::Geometry> _tubeRegionArrow;

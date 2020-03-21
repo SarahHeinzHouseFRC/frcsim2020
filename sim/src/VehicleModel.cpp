@@ -8,10 +8,9 @@
 using namespace Geometry;
 
 
-VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp, int player) :
-        _player(player),
-        _team(config.players.at(_player).team),
-        _alliance(config.players.at(_player).alliance),
+VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp, int id) :
+        _team(config.players.at(id).team),
+        _alliance(config.players.at(id).alliance),
         _prevTimestamp(startTimestamp),
         _state{0},
         _leftDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.leftMotorMaxSpeed),
@@ -34,9 +33,9 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp, in
     }
 
     // Set initial state (so we can reset to it later if needed)
-    _initialState.x = config.players.at(_player).initialPosition.x;
-    _initialState.y = config.players.at(_player).initialPosition.y;
-    _initialState.theta = config.players.at(_player).initialPosition.theta;
+    _initialState.x = config.players.at(id).initialPosition.x;
+    _initialState.y = config.players.at(id).initialPosition.y;
+    _initialState.theta = config.players.at(id).initialPosition.theta;
 
     // Set pose
     _state.pose.x = _initialState.x;

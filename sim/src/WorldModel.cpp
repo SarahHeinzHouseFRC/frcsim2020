@@ -6,20 +6,20 @@
 #include "WorldModel.h"
 
 
-WorldModel::WorldModel(ConfigReader& configReader, int numVehicles, double timestamp) :
-        _fieldModel(configReader, timestamp)
+WorldModel::WorldModel(ConfigReader& config, double timestamp) :
+        _fieldModel(config, timestamp)
 {
     // Initialize all vehicle models
-    for (int i=0; i<numVehicles; i++)
+    for (int i=0; i<config.players.size(); i++)
     {
-        VehicleModel v(configReader, timestamp, i);
+        VehicleModel v(config, timestamp, i);
         _vehicleModels.emplace_back(v);
     }
 
     // Initialize all game piece models
-    for (const auto& initialPosition : configReader.sim.gamePiece.initialPositions)
+    for (const auto& initialPosition : config.sim.gamePiece.initialPositions)
     {
-        _gamePieceModels.emplace_back(configReader.sim.gamePiece.radius, initialPosition.x, initialPosition.y);
+        _gamePieceModels.emplace_back(config.sim.gamePiece.radius, initialPosition.x, initialPosition.y);
     }
 
     _physicsEngine = PhysicsEngine(_fieldModel, _vehicleModels, _gamePieceModels, timestamp);
@@ -72,15 +72,20 @@ SimState WorldModel::getSimState()
     s.blueScore = std::get<0>(getScore());
     s.redScore = std::get<1>(getScore());
 
+    s.field.inCollision = _fieldModel._inCollision;
+
     for (const auto& vehicle : _vehicleModels)
     {
         SimState::VehicleState v{};
-        v.player = vehicle._player;
-        v.team = "3260";
+        v.team = vehicle._team;
         v.alliance = vehicle._alliance;
         v.x = (float) vehicle._state.pose.x;
         v.y = (float) vehicle._state.pose.y;
         v.theta = (float) vehicle._state.pose.theta;
+        v.intakeCenterMotorSpeed = (float) vehicle._state.intakeCenterMotorSpeed;
+        v.intakeLeftMotorSpeed = (float) vehicle._state.intakeLeftMotorSpeed;
+        v.intakeRightMotorSpeed = (float) vehicle._state.intakeRightMotorSpeed;
+        v.tubeMotorSpeed = (float) vehicle._state.tubeMotorSpeed;
         s.vehicles.push_back(v);
     }
 
@@ -90,6 +95,7 @@ SimState WorldModel::getSimState()
         g.x = (float) gamePiece._state.pose.x;
         g.y = (float) gamePiece._state.pose.y;
         g.z = (float) gamePiece._state.pose.z;
+        g.ingestionState = gamePiece._state.ingestion;
         s.gamePieces.push_back(g);
     }
 

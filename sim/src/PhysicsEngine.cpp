@@ -365,6 +365,10 @@ void PhysicsEngine::reset(const FieldModel& fieldModel, std::vector<VehicleModel
         body->SetTransform(b2Vec2(model._initialX, model._initialY), 0);
         body->SetLinearVelocity({ 0, 0 });
     }
+
+    // Reset score
+    _blueOuttaken = 0;
+    _redOuttaken = 0;
 }
 
 

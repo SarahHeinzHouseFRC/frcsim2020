@@ -2,27 +2,26 @@
  * Copyright (c) 2020 Team 3260
  */
 
-#include "ConfigReader.h"
 #include "Scene.h"
 
 
-Scene::Scene(const ConfigReader& config, const WorldModel& wm)
+Scene::Scene(const ConfigReader& config)
 {
     _root = new osg::Group;
 
-    for (const auto & _vehicleModel : wm._vehicleModels)
+    _fieldView = new FieldView(config);
+    _root->addChild(_fieldView);
+
+    for (int i=0; i<config.players.size(); i++)
     {
-        osg::ref_ptr<VehicleView> vehicleView = new VehicleView(config, _vehicleModel);
+        osg::ref_ptr<VehicleView> vehicleView = new VehicleView(config, i);
         _vehicleViews.push_back(vehicleView);
         _root->addChild(vehicleView);
     }
 
-    _fieldView = new FieldView(config, wm._fieldModel);
-    _root->addChild(_fieldView);
-
-    for (const auto& gamePieceModel : wm._gamePieceModels)
+    for (int i=0; i<config.sim.gamePiece.initialPositions.size(); i++)
     {
-        osg::ref_ptr<GamePieceView> gamePieceView = new GamePieceView(config, gamePieceModel);
+        osg::ref_ptr<GamePieceView> gamePieceView = new GamePieceView(config, i);
         _root->addChild(gamePieceView);
         _gamePieceViews.push_back(gamePieceView);
     }
@@ -30,15 +29,20 @@ Scene::Scene(const ConfigReader& config, const WorldModel& wm)
 
 
 
-void Scene::update(const WorldModel& wm)
+void Scene::update(const SimState& simState)
 {
-    for (unsigned int i=0; i<wm._vehicleModels.size(); i++)
+    // Update field
+    _fieldView->update(simState.field);
+
+    // Update vehicles
+    for (int i=0; i<simState.vehicles.size(); i++)
     {
-        _vehicleViews[i]->update(wm._vehicleModels[i]);
+        _vehicleViews.at(i)->update(simState.vehicles.at(i));
     }
-    _fieldView->update(wm._fieldModel);
-    for (unsigned int i=0; i<wm._gamePieceModels.size(); i++)
+
+    // Update game pieces
+    for (int i=0; i<simState.gamePieces.size(); i++)
     {
-        _gamePieceViews[i]->update(wm._gamePieceModels[i]);
+        _gamePieceViews.at(i)->update(simState.gamePieces.at(i));
     }
 }

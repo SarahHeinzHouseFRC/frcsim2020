@@ -21,7 +21,7 @@ public:
     /**
      * Constructor
      */
-    WorldModel(ConfigReader& configReader, int numVehicles, double timestamp);
+    WorldModel(ConfigReader& config, double timestamp);
 
     /**
      * Updates the field, vehicle, and game piece models

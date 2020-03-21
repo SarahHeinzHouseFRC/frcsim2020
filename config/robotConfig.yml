@@ -1,5 +1,13 @@
-# Robot Config
+# Sim Config
 # Copyright (c) 2020 FRC Team 3260
+
+players:
+  - { team: "3260", alliance: "Blue", initialPosition: { x: 0.0, y: -197.0, theta: 90 } } # Player 1
+  - { team: "1234", alliance: "Red", initialPosition: { x: 0.0, y: 197.0, theta: -90 } }  # Player 2
+  - { team: "234", alliance: "Blue", initialPosition: { x: 60.0, y: -197.0, theta: 90 } } # Player 3
+  - { team: "34", alliance: "Red", initialPosition: { x: -60.0, y: 197.0, theta: -90 } }  # Player 4
+  - { team: "41", alliance: "Blue", initialPosition: { x: -60.0, y: -197.0, theta: 90 } } # Player 5
+  - { team: "412", alliance: "Red", initialPosition: { x: 60.0, y: 197.0, theta: -90 } }  # Player 6
 
 joystick:
   ip: "127.0.0.1"                                        # IP address where joystick is running

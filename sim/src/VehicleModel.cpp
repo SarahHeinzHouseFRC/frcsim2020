@@ -8,9 +8,10 @@
 using namespace Geometry;
 
 
-VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp, int player, const std::string& alliance) :
+VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp, int player) :
         _player(player),
-        _alliance(alliance),
+        _team(config.players.at(_player).team),
+        _alliance(config.players.at(_player).alliance),
         _prevTimestamp(startTimestamp),
         _state{0},
         _leftDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.leftMotorMaxSpeed),
@@ -26,8 +27,18 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp, in
         _outtake(false),
         _prevOuttakeButtonState(false)
 {
-    // Set initial state
-    _initialState = { config.sim.vehicle.initialState.x, config.sim.vehicle.initialState.y, config.sim.vehicle.initialState.theta };
+    // Account for bad inputs
+    if (_alliance != "Blue" && _alliance != "Red")
+    {
+        _alliance = "Red";
+    }
+
+    // Set initial state (so we can reset to it later if needed)
+    _initialState.x = config.players.at(_player).initialPosition.x;
+    _initialState.y = config.players.at(_player).initialPosition.y;
+    _initialState.theta = config.players.at(_player).initialPosition.theta;
+
+    // Set pose
     _state.pose.x = _initialState.x;
     _state.pose.y = _initialState.y;
     _state.pose.theta = _initialState.theta;

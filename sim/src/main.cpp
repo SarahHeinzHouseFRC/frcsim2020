@@ -54,6 +54,10 @@ int main(int argc, char** argv)
         std::cout << e.what() << std::endl;
         return 1;
     }
+    if (numPlayers > config.players.size())
+    {
+        throw std::runtime_error("Requested " + std::to_string(numPlayers) + " players, but only " + std::to_string(config.players.size()) + " are configured");
+    }
 
     // Initialize vehicle and field models
     double t = Time::now();

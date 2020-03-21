@@ -12,8 +12,8 @@ WorldModel::WorldModel(ConfigReader& configReader, int numVehicles, double times
     // Initialize all vehicle models
     for (int i=0; i<numVehicles; i++)
     {
-        configReader.sim.vehicle.initialState.y += 1.5;
-        _vehicleModels.emplace_back(configReader, timestamp, i+1, (i % 2 == 0) ? "Blue" : "Red");
+        VehicleModel v(configReader, timestamp, i);
+        _vehicleModels.emplace_back(v);
     }
 
     // Initialize all game piece models

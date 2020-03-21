@@ -350,7 +350,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawInfo(const VehicleModel& vehicleModel,
 
     // Draw text
     osg::ref_ptr<osgText::Text> text = new osgText::Text;
-    text->setText("Player " + std::to_string(vehicleModel._player) + "\n" + vehicleModel._alliance + " Alliance");
+    text->setText("Player " + std::to_string(vehicleModel._player+1) + ": Team " + vehicleModel._team);
     text->setFont(fontFile);
     text->setCharacterSize(0.2);
     text->setAlignment(osgText::TextBase::CENTER_BOTTOM);

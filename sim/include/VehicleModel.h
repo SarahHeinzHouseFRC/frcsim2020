@@ -30,7 +30,7 @@ public:
     /**
      * Constructor
      */
-    VehicleModel(const ConfigReader& config, double startTimestamp, int player, const std::string& alliance);
+    VehicleModel(const ConfigReader& config, double startTimestamp, int player);
 
     /**
      * Updates the robot model to the new time
@@ -76,6 +76,7 @@ private:
     static double wrapAngle(double val) { while (val > 2*M_PI) { val -= 2*M_PI; } while (val < 0) { val += 2*M_PI; } return val; }
 
     int _player;
+    std::string _team;
     std::string _alliance;
     Geometry::Polygon2d _boundingPolygonFrontLeft; // Front left bounding polygon of the vehicle in vehicle frame
     Geometry::Polygon2d _boundingPolygonFrontRight; // Front right bounding polygon of the vehicle in vehicle frame

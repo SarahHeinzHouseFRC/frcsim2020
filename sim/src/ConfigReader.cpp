@@ -23,6 +23,12 @@ void ConfigReader::parse(const std::string &configFile)
         throw std::runtime_error("ConfigReader: File not found: " + configFile);
     }
 
+    YAML::Node playersConfig = config["players"];
+    if (playersConfig)
+    {
+        parsePlayersConfig(playersConfig);
+    }
+
     YAML::Node coreConfig = config["core"];
     if (coreConfig)
     {
@@ -42,6 +48,22 @@ void ConfigReader::parse(const std::string &configFile)
     }
 
     std::cout << "Successfully loaded config file " << configFile << std::endl;
+}
+
+
+
+void ConfigReader::parsePlayersConfig(const YAML::Node& playersConfig)
+{
+    for (const auto& playerConfig : playersConfig)
+    {
+        Player p;
+        p.team = playerConfig["team"].as<std::string>();
+        p.alliance = playerConfig["alliance"].as<std::string>();
+        p.initialPosition.x = playerConfig["initialPosition"]["x"].as<float>() * IN_TO_M;
+        p.initialPosition.y = playerConfig["initialPosition"]["y"].as<float>() * IN_TO_M;
+        p.initialPosition.theta = playerConfig["initialPosition"]["theta"].as<float>() * DEG_TO_RAD;
+        players.push_back(p);
+    }
 }
 
 
@@ -121,15 +143,6 @@ void ConfigReader::parseSimVehicleConfig(const YAML::Node& vehicleConfig)
     sim.vehicle.ingestibleRegionRight = parsePolygon(vehicleConfig["ingestibleRegionRight"]);
     sim.vehicle.tubeRegion = parsePolygon(vehicleConfig["tubeRegion"]);
     sim.vehicle.mass = vehicleConfig["weight"].as<float>() * LBS_TO_KG;
-
-    YAML::Node initialState = vehicleConfig["initialState"];
-
-    if (initialState)
-    {
-        sim.vehicle.initialState.x = initialState["x"].as<float>() * IN_TO_M;
-        sim.vehicle.initialState.y = initialState["y"].as<float>() * IN_TO_M;
-        sim.vehicle.initialState.theta = initialState["theta"].as<float>() * DEG_TO_RAD;
-    }
 
     //
     // Load vehicle drivetrain params

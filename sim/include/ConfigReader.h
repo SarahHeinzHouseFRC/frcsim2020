@@ -29,6 +29,21 @@ public:
      */
     void parse(const std::string& configFile);
 
+    struct Pose
+    {
+        float x;
+        float y;
+        float theta;
+    };
+
+    struct Player
+    {
+        std::string team;     // Team number
+        std::string alliance; // "Blue" or "Red"
+        Pose initialPosition; // Initial pose
+    };
+
+    std::vector<Player> players; // List of all players
     struct
     {
         std::string ip;   // IP address
@@ -78,12 +93,6 @@ public:
             float mass;                                                      // Kilograms
             struct
             {
-                float x;     // Meters
-                float y;     // Meters
-                float theta; // Degrees
-            } initialState;
-            struct
-            {
                 float width;              // Meters
                 float depth;              // Meters
                 float widthChannel;       // Meters
@@ -118,6 +127,11 @@ public:
     bool debugView;
 
 private:
+    /**
+     * Helper method for loading player parameters
+     */
+    void parsePlayersConfig(const YAML::Node& playersConfig);
+
     /**
      * Helper method for loading core parameters
      */

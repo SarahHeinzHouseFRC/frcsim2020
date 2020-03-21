@@ -52,13 +52,30 @@ public:
         } assets;
         struct
         {
-            std::vector<Geometry::Vertex2d> exteriorPolygon;
-            std::vector<std::vector<Geometry::Vertex2d>> interiorPolygons;
+            Geometry::Polygon2d exteriorPolygon;
+            std::vector<Geometry::Polygon2d> interiorPolygons;
+            Geometry::Polygon2d blueGoalPolygon;
+            Geometry::Polygon2d redGoalPolygon;
+            Geometry::Vertex2d blueOuttake;
+            Geometry::Vertex2d redOuttake;
         } field;
         struct
         {
-            std::vector<Geometry::Vertex2d> polygon; // Meters where (0,0) is CoG of the vehicle
-            float mass;                              // Kilograms
+            Geometry::Polygon2d boundingPolygonFrontLeft;        // Meters in vehicle frame
+            Geometry::Polygon2d boundingPolygonFrontRight;       // Meters in vehicle frame
+            Geometry::Polygon2d boundingPolygonRearLeft;         // Meters in vehicle frame
+            Geometry::Polygon2d boundingPolygonRearRight;        // Meters in vehicle frame
+            Geometry::Polygon2d boundingPolygonBumperFrontLeft;  // Meters in vehicle frame
+            Geometry::Polygon2d boundingPolygonBumperFrontRight; // Meters in vehicle frame
+            Geometry::Polygon2d boundingPolygonBumperLeft;       // Meters in vehicle frame
+            Geometry::Polygon2d boundingPolygonBumperRight;      // Meters in vehicle frame
+            Geometry::Polygon2d boundingPolygonBumperRearLeft;   // Meters in vehicle frame
+            Geometry::Polygon2d boundingPolygonBumperRearRight;  // Meters in vehicle frame
+            Geometry::Polygon2d ingestibleRegionCenter;          // Meters in vehicle frame
+            Geometry::Polygon2d ingestibleRegionLeft;            // Meters in vehicle frame
+            Geometry::Polygon2d ingestibleRegionRight;           // Meters in vehicle frame
+            Geometry::Polygon2d tubeRegion;                      // Meters in vehicle frame
+            float mass;                                                      // Kilograms
             struct
             {
                 float x;     // Meters
@@ -140,6 +157,16 @@ private:
      * Helper method for loading sim view parameters
      */
     void parseSimViewConfig(const YAML::Node& simViewConfig);
+
+    /**
+     * Helper method for parsing a polygon
+     */
+    static std::vector<Geometry::Vertex2d> parsePolygon(const YAML::Node& node);
+
+    /**
+     * Helper method for parsing a vertex
+     */
+    static Geometry::Vertex2d parseVertex(const YAML::Node& node);
 };
 
 

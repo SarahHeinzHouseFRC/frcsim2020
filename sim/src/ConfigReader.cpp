@@ -87,21 +87,15 @@ void ConfigReader::parseSimAssetsConfig(const YAML::Node &assetsConfig)
 
 void ConfigReader::parseSimFieldConfig(const YAML::Node& fieldConfig)
 {
-    YAML::Node exteriorPolygon = fieldConfig["exteriorPolygon"];
-    for (const auto& vertex : exteriorPolygon)
+    sim.field.exteriorPolygon = parsePolygon(fieldConfig["exteriorPolygon"]);
+    for (const auto& interiorPolygon : fieldConfig["interiorPolygons"])
     {
-        sim.field.exteriorPolygon.emplace_back(vertex["x"].as<float>()*IN_TO_M, vertex["y"].as<float>()*IN_TO_M);
+        sim.field.interiorPolygons.emplace_back(parsePolygon(interiorPolygon));
     }
-    YAML::Node interiorPolygons = fieldConfig["interiorPolygons"];
-    for (const auto& interiorPolygon : interiorPolygons)
-    {
-        std::vector<Geometry::Vertex2d> interiorVertices;
-        for (const auto& vertex : interiorPolygon)
-        {
-            interiorVertices.emplace_back(vertex["x"].as<float>()*IN_TO_M, vertex["y"].as<float>()*IN_TO_M);
-        }
-        sim.field.interiorPolygons.emplace_back(interiorVertices);
-    }
+    sim.field.blueGoalPolygon = parsePolygon(fieldConfig["blueGoalPolygon"]);
+    sim.field.redGoalPolygon = parsePolygon(fieldConfig["redGoalPolygon"]);
+    sim.field.blueOuttake = parseVertex(fieldConfig["blueOuttake"]);
+    sim.field.redOuttake = parseVertex(fieldConfig["redOuttake"]);
 }
 
 
@@ -112,12 +106,20 @@ void ConfigReader::parseSimVehicleConfig(const YAML::Node& vehicleConfig)
     // Load vehicle params
     //
 
-    YAML::Node polygon = vehicleConfig["polygon"];
-    for (auto it=polygon.begin(); it!=polygon.end(); it++)
-    {
-        YAML::Node point = *it;
-        sim.vehicle.polygon.emplace_back(point["x"].as<float>()*IN_TO_M, point["y"].as<float>()*IN_TO_M);
-    }
+    sim.vehicle.boundingPolygonFrontLeft = parsePolygon(vehicleConfig["boundingPolygonFrontLeft"]);
+    sim.vehicle.boundingPolygonFrontRight = parsePolygon(vehicleConfig["boundingPolygonFrontRight"]);
+    sim.vehicle.boundingPolygonRearLeft = parsePolygon(vehicleConfig["boundingPolygonRearLeft"]);
+    sim.vehicle.boundingPolygonRearRight = parsePolygon(vehicleConfig["boundingPolygonRearRight"]);
+    sim.vehicle.boundingPolygonBumperFrontLeft = parsePolygon(vehicleConfig["boundingPolygonBumperFrontLeft"]);
+    sim.vehicle.boundingPolygonBumperFrontRight = parsePolygon(vehicleConfig["boundingPolygonBumperFrontRight"]);
+    sim.vehicle.boundingPolygonBumperLeft = parsePolygon(vehicleConfig["boundingPolygonBumperLeft"]);
+    sim.vehicle.boundingPolygonBumperRight = parsePolygon(vehicleConfig["boundingPolygonBumperRight"]);
+    sim.vehicle.boundingPolygonBumperRearLeft = parsePolygon(vehicleConfig["boundingPolygonBumperRearLeft"]);
+    sim.vehicle.boundingPolygonBumperRearRight = parsePolygon(vehicleConfig["boundingPolygonBumperRearRight"]);
+    sim.vehicle.ingestibleRegionCenter = parsePolygon(vehicleConfig["ingestibleRegionCenter"]);
+    sim.vehicle.ingestibleRegionLeft = parsePolygon(vehicleConfig["ingestibleRegionLeft"]);
+    sim.vehicle.ingestibleRegionRight = parsePolygon(vehicleConfig["ingestibleRegionRight"]);
+    sim.vehicle.tubeRegion = parsePolygon(vehicleConfig["tubeRegion"]);
     sim.vehicle.mass = vehicleConfig["weight"].as<float>() * LBS_TO_KG;
 
     YAML::Node initialState = vehicleConfig["initialState"];
@@ -185,4 +187,26 @@ void ConfigReader::parseSimViewConfig(const YAML::Node& simViewConfig)
 {
     simView.ip = simViewConfig["ip"].as<std::string>();
     simView.port = simViewConfig["port"].as<int>();
+}
+
+
+
+std::vector<Geometry::Vertex2d> ConfigReader::parsePolygon(const YAML::Node& node)
+{
+    std::vector<Geometry::Vertex2d> result;
+    for (const auto& vertex : node)
+    {
+        result.emplace_back(parseVertex(vertex));
+    }
+    return result;
+}
+
+
+
+Geometry::Vertex2d ConfigReader::parseVertex(const YAML::Node& node)
+{
+    Geometry::Vertex2d v{};
+    v.x = node["x"].as<float>() * IN_TO_M;
+    v.y = node["y"].as<float>() * IN_TO_M;
+    return v;
 }

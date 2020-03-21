@@ -38,6 +38,16 @@ sim:
       - { x: -50.00, y: -314.96 }
       - { x: 90.94, y: -314.96 }
       - { x: 161.81, y: -288.58 }
+    blueGoalPolygon:                                     # Blue goal polygon
+      - { x: -84.00, y: -314.96 }
+      - { x: -84.00, y: -354.96 }
+      - { x: -50.00, y: -354.96 }
+      - { x: -50.00, y: -314.96 }
+    redGoalPolygon:                                      # Red goal polygon
+      - { x: 84.00, y: 314.96 }
+      - { x: 84.00, y: 354.96 }
+      - { x: 50.00, y: 354.96 }
+      - { x: 50.00, y: 314.96 }
     interiorPolygons:
       -                                                  # Right trench right wall
         - { x: 161.81, y: -59.84 }
@@ -79,12 +89,79 @@ sim:
         - { x: -33.86, y: -92.52 }
         - { x: -44.88, y: -96.85 }
         - { x: -40.55, y: -108.27 }
+    blueOuttake: { x: -61.00, y: 314.96 }
+    redOuttake: { x: 61.00, y: -314.96 }
   vehicle:
-    polygon:                                             # Bounding polygon (meters where (0, 0) is the center of rotation of the robot)
-      - { x: 16.93, y: 12.2 }
-      - { x: -13.78, y: 12.2 }
-      - { x: -13.78, y: -12.2 }
-      - { x: 16.93, y: -12.2 }
+    boundingPolygonFrontLeft:                            # Vehicle's front left (inches)
+      - { x: 7.87, y: 4.33 }
+      - { x: 7.87, y: 12.20 }
+      - { x: 1.97, y: 12.20 }
+      - { x: 1.97, y: 4.33 }
+    boundingPolygonFrontRight:                           # Vehicle's front right (inches)
+      - { x: 7.87, y: -12.20 }
+      - { x: 7.87, y: -4.33 }
+      - { x: 1.97, y: -4.33 }
+      - { x: 1.97, y: -12.20 }
+    boundingPolygonRearLeft:                             # Vehicle's rear left (inches)
+      - { x: 1.97, y: 7.09 }
+      - { x: 1.97, y: 12.20 }
+      - { x: -20.08, y: 12.20 }
+      - { x: -20.08, y: 7.09 }
+    boundingPolygonRearRight:                            # Vehicle's rear right (inches)
+      - { x: 1.97, y: -12.20 }
+      - { x: 1.97, y: -7.09 }
+      - { x: -20.08, y: -7.09 }
+      - { x: -20.08, y: -12.20 }
+    boundingPolygonBumperFrontLeft:                      # Bumper's front left polygon (inches)
+      - { x: 11.81, y: 6.30 }
+      - { x: 11.81, y: 12.20 }
+      - { x: 7.87, y: 12.20 }
+      - { x: 7.87, y: 6.30 }
+    boundingPolygonBumperFrontRight:                     # Bumper's front right polygon (inches)
+      - { x: 11.81, y: -12.20 }
+      - { x: 11.81, y: -6.30 }
+      - { x: 7.87, y: -6.30 }
+      - { x: 7.87, y: -12.20 }
+    boundingPolygonBumperLeft:                           # Bumper's left side polygon (inches)
+      - { x: 11.81, y: 12.20 }
+      - { x: 11.81, y: 15.75 }
+      - { x: -23.62, y: 15.75 }
+      - { x: -23.62, y: 12.20 }
+    boundingPolygonBumperRight:                          # Bumper's right side polygon (inches)
+      - { x: 11.81, y: -15.75 }
+      - { x: 11.81, y: -12.20 }
+      - { x: -23.62, y: -12.20 }
+      - { x: -23.62, y: -15.75 }
+    boundingPolygonBumperRearLeft:                       # Bumper's rear left polygon (inches)
+      - { x: -20.08, y: 7.09 }
+      - { x: -20.08, y: 12.20 }
+      - { x: -23.62, y: 12.20 }
+      - { x: -23.62, y: 7.09 }
+    boundingPolygonBumperRearRight:                      # Bumper's rear right polygon (inches)
+      - { x: -20.08, y: -12.20 }
+      - { x: -20.08, y: -7.09 }
+      - { x: -23.62, y: -7.09 }
+      - { x: -23.62, y: -12.20 }
+    ingestibleRegionCenter:                              # Ingestible region's center polygon (inches)
+      - { x: 20.08, y: -4.33 }
+      - { x: 20.08, y: 4.33 }
+      - { x: 1.97, y: 4.33 }
+      - { x: 1.97, y: -4.33 }
+    ingestibleRegionLeft:                                # Ingestible region's left polygon (inches)
+      - { x: 20.08, y: 4.33 }
+      - { x: 20.08, y: 10.24 }
+      - { x: 11.81, y: 10.24 }
+      - { x: 11.81, y: 4.33 }
+    ingestibleRegionRight:                               # Ingestible region's right polygon (inches)
+      - { x: 20.08, y: -10.24 }
+      - { x: 20.08, y: -4.33 }
+      - { x: 11.81, y: -4.33 }
+      - { x: 11.81, y: -10.24 }
+    tubeRegion:                                          # Ingestible region's tube polygon (inches)
+      - { x: 1.97, y: -7.09 }
+      - { x: 1.97, y: 7.09 }
+      - { x: -23.62, y: 7.09 }
+      - { x: -23.62, y: -7.09 }
     weight: 154                                          # Pounds
     initialState:
       x: 0                                               # Inches

@@ -33,23 +33,23 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp, in
     _state.pose.theta = _initialState.theta;
 
     // Make bounding polygons
-    _boundingPolygonFrontLeft = std::vector<Vertex2d>{{0.20, 0.11}, {0.20, 0.31}, {0.05, 0.31}, {0.05, 0.11}};
-    _boundingPolygonFrontRight = std::vector<Vertex2d>{{0.20, -0.31}, {0.20, -0.11}, {0.05, -0.11}, {0.05, -0.31}};
-    _boundingPolygonRearLeft = std::vector<Vertex2d>{{0.05, 0.18}, {0.05, 0.31}, {-0.51, 0.31}, {-0.51, 0.18}};
-    _boundingPolygonRearRight = std::vector<Vertex2d>{{0.05, -0.31}, {0.05, -0.18}, {-0.51, -0.18}, {-0.51, -0.31}};
+    _boundingPolygonFrontLeft = config.sim.vehicle.boundingPolygonFrontLeft;
+    _boundingPolygonFrontRight = config.sim.vehicle.boundingPolygonFrontRight;
+    _boundingPolygonRearLeft = config.sim.vehicle.boundingPolygonRearLeft;
+    _boundingPolygonRearRight = config.sim.vehicle.boundingPolygonRearRight;
 
-    _boundingPolygonBumperFrontLeft = std::vector<Vertex2d>{ {0.30, 0.16}, {0.30, 0.31}, {0.20, 0.31}, {0.20, 0.16} };
-    _boundingPolygonBumperFrontRight = std::vector<Vertex2d>{ {0.30, -0.31}, {0.30, -0.16}, {0.20, -0.16}, {0.20, -0.31} };
-    _boundingPolygonBumperLeft = std::vector<Vertex2d>{ {0.30, 0.31}, {0.30, 0.40}, {-0.60, 0.40}, {-0.60, 0.31} };
-    _boundingPolygonBumperRight = std::vector<Vertex2d>{ {0.30, -0.40}, {0.30, -0.31}, {-0.60, -0.31}, {-0.60, -0.40} };
-    _boundingPolygonBumperRearLeft = std::vector<Vertex2d>{ {-0.51, 0.18}, {-0.51, 0.31}, {-0.60, 0.31}, {-0.60, 0.18} };
-    _boundingPolygonBumperRearRight = std::vector<Vertex2d>{ {-0.51, -0.31}, {-0.51, -0.18}, {-0.60, -0.18}, {-0.60, -0.31} };
+    _boundingPolygonBumperFrontLeft = config.sim.vehicle.boundingPolygonBumperFrontLeft;
+    _boundingPolygonBumperFrontRight = config.sim.vehicle.boundingPolygonBumperFrontRight;
+    _boundingPolygonBumperLeft = config.sim.vehicle.boundingPolygonBumperLeft;
+    _boundingPolygonBumperRight = config.sim.vehicle.boundingPolygonBumperRight;
+    _boundingPolygonBumperRearLeft = config.sim.vehicle.boundingPolygonBumperRearLeft;
+    _boundingPolygonBumperRearRight = config.sim.vehicle.boundingPolygonBumperRearRight;
 
     // Make ingestible/ingested regions
-    _ingestibleRegionCenter = std::vector<Vertex2d>{{0.51, -0.11}, {0.51, 0.11}, {0.05, 0.11}, {0.05, -0.11}};
-    _ingestibleRegionLeft = std::vector<Vertex2d>{{0.51, 0.11}, {0.51, 0.26}, {0.30, 0.26}, {0.30, 0.11}};
-    _ingestibleRegionRight = std::vector<Vertex2d>{{0.51, -0.26}, {0.51, -0.11}, {0.30, -0.11}, {0.30, -0.26}};
-    _tubeRegion = std::vector<Vertex2d>{{0.05, -0.18}, {0.05, 0.18}, {-0.60, 0.18}, {-0.60, -0.18}};
+    _ingestibleRegionCenter = config.sim.vehicle.ingestibleRegionCenter;
+    _ingestibleRegionLeft = config.sim.vehicle.ingestibleRegionLeft;
+    _ingestibleRegionRight = config.sim.vehicle.ingestibleRegionRight;
+    _tubeRegion = config.sim.vehicle.tubeRegion;
 }
 
 

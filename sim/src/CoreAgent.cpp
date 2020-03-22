@@ -5,6 +5,8 @@
 #include <string>
 #include "CoreAgent.h"
 
+#define NUM_ALLOWABLE_DROPPED_PACKETS 150
+
 
 CoreAgent::CoreAgent(const ConfigReader& config) :
         _sensorState{0}, _coreCommands{}, _numDroppedPackets(0), _verbose(config.verbose)
@@ -64,5 +66,5 @@ bool CoreAgent::rxCoreCommands()
 bool CoreAgent::isConnected() const
 {
     // As long as we've heard from the controls <= 100 packets ago, we're still connected
-    return _numDroppedPackets < 100;
+    return _numDroppedPackets < NUM_ALLOWABLE_DROPPED_PACKETS;
 }

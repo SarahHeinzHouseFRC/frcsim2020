@@ -38,7 +38,7 @@ public:
     /**
      * Displays "connected" or "disconnected"
      */
-    void displayConnectionStatus(bool isConnected);
+    void displayConnectionStatus(const std::vector<bool>& connected);
 
     /**
      * Displays the countdown timer
@@ -65,7 +65,8 @@ private:
     osg::ref_ptr<osg::Geometry> _geom;
     osg::ref_ptr<osg::Vec3Array> _vertices;
     int _width;
-    osg::ref_ptr<HudLabel> _connected;
+    std::vector<HudLabel*> _connectedLabels;
+    std::vector<HudBox*> _connectedBoxes;
     osg::ref_ptr<HudLabel> _timer;
     osg::ref_ptr<HudLabel> _blueScore;
     osg::ref_ptr<HudLabel> _redScore;

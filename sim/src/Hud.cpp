@@ -52,17 +52,10 @@ Hud::Hud(const ConfigReader& config) : _width(225)
     constexpr int P_FONT_SIZE = 16;
 
     // Add labels to _labelsGeode
-    float y = -94;
     _labelsGeode = new osg::Geode;
     _root->addChild(_labelsGeode);
 
-    // Has to be first or else it won't draw the background color for some reason
-    _connected = new HudTopLabel("Connected", _padding, y, P_FONT_SIZE, config.sim.assets.fontFile);
-    _connected->setDrawMode(osgText::TextBase::TEXT | osgText::TextBase::FILLEDBOUNDINGBOX);
-    _connected->setBoundingBoxMargin(5);
-    _labelsGeode->addChild(_connected);
-
-    y = 0;
+    float y = 0;
 
     y -= 34;
     auto title = new HudTopLabel("Robot Sim", _padding, y, H1_FONT_SIZE, config.sim.assets.fontFile);
@@ -73,7 +66,20 @@ Hud::Hud(const ConfigReader& config) : _width(225)
     subtitle->setColor(osg::Vec4(0.8, 0.8, 1, 1));
     _labelsGeode->addChild(subtitle);
 
-    y -= 110;
+    for (int i=0; i<config.players.size(); i++)
+    {
+        y -= 35;
+        constexpr float margin = 12.5;
+        osg::ref_ptr<HudLabel> label = new HudTopLabel("Connected", _padding + margin, y + margin, P_FONT_SIZE, config.sim.assets.fontFile);
+        label->setAlignment(osgText::TextBase::LEFT_CENTER);
+        _connectedLabels.push_back(label);
+        _labelsGeode->addChild(label);
+        osg::ref_ptr<HudBox> labelBoundingBox = new HudBox(_padding, y, _width - 2 * _padding, margin*2, Color::Green);
+        _connectedBoxes.push_back(labelBoundingBox);
+        _labelsGeode->addChild(labelBoundingBox);
+    }
+
+    y -= 50;
     osg::ref_ptr<HudBox> yellowScoreboard = new HudBox(_padding, y, _width - 2 * _padding, P_FONT_SIZE * 2, Color(Color::Yellow, 127));
     _labelsGeode->addDrawable(yellowScoreboard);
 
@@ -145,17 +151,28 @@ void Hud::onWindowResize(int width, int height)
 
 
 
-void Hud::displayConnectionStatus(bool isConnected)
+void Hud::displayConnectionStatus(const std::vector<bool>& connected)
 {
-    if (isConnected)
+    for (int i=0; i<_connectedLabels.size(); i++)
     {
-        _connected->setBoundingBoxColor(Color::Green);
-        _connected->setText("Connected");
-    }
-    else
-    {
-        _connected->setBoundingBoxColor(Color::Red);
-        _connected->setText("Disconnected");
+        HudLabel* label = _connectedLabels.at(i);
+        HudBox* labelBoundingBox = _connectedBoxes.at(i);
+        if (connected.at(i))
+        {
+            char tmp[255];
+            sprintf(tmp, "Player %d connected", i+1);
+            label->setText(tmp);
+            labelBoundingBox->setColor(Color::Green);
+        }
+        else
+        {
+            char tmp[255];
+            sprintf(tmp, "Player %d disconnected", i+1);
+            label->setText(tmp);
+            labelBoundingBox->setColor(Color::Red);
+        }
+        osg::BoundingBox bb = label->getBoundingBox();
+        labelBoundingBox->setSize(bb, 5);
     }
 }
 

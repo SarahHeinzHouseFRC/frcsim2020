@@ -119,6 +119,7 @@ int main(int argc, char** argv)
                     wm.vehicleModel(i).processCommands(rxCommands);
                 }
             }
+            usleep(100);
         }
     });
 
@@ -163,10 +164,10 @@ int main(int argc, char** argv)
             scene.update(s);
 
             // Update the hud
-            bool connected = true;
+            std::vector<bool> connected;
             for (const auto& coreAgent : coreAgents)
             {
-                if (!coreAgent.isConnected()) { connected = false; }
+                connected.push_back(coreAgent.isConnected());
             }
             hud.displayConnectionStatus(connected);
             hud.displayTimerStatus(s.isTimerRunning, s.timer);

@@ -41,12 +41,46 @@ HudBox::HudBox(float x, float y, float width, float height, const Color& color) 
 
 
 
+void HudBox::setColor(const Color& color)
+{
+    _colors->clear();
+    _colors->push_back(color);
+    this->setColorArray(_colors);
+    this->setColorBinding(osg::Geometry::BIND_OVERALL);
+}
+
+
+
+void HudBox::setSize(const osg::BoundingBox& bb, float padding)
+{
+    float x = bb.xMin() - padding - 3;
+    float y = bb.yMin() - _windowHeight - padding + 2;
+    float width = bb.xMax() - bb.xMin() + 2*padding + 6;
+    float height = bb.yMax() - bb.yMin() + 2*padding;
+    if (_x != x || _y != y || _width != width || _height != height)
+    {
+        _x = x;
+        _y = y;
+        _width = width;
+        _height = height;
+        _vertices = new osg::Vec3Array;
+        _vertices->push_back(osg::Vec3(_x, _windowHeight + _y, -0.01));
+        _vertices->push_back(osg::Vec3(_x + _width, _windowHeight + _y, -0.01));
+        _vertices->push_back(osg::Vec3(_x + _width, _windowHeight + _y + _height, -0.01));
+        _vertices->push_back(osg::Vec3(_x, _windowHeight + _y + _height, -0.01));
+        this->setVertexArray(_vertices);
+    }
+}
+
+
+
 void HudBox::onWindowResize(int windowWidth, int windowHeight)
 {
+    _windowHeight = windowHeight;
     _vertices = new osg::Vec3Array;
-    _vertices->push_back(osg::Vec3(_x, windowHeight + _y, -0.01));
-    _vertices->push_back(osg::Vec3(_x + _width, windowHeight + _y, -0.01));
-    _vertices->push_back(osg::Vec3(_x + _width, windowHeight + _y + _height, -0.01));
-    _vertices->push_back(osg::Vec3(_x, windowHeight + _y + _height, -0.01));
+    _vertices->push_back(osg::Vec3(_x, _windowHeight + _y, -0.01));
+    _vertices->push_back(osg::Vec3(_x + _width, _windowHeight + _y, -0.01));
+    _vertices->push_back(osg::Vec3(_x + _width, _windowHeight + _y + _height, -0.01));
+    _vertices->push_back(osg::Vec3(_x, _windowHeight + _y + _height, -0.01));
     this->setVertexArray(_vertices);
 }

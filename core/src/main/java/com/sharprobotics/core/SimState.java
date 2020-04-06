@@ -10,7 +10,7 @@ package com.sharprobotics.core;
  */
 public class SimState
 {
-    public int leftDriveEncoderPosition; // Integer from 0-1024
-    public int rightDriveEncoderPosition; // Integer from 0-1024
-    public int elevatorEncoderPos; // Integer from 0-1024
+    public int leftDriveEncoder; // Integer from 0-1024
+    public int rightDriveEncoder; // Integer from 0-1024
+    public LidarPoint[] lidarSweep; // LIDAR sweep
 }

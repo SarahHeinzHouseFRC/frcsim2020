@@ -32,7 +32,7 @@ public:
     /**
      * Send over UDP
      */
-    void send(std::string msg);
+    void send(const std::string &msg);
 
     /**
      * Receive over UDP (max 1024 bytes)

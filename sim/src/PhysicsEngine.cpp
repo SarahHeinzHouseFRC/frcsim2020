@@ -350,7 +350,7 @@ void PhysicsEngine::update(FieldModel& fieldModel, std::vector<VehicleModel>& ve
     for (unsigned int i=0; i<vehicleModels.size(); i++)
     {
         b2Transform vehicleTf = _vehiclePhysicsModels.at(i).body->GetTransform();
-        vehicleModels.at(i)._sweep = _lidar->sweep(vehicleTf);
+        vehicleModels.at(i)._lidarSweep = _lidar->sweep(vehicleTf);
     }
 
     _prevTimestamp = currTimestamp;

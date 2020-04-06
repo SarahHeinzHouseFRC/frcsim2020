@@ -124,7 +124,8 @@ int main(int argc, char** argv)
         }
     });
 
-    std::mutex m;
+    std::mutex m1;
+    std::mutex m2;
 
     // Launch tx comms in background thread
     std::thread txThread([&]()
@@ -134,13 +135,16 @@ int main(int argc, char** argv)
             for (int i=0; i<coreAgents.size(); i++)
             {
                 CoreAgent& coreAgent = coreAgents.at(i);
-                coreAgent.setSensorState(wm.vehicleModel(i).getSensorState());
+                m1.lock();
+                SensorState s = wm.vehicleModel(i).getSensorState();
+                coreAgent.setSensorState(s);
+                m1.unlock();
                 coreAgent.txSensorState();
             }
 
-            m.lock();
+            m2.lock();
             SimState s = wm.getSimState();
-            m.unlock();
+            m2.unlock();
             s.isTimerRunning = timer.isRunning();
             s.timer = timer.getValue();
 
@@ -161,9 +165,9 @@ int main(int argc, char** argv)
         {
             if (headless) { break; }
 
-            m.lock();
+            m2.lock();
             SimState s = wm.getSimState();
-            m.unlock();
+            m2.unlock();
             s.isTimerRunning = timer.isRunning();
             s.timer = timer.getValue();
 
@@ -195,9 +199,11 @@ int main(int argc, char** argv)
         timer.update(t);
 
         // Update the world to reflect the current time
-        m.lock();
+        m1.lock();
+        m2.lock();
         wm.update(t);
-        m.unlock();
+        m1.unlock();
+        m2.unlock();
 
         if (reset)
         {

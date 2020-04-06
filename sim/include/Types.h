@@ -7,32 +7,63 @@
 
 #include <string>
 #include "rapidjson/document.h"
-#include "rapidjson/prettywriter.h"
+#include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+
+
+struct LidarPoint
+{
+    double azimuth, elevation, range;
+};
+
 
 
 struct SensorState
 {
-    int leftDriveEncoder;  // 0-1023
-    int rightDriveEncoder; // 0-1023
-    int elevatorEncoder;   // 0-1023
+    float x;                            // Meters
+    float y;                            // Meters
+    float theta;                        // Radians
+    int leftDriveEncoder;               // 0-1023
+    int rightDriveEncoder;              // 0-1023
+    std::vector<LidarPoint> lidarSweep; // LIDAR points
 
     /**
      * Returns the sensor state as a JSON string
      */
     std::string toJson()
     {
-        const char msg[] = R"({ "leftDriveEncoder": 0, "rightDriveEncoder": 0, "elevatorEncoder": 0 })";
-        rapidjson::Document d;
-        d.Parse(msg);
-        d["leftDriveEncoder"] = leftDriveEncoder;
-        d["rightDriveEncoder"] = rightDriveEncoder;
-        d["elevatorEncoder"] = elevatorEncoder;
+//        printf("Pose = (%f, %f, %f)\n", x, y, theta);
 
-        rapidjson::StringBuffer sb;
-        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-        d.Accept(writer);
-        return sb.GetString();
+        rapidjson::StringBuffer s;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+        writer.StartObject();
+        writer.Key("x");
+        writer.Double(x);
+        writer.Key("y");
+        writer.Double(y);
+        writer.Key("theta");
+        writer.Double(theta);
+        writer.Key("leftDriveEncoder");
+        writer.Int(leftDriveEncoder);
+        writer.Key("rightDriveEncoder");
+        writer.Int(rightDriveEncoder);
+        writer.Key("lidarSweep");
+        writer.StartArray();
+        for (const auto& p : lidarSweep)
+        {
+            writer.StartObject();
+            writer.Key("azimuth");
+            writer.Double(p.azimuth);
+            writer.Key("elevation");
+            writer.Double(p.elevation);
+            writer.Key("range");
+            writer.Double(p.range);
+            writer.EndObject();
+        }
+        writer.EndArray();
+        writer.EndObject();
+        return s.GetString();
     }
 
     /**
@@ -42,7 +73,7 @@ struct SensorState
     {
         leftDriveEncoder = 0;
         rightDriveEncoder = 0;
-        elevatorEncoder = 0;
+        lidarSweep.clear();
     }
 };
 
@@ -105,14 +136,6 @@ struct CoreCommands
 
 
 
-struct LidarPoint
-{
-    double x, y, z;
-    double azimuth, elevation, range;
-};
-
-
-
 struct SimState
 {
     struct VehicleState
@@ -166,7 +189,7 @@ struct SimState
     std::string toJson()
     {
         rapidjson::StringBuffer s;
-        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+        rapidjson::Writer<rapidjson::StringBuffer> writer(s);
 
         writer.StartObject();
         writer.Key("blueScore");
@@ -209,6 +232,20 @@ struct SimState
             writer.Double(v.leftDriveMotorSpeed);
             writer.Key("rightDriveMotorSpeed");
             writer.Double(v.rightDriveMotorSpeed);
+            writer.Key("lidarSweep");
+            writer.StartArray();
+            for (const auto& p : v.lidarSweep)
+            {
+                writer.StartObject();
+                writer.Key("azimuth");
+                writer.Double(p.azimuth);
+                writer.Key("elevation");
+                writer.Double(p.elevation);
+                writer.Key("range");
+                writer.Double(p.range);
+                writer.EndObject();
+            }
+            writer.EndArray();
             writer.EndObject();
         }
         writer.EndArray();
@@ -265,6 +302,17 @@ struct SimState
             vehicle.tubeMotorSpeed = (*itr)["tubeMotorSpeed"].GetFloat();
             vehicle.leftDriveMotorSpeed = (*itr)["leftDriveMotorSpeed"].GetFloat();
             vehicle.rightDriveMotorSpeed = (*itr)["rightDriveMotorSpeed"].GetFloat();
+            const Value& s = (*itr)["lidarSweep"];
+            std::vector<LidarPoint> lidarSweep;
+            for (auto itr2 = s.Begin(); itr2 != s.End(); itr2++)
+            {
+                LidarPoint p{};
+                p.azimuth = (*itr2)["azimuth"].GetFloat();
+                p.elevation = (*itr2)["elevation"].GetFloat();
+                p.range = (*itr2)["range"].GetFloat();
+                lidarSweep.push_back(p);
+            }
+            vehicle.lidarSweep = lidarSweep;
             vehicles.push_back(vehicle);
         }
 

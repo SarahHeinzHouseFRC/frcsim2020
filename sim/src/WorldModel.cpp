@@ -88,7 +88,7 @@ SimState WorldModel::getSimState()
         v.tubeMotorSpeed = (float) vehicle._state.tubeMotorSpeed;
         v.leftDriveMotorSpeed = (float) vehicle._state.rightDriveMotorSpeed;
         v.rightDriveMotorSpeed = (float) vehicle._state.leftDriveMotorSpeed;
-        v.lidarSweep = vehicle._sweep;
+        v.lidarSweep = vehicle._lidarSweep;
         s.vehicles.push_back(v);
     }
 

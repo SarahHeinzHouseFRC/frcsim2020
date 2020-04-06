@@ -5,7 +5,7 @@
 #include <string>
 #include "CoreAgent.h"
 
-#define NUM_ALLOWABLE_DROPPED_PACKETS 150
+#define NUM_ALLOWABLE_DROPPED_PACKETS 500
 
 
 CoreAgent::CoreAgent(const ConfigReader& config) :

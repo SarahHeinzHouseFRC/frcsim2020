@@ -135,6 +135,12 @@ void VehicleModel::processCommands(const CoreCommands& commands)
 SensorState VehicleModel::getSensorState()
 {
     SensorState state{0};
+    state.x = _state.pose.x;
+    state.y = _state.pose.y;
+    state.theta = _state.pose.theta;
+    state.leftDriveEncoder = 0; // TODO: Assign real values
+    state.rightDriveEncoder = 0; // TODO: Assign real values
+    state.lidarSweep = _lidarSweep;
     return state;
 }
 

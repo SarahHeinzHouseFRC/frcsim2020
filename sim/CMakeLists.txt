@@ -33,6 +33,7 @@ set(SIM_SRCS
         src/PhysicsEngine.cpp
         src/Geometry.cpp
         src/ArgumentParser.cpp
+        src/PhysicsEngineLidar.cpp
 )
 
 add_executable(sim ${SIM_SRCS})

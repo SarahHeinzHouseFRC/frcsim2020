@@ -105,21 +105,30 @@ struct CoreCommands
 
 
 
+struct LidarPoint
+{
+    double x, y, z;
+    double azimuth, elevation, range;
+};
+
+
+
 struct SimState
 {
     struct VehicleState
     {
-        std::string team;             // Team number
-        std::string alliance;         // "Blue" or "Red"
-        float x;                      // Meters
-        float y;                      // Meters
-        float theta;                  // Radians
-        float intakeCenterMotorSpeed; // Meters/sec
-        float intakeLeftMotorSpeed;   // Meters/sec
-        float intakeRightMotorSpeed;  // Meters/sec
-        float tubeMotorSpeed;         // Meters/sec
-        float leftDriveMotorSpeed;    // Rads/sec
-        float rightDriveMotorSpeed;   // Rads/sec
+        std::string team;                   // Team number
+        std::string alliance;               // "Blue" or "Red"
+        float x;                            // Meters
+        float y;                            // Meters
+        float theta;                        // Radians
+        float intakeCenterMotorSpeed;       // Meters/sec
+        float intakeLeftMotorSpeed;         // Meters/sec
+        float intakeRightMotorSpeed;        // Meters/sec
+        float tubeMotorSpeed;               // Meters/sec
+        float leftDriveMotorSpeed;          // Rads/sec
+        float rightDriveMotorSpeed;         // Rads/sec
+        std::vector<LidarPoint> lidarSweep; // LIDAR points
     };
 
     struct FieldState

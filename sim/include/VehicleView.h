@@ -55,8 +55,14 @@ private:
      */
     osg::ref_ptr<osg::Geode> drawInfo(const ConfigReader& config, int playerId, const std::string& fontFile);
 
+    /**
+     * Draws LIDAR rays
+     */
+    osg::ref_ptr<osg::Geode> drawRays(const ConfigReader&config);
+
     osg::ref_ptr<osg::Node> _vehicleNode;
     osg::ref_ptr<osg::Geode> _vehicleBounds;
+    osg::ref_ptr<osg::Geode> _sweep;
     osg::ref_ptr<osg::Geometry> _ingestibleRegionCenterArrow;
     Geometry::Vertex2d _centerIngestibleRegionCenter;
     Geometry::Vertex2d _centerIngestibleRegionLeft;

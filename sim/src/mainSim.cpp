@@ -3,6 +3,7 @@
  */
 
 #include <iostream>
+#include <mutex>
 #include <thread>
 #include "ArgumentParser.h"
 #include "ConfigReader.h"
@@ -123,6 +124,8 @@ int main(int argc, char** argv)
         }
     });
 
+    std::mutex m;
+
     // Launch tx comms in background thread
     std::thread txThread([&]()
     {
@@ -135,7 +138,9 @@ int main(int argc, char** argv)
                 coreAgent.txSensorState();
             }
 
+            m.lock();
             SimState s = wm.getSimState();
+            m.unlock();
             s.isTimerRunning = timer.isRunning();
             s.timer = timer.getValue();
 
@@ -156,7 +161,9 @@ int main(int argc, char** argv)
         {
             if (headless) { break; }
 
+            m.lock();
             SimState s = wm.getSimState();
+            m.unlock();
             s.isTimerRunning = timer.isRunning();
             s.timer = timer.getValue();
 
@@ -188,7 +195,9 @@ int main(int argc, char** argv)
         timer.update(t);
 
         // Update the world to reflect the current time
+        m.lock();
         wm.update(t);
+        m.unlock();
 
         if (reset)
         {

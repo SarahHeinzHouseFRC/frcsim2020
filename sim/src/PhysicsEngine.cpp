@@ -2,7 +2,6 @@
  * Copyright (c) 2020 Team 3260
  */
 
-#include <GamePieceModel.h>
 #include "Geometry.h"
 #include "PhysicsEngine.h"
 
@@ -52,6 +51,9 @@ PhysicsEngine::PhysicsEngine(const FieldModel& fieldModel,
 
     // Add collision listener
     _world->SetContactListener(new CollisionListener);
+
+    // Create LIDAR with ray casts
+    _lidar = std::make_unique<PhysicsEngineLidar>(_world.get());
 
     // Field static bodies
     initFieldBodies(_world.get(), fieldModel);
@@ -343,6 +345,13 @@ void PhysicsEngine::update(FieldModel& fieldModel, std::vector<VehicleModel>& ve
 
     fieldModel._blueScore = _blueGoalGamePieceBodies.size() + _blueOuttaken;
     fieldModel._redScore = _redGoalGamePieceBodies.size() + _redOuttaken;
+
+    // Get LIDAR sweep
+    for (unsigned int i=0; i<vehicleModels.size(); i++)
+    {
+        b2Transform vehicleTf = _vehiclePhysicsModels.at(i).body->GetTransform();
+        vehicleModels.at(i)._sweep = _lidar->sweep(vehicleTf);
+    }
 
     _prevTimestamp = currTimestamp;
 }

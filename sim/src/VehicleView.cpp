@@ -5,7 +5,6 @@
 #include <osgDB/ReadFile>
 #include <osgText/Text>
 #include <iostream>
-#include <ConfigReader.h>
 #include "VehicleView.h"
 #include "ViewUtils.h"
 #include "Color.h"
@@ -44,6 +43,9 @@ VehicleView::VehicleView(const ConfigReader& config, int playerId) :
 
     osg::ref_ptr<osg::Geode> info = drawInfo(config, playerId, config.sim.assets.fontFile);
     addChild(info);
+
+    _sweep = drawRays(config);
+    addChild(_sweep);
 }
 
 
@@ -105,6 +107,30 @@ void VehicleView::update(const SimState::VehicleState& state)
         _tubeRegionArrow->getVertexArray()->dirty();
         _tubeRegionArrow->setPrimitiveSet(0, new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_FAN, 0, vertices->size()));
         _tubeRegionArrow->setColorBinding(osg::Geometry::BIND_OVERALL);
+    }
+
+    // Update LIDAR sweep
+    if (!state.lidarSweep.empty())
+    {
+        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+        constexpr double nearRange = 0.75;
+        double z = -_wheelRadius + 0.089;
+        for (int i=0; i<800; i++) // TODO: Fix magic number
+        {
+            LidarPoint p = state.lidarSweep.at(i);
+            if (p.range > 0)
+            {
+                double farRange = p.range;
+                double azimuth = p.azimuth;
+                osg::Vec3 nearPoint(nearRange * cos(azimuth), nearRange * sin(azimuth), z);
+                osg::Vec3 farPoint(farRange * cos(azimuth), farRange * sin(azimuth), z);
+                vertices->push_back(nearPoint);
+                vertices->push_back(farPoint);
+            }
+        }
+        osg::ref_ptr<osg::Geometry> geom = ViewUtils::drawLines(vertices, Color::Orange);
+        _sweep->removeDrawables(0);
+        _sweep->addDrawable(geom);
     }
 }
 
@@ -369,5 +395,28 @@ osg::ref_ptr<osg::Geode> VehicleView::drawInfo(const ConfigReader& config, int p
     text->setAutoRotateToScreen(true);
     geode->addDrawable(text);
 
+    return geode;
+}
+
+
+
+osg::ref_ptr<osg::Geode> VehicleView::drawRays(const ConfigReader&config)
+{
+
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+    constexpr double nearRange = 0.75;
+    constexpr double farRange = 12;
+    double z = -config.sim.vehicle.drivetrain.wheelRadius + 0.1;
+    for (int i=0; i<800; i++)
+    {
+        double theta = i * (2*M_PI) / 800;
+        osg::Vec3 nearPoint(nearRange * cos(theta), nearRange * sin(theta), z);
+        osg::Vec3 farPoint(farRange * cos(theta), farRange * sin(theta), z);
+        vertices->push_back(nearPoint);
+        vertices->push_back(farPoint);
+    }
+    osg::ref_ptr<osg::Geometry> geom = ViewUtils::drawLines(vertices, Color::Gray);
+    geode->addDrawable(geom);
     return geode;
 }

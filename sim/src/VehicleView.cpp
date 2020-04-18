@@ -19,7 +19,10 @@ VehicleView::VehicleView(const ConfigReader& config, int playerId) :
         _centerIngestibleRegionRight(config.sim.vehicle.ingestibleRegionRight.center()),
         _intakeRightMotorMaxSpeed(config.sim.vehicle.intake.rightMotorMaxSpeed),
         _centerTubeRegion(config.sim.vehicle.tubeRegion.center()),
-        _tubeMotorMaxSpeed(config.sim.vehicle.intake.tubeMotorMaxSpeed)
+        _tubeMotorMaxSpeed(config.sim.vehicle.intake.tubeMotorMaxSpeed),
+        _lidarNearRange(config.sim.vehicle.lidar.minRange),
+        _laserFrequency(config.sim.vehicle.lidar.laserFrequency),
+        _motorFrequency(config.sim.vehicle.lidar.motorFrequency)
 {
     if (config.debugView || config.headless)
     {
@@ -113,9 +116,9 @@ void VehicleView::update(const SimState::VehicleState& state)
     if (!state.lidarSweep.empty())
     {
         osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-        constexpr double nearRange = 0.75;
+        double nearRange = _lidarNearRange;
         double z = -_wheelRadius + 0.089;
-        for (int i=0; i<800; i++) // TODO: Fix magic number
+        for (int i=0; i<_laserFrequency/_motorFrequency; i++)
         {
             LidarPoint p = state.lidarSweep.at(i);
             if (p.range > 0)
@@ -402,21 +405,8 @@ osg::ref_ptr<osg::Geode> VehicleView::drawInfo(const ConfigReader& config, int p
 
 osg::ref_ptr<osg::Geode> VehicleView::drawRays(const ConfigReader&config)
 {
-
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
-    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-    constexpr double nearRange = 0.75;
-    constexpr double farRange = 12;
-    double z = -config.sim.vehicle.drivetrain.wheelRadius + 0.1;
-    for (int i=0; i<800; i++)
-    {
-        double theta = i * (2*M_PI) / 800;
-        osg::Vec3 nearPoint(nearRange * cos(theta), nearRange * sin(theta), z);
-        osg::Vec3 farPoint(farRange * cos(theta), farRange * sin(theta), z);
-        vertices->push_back(nearPoint);
-        vertices->push_back(farPoint);
-    }
-    osg::ref_ptr<osg::Geometry> geom = ViewUtils::drawLines(vertices, Color::Gray);
+    osg::ref_ptr<osg::Geometry> geom = new osg::Geometry;
     geode->addDrawable(geom);
     return geode;
 }

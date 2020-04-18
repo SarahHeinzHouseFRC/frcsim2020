@@ -2,12 +2,15 @@
  * Copyright (c) 2020 Team 3260
  */
 
+#include "ConfigReader.h"
 #include "PhysicsEngineLidar.h"
 
-#define NUM_RAYS_PER_SWEEP 800
 
-
-PhysicsEngineLidar::PhysicsEngineLidar(b2World* world) : _world(world)
+PhysicsEngineLidar::PhysicsEngineLidar(b2World* world, const ConfigReader& config) :
+        _world(world),
+        _minRange(config.sim.vehicle.lidar.minRange),
+        _maxRange(config.sim.vehicle.lidar.maxRange),
+        _numRaysPerSweep(config.sim.vehicle.lidar.laserFrequency / config.sim.vehicle.lidar.motorFrequency)
 {
 
 }
@@ -16,17 +19,15 @@ PhysicsEngineLidar::PhysicsEngineLidar(b2World* world) : _world(world)
 
 std::vector<LidarPoint> PhysicsEngineLidar::sweep(const b2Transform& pose)
 {
-    std::vector<LidarPoint> results(NUM_RAYS_PER_SWEEP);
+    std::vector<LidarPoint> results(_numRaysPerSweep);
 
-    constexpr double minRange = 0.75;
-    constexpr double maxRange = 12;
-    for (int i=0; i<NUM_RAYS_PER_SWEEP; i++)
+    for (int i=0; i<_numRaysPerSweep; i++)
     {
-        double azimuth = i * (2*M_PI) / NUM_RAYS_PER_SWEEP;
-        b2Vec2 nearPoint = b2Mul(pose, b2Vec2(minRange * cos(azimuth), minRange * sin(azimuth)));
-        b2Vec2 farPoint =  b2Mul(pose, b2Vec2(maxRange * cos(azimuth), maxRange * sin(azimuth)));
+        double azimuth = i * (2*M_PI) / _numRaysPerSweep;
+        b2Vec2 nearPoint = b2Mul(pose, b2Vec2(_minRange * cos(azimuth), _minRange * sin(azimuth)));
+        b2Vec2 farPoint =  b2Mul(pose, b2Vec2(_maxRange * cos(azimuth), _maxRange * sin(azimuth)));
 
-        LidarRayCastCallback rayCastCallback(minRange, maxRange);
+        LidarRayCastCallback rayCastCallback(_minRange, _maxRange);
         _world->RayCast(&rayCastCallback, nearPoint, farPoint);
         LidarPoint p{};
         p.azimuth = azimuth;

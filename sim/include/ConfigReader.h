@@ -41,6 +41,7 @@ public:
         std::string team;     // Team number
         std::string alliance; // "Blue" or "Red"
         Pose initialPosition; // Initial pose
+        bool hasLidar;        // Has LIDAR or not
     };
 
     std::vector<Player> players; // List of all possible players
@@ -111,6 +112,13 @@ public:
                 float rightMotorMaxSpeed;  // Rads/sec
                 float tubeMotorMaxSpeed;   // Rads/sec
             } intake;
+            struct
+            {
+                float minRange;       // Meters
+                float maxRange;       // Meters
+                float laserFrequency; // Hertz
+                float motorFrequency; // Hertz
+            } lidar;
         } vehicle;
         struct
         {

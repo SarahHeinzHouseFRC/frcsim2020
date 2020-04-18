@@ -11,6 +11,7 @@ using namespace Geometry;
 VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp, int playerId) :
         _team(config.players.at(playerId).team),
         _alliance(config.players.at(playerId).alliance),
+        _hasLidar(config.players.at(playerId).hasLidar),
         _prevTimestamp(startTimestamp),
         _state{0},
         _leftDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.leftMotorMaxSpeed),

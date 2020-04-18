@@ -22,7 +22,7 @@ public:
     /**
      * Constructor
      */
-    PhysicsEngineLidar(b2World* world);
+    PhysicsEngineLidar(b2World* world, const ConfigReader& config);
 
     /**
      * Performs one sweep of the LIDAR from the given vehicle pose
@@ -60,7 +60,11 @@ private:
         int _numIntersections;
         float _fraction;
     };
+
     b2World* _world; // Non-owning pointer to world
+    float _minRange;
+    float _maxRange;
+    float _numRaysPerSweep;
 };
 
 

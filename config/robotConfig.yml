@@ -2,12 +2,12 @@
 # Copyright (c) 2020 FRC Team 3260
 
 players:
-  - { team: "3260", alliance: "Blue", initialPosition: { x: 0.0, y: -197.0, theta: 90 } } # Player 1
-  - { team: "1234", alliance: "Red", initialPosition: { x: 0.0, y: 197.0, theta: -90 } }  # Player 2
-  - { team: "234", alliance: "Blue", initialPosition: { x: 60.0, y: -197.0, theta: 90 } } # Player 3
-  - { team: "34", alliance: "Red", initialPosition: { x: -60.0, y: 197.0, theta: -90 } }  # Player 4
-  - { team: "41", alliance: "Blue", initialPosition: { x: -60.0, y: -197.0, theta: 90 } } # Player 5
-  - { team: "412", alliance: "Red", initialPosition: { x: 60.0, y: 197.0, theta: -90 } }  # Player 6
+  - { team: "3260", alliance: "Blue", initialPosition: { x: 0.0, y: -197.0, theta: 90 }, hasLidar: true } # Player 1
+  - { team: "1234", alliance: "Red", initialPosition: { x: 0.0, y: 197.0, theta: -90 }, hasLidar: false }  # Player 2
+  - { team: "234", alliance: "Blue", initialPosition: { x: 60.0, y: -197.0, theta: 90 }, hasLidar: false } # Player 3
+  - { team: "34", alliance: "Red", initialPosition: { x: -60.0, y: 197.0, theta: -90 }, hasLidar: false }  # Player 4
+  - { team: "41", alliance: "Blue", initialPosition: { x: -60.0, y: -197.0, theta: 90 }, hasLidar: false } # Player 5
+  - { team: "412", alliance: "Red", initialPosition: { x: 60.0, y: 197.0, theta: -90 }, hasLidar: false }  # Player 6
 
 joystick:
   ip: "127.0.0.1"                                        # IP address where joystick is running
@@ -171,10 +171,6 @@ sim:
       - { x: -23.62, y: 7.09 }
       - { x: -23.62, y: -7.09 }
     weight: 154                                          # Pounds
-    initialState:
-      x: 0                                               # Inches
-      y: -197.0                                          # Inches
-      theta: 90                                          # Degrees
     drivetrain:
       width: 27.5                                        # Inches, length along robot's y-axis
       depth: 28.3                                        # Inches, length along robot's x-axis
@@ -190,6 +186,11 @@ sim:
       leftMotorMaxSpeed: 25                              # RPM
       rightMotorMaxSpeed: 25                             # RPM
       tubeMotorMaxSpeed: 25                              # RPM
+    lidar:
+      minRange: 0.75                                     # Meters
+      maxRange: 12                                       # Meters
+      laserFrequency: 8000                               # Hertz, laser fires per second
+      motorFrequency: 10                                 # Hertz, sweeps per second
   gamePiece:
     radius: 3.50                                         # Inches
     initialPositions:                                    # Inches (where (0, 0) is the center of the field)

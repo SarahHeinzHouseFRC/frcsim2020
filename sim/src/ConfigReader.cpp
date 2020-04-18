@@ -3,6 +3,7 @@
  */
 
 #include <iostream>
+#include <ConfigReader.h>
 #include "ConfigReader.h"
 
 #define RPM_TO_RADS_PER_SEC 0.1047f
@@ -62,6 +63,7 @@ void ConfigReader::parsePlayersConfig(const YAML::Node& playersConfig)
         p.initialPosition.x = playerConfig["initialPosition"]["x"].as<float>() * IN_TO_M;
         p.initialPosition.y = playerConfig["initialPosition"]["y"].as<float>() * IN_TO_M;
         p.initialPosition.theta = playerConfig["initialPosition"]["theta"].as<float>() * DEG_TO_RAD;
+        p.hasLidar = playerConfig["hasLidar"].as<bool>();
         players.push_back(p);
     }
 }
@@ -176,6 +178,20 @@ void ConfigReader::parseSimVehicleConfig(const YAML::Node& vehicleConfig)
         sim.vehicle.intake.leftMotorMaxSpeed = intakeConfig["leftMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
         sim.vehicle.intake.rightMotorMaxSpeed = intakeConfig["rightMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
         sim.vehicle.intake.tubeMotorMaxSpeed = intakeConfig["tubeMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
+    }
+
+    //
+    // Load vehicle LIDAR params
+    //
+
+    YAML::Node lidarConfig = vehicleConfig["lidar"];
+
+    if (lidarConfig)
+    {
+        sim.vehicle.lidar.minRange = lidarConfig["minRange"].as<float>();
+        sim.vehicle.lidar.maxRange = lidarConfig["maxRange"].as<float>();
+        sim.vehicle.lidar.laserFrequency = lidarConfig["laserFrequency"].as<float>();
+        sim.vehicle.lidar.motorFrequency = lidarConfig["motorFrequency"].as<float>();
     }
 }
 

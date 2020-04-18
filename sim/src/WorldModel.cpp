@@ -22,7 +22,7 @@ WorldModel::WorldModel(ConfigReader& config, double timestamp) :
         _gamePieceModels.emplace_back(config.sim.gamePiece.radius, initialPosition.x, initialPosition.y);
     }
 
-    _physicsEngine = PhysicsEngine(_fieldModel, _vehicleModels, _gamePieceModels, timestamp);
+    _physicsEngine = PhysicsEngine(config, _fieldModel, _vehicleModels, _gamePieceModels, timestamp);
 }
 
 

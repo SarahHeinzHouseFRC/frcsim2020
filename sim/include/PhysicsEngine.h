@@ -38,7 +38,7 @@ public:
     /**
      * Constructor
      */
-    PhysicsEngine(const FieldModel& fieldModel, const std::vector<VehicleModel>& vehicleModels, const std::vector<GamePieceModel>& gamePieceModels, double timestamp);
+    PhysicsEngine(const ConfigReader& config, const FieldModel& fieldModel, const std::vector<VehicleModel>& vehicleModels, const std::vector<GamePieceModel>& gamePieceModels, double timestamp);
 
     // TODO: Add destructor that destroys all bodies
 

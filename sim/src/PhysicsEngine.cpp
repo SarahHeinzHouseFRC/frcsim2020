@@ -37,7 +37,8 @@ enum CollisionMask
 
 
 
-PhysicsEngine::PhysicsEngine(const FieldModel& fieldModel,
+PhysicsEngine::PhysicsEngine(const ConfigReader& config,
+                             const FieldModel& fieldModel,
                              const std::vector<VehicleModel>& vehicleModels,
                              const std::vector<GamePieceModel>& gamePieceModels,
                              double timestamp) :
@@ -53,7 +54,7 @@ PhysicsEngine::PhysicsEngine(const FieldModel& fieldModel,
     _world->SetContactListener(new CollisionListener);
 
     // Create LIDAR with ray casts
-    _lidar = std::make_unique<PhysicsEngineLidar>(_world.get());
+    _lidar = std::make_unique<PhysicsEngineLidar>(_world.get(), config);
 
     // Field static bodies
     initFieldBodies(_world.get(), fieldModel);
@@ -349,8 +350,11 @@ void PhysicsEngine::update(FieldModel& fieldModel, std::vector<VehicleModel>& ve
     // Get LIDAR sweep
     for (unsigned int i=0; i<vehicleModels.size(); i++)
     {
-        b2Transform vehicleTf = _vehiclePhysicsModels.at(i).body->GetTransform();
-        vehicleModels.at(i)._lidarSweep = _lidar->sweep(vehicleTf);
+        if (vehicleModels.at(i)._hasLidar)
+        {
+            b2Transform vehicleTf = _vehiclePhysicsModels.at(i).body->GetTransform();
+            vehicleModels.at(i)._lidarSweep = _lidar->sweep(vehicleTf);
+        }
     }
 
     _prevTimestamp = currTimestamp;

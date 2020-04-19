@@ -99,7 +99,6 @@ private:
     double _tubeMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
     double _wheelRadius; // Needed to calculate travel of robot per unit time
     double _wheelTrack; // Needed to calculate arced turns
-    double _drivetrainWidth; // Needed to calculate turning radius
     double _mass; // Needed to calculate density for collision checker
     double _prevTimestamp; // Needed to calculate how much time has passed since last update()
     bool _outtake; // Whether or not this vehicle has requested the field to outtake

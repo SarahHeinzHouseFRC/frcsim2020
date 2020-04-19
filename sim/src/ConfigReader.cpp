@@ -154,14 +154,10 @@ void ConfigReader::parseSimVehicleConfig(const YAML::Node& vehicleConfig)
 
     if (drivetrainConfig)
     {
-        sim.vehicle.drivetrain.width = drivetrainConfig["width"].as<float>() * IN_TO_M;
-        sim.vehicle.drivetrain.depth = drivetrainConfig["depth"].as<float>() * IN_TO_M;
-        sim.vehicle.drivetrain.widthChannel = drivetrainConfig["widthChannel"].as<float>() * IN_TO_M;
-        sim.vehicle.drivetrain.heightChannel = drivetrainConfig["heightChannel"].as<float>() * IN_TO_M;
+        sim.vehicle.drivetrain.wheelBase = drivetrainConfig["wheelBase"].as<float>() * IN_TO_M;
+        sim.vehicle.drivetrain.wheelTrack = drivetrainConfig["wheelTrack"].as<float>() * IN_TO_M;
         sim.vehicle.drivetrain.wheelRadius = drivetrainConfig["wheelRadius"].as<float>() * IN_TO_M;
         sim.vehicle.drivetrain.wheelWidth = drivetrainConfig["wheelWidth"].as<float>() * IN_TO_M;
-        sim.vehicle.drivetrain.wheelBase = drivetrainConfig["wheelBase"].as<float>() * IN_TO_M;
-        sim.vehicle.drivetrain.wheelTrack = sim.vehicle.drivetrain.width - 2*sim.vehicle.drivetrain.widthChannel - sim.vehicle.drivetrain.wheelWidth;
         sim.vehicle.drivetrain.leftMotorMaxSpeed = drivetrainConfig["leftMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
         sim.vehicle.drivetrain.rightMotorMaxSpeed = drivetrainConfig["rightMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
     }

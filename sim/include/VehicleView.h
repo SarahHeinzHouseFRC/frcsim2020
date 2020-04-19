@@ -30,15 +30,14 @@ public:
 
 private:
     /**
-     * Helper method for creating a default robot out of basic geometry
+     * Draws wheels
      */
-
-    osg::ref_ptr<osg::Geode> drawVehicle(const ConfigReader& config);
+    osg::ref_ptr<osg::Geode> drawWheels(const ConfigReader& config);
 
     /**
      * Draws the collision boundary of the vehicle
      */
-    osg::ref_ptr<osg::Geode> drawCollisionBoundary(const ConfigReader& config);
+    osg::ref_ptr<osg::Geode> drawBody(const ConfigReader& config);
 
     /**
      * Draws the bumpers around the vehicle
@@ -61,7 +60,6 @@ private:
     osg::ref_ptr<osg::Geode> drawRays(const ConfigReader&config);
 
     osg::ref_ptr<osg::Node> _vehicleNode;
-    osg::ref_ptr<osg::Geode> _vehicleBounds;
     osg::ref_ptr<osg::Geode> _sweep;
     osg::ref_ptr<osg::Geometry> _ingestibleRegionCenterArrow;
     Geometry::Vertex2d _centerIngestibleRegionCenter;
@@ -79,6 +77,8 @@ private:
     float _lidarNearRange;
     float _laserFrequency;
     float _motorFrequency;
+    float _gamePieceRadius;
+    float _bodyZ;
 };
 
 

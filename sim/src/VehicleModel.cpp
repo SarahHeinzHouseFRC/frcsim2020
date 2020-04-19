@@ -21,7 +21,6 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp, in
         _intakeRightMotorMaxSpeed(config.sim.vehicle.intake.rightMotorMaxSpeed),
         _tubeMotorMaxSpeed(config.sim.vehicle.intake.tubeMotorMaxSpeed),
         _wheelRadius(config.sim.vehicle.drivetrain.wheelRadius),
-        _drivetrainWidth(config.sim.vehicle.drivetrain.width),
         _wheelTrack(config.sim.vehicle.drivetrain.wheelTrack),
         _mass(config.sim.vehicle.mass),
         _outtake(false),

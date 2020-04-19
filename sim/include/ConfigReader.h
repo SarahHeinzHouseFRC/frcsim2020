@@ -94,14 +94,10 @@ public:
             float mass;                                                      // Kilograms
             struct
             {
-                float width;              // Meters
-                float depth;              // Meters
-                float widthChannel;       // Meters
-                float heightChannel;      // Meters
+                float wheelBase;          // Meters
+                float wheelTrack;         // Meters
                 float wheelRadius;        // Meters
                 float wheelWidth;         // Meters
-                float wheelBase;          // Meters
-                float wheelTrack;         // Meters (derived value)
                 float leftMotorMaxSpeed;  // Rads/sec
                 float rightMotorMaxSpeed; // Rads/sec
             } drivetrain;

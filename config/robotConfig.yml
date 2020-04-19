@@ -172,11 +172,8 @@ sim:
       - { x: -23.62, y: -7.09 }
     weight: 154                                          # Pounds
     drivetrain:
-      width: 27.5                                        # Inches, length along robot's y-axis
-      depth: 28.3                                        # Inches, length along robot's x-axis
-      widthChannel: 0.5                                  # Inches
-      heightChannel: 0.5                                 # Inches
       wheelBase: 18                                      # Inches, distance between centers of front and rear wheels
+      wheelTrack: 22                                     # Inches, distance between centers of front wheels
       wheelRadius: 3.0                                   # Inches
       wheelWidth: 1.0                                    # Inches
       leftMotorMaxSpeed: 833                             # RPM

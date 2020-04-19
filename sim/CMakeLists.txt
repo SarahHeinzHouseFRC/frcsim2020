@@ -4,6 +4,8 @@ project(sim)
 find_package(OpenSceneGraph REQUIRED COMPONENTS osgViewer osgDB osgGA osgText)
 find_package(Box2D)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+
 include_directories(
         include
         ${OPENSCENEGRAPH_INCLUDE_DIRS}

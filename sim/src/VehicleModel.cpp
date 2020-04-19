@@ -12,8 +12,6 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp, in
         _team(config.players.at(playerId).team),
         _alliance(config.players.at(playerId).alliance),
         _hasLidar(config.players.at(playerId).hasLidar),
-        _prevTimestamp(startTimestamp),
-        _state{0},
         _leftDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.leftMotorMaxSpeed),
         _rightDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.rightMotorMaxSpeed),
         _intakeCenterMotorMaxSpeed(config.sim.vehicle.intake.centerMotorMaxSpeed),
@@ -23,6 +21,23 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp, in
         _wheelRadius(config.sim.vehicle.drivetrain.wheelRadius),
         _wheelTrack(config.sim.vehicle.drivetrain.wheelTrack),
         _mass(config.sim.vehicle.mass),
+        _boundingPolygonFrontLeft(config.sim.vehicle.boundingPolygonFrontLeft),
+        _boundingPolygonFrontRight(config.sim.vehicle.boundingPolygonFrontRight),
+        _boundingPolygonRearLeft(config.sim.vehicle.boundingPolygonRearLeft),
+        _boundingPolygonRearRight(config.sim.vehicle.boundingPolygonRearRight),
+        _boundingPolygonBumperFrontLeft(config.sim.vehicle.boundingPolygonBumperFrontLeft),
+        _boundingPolygonBumperFrontRight(config.sim.vehicle.boundingPolygonBumperFrontRight),
+        _boundingPolygonBumperLeft(config.sim.vehicle.boundingPolygonBumperLeft),
+        _boundingPolygonBumperRight(config.sim.vehicle.boundingPolygonBumperRight),
+        _boundingPolygonBumperRearLeft(config.sim.vehicle.boundingPolygonBumperRearLeft),
+        _boundingPolygonBumperRearRight(config.sim.vehicle.boundingPolygonBumperRearRight),
+        _ingestibleRegionCenter(config.sim.vehicle.ingestibleRegionCenter),
+        _ingestibleRegionLeft(config.sim.vehicle.ingestibleRegionLeft),
+        _ingestibleRegionRight(config.sim.vehicle.ingestibleRegionRight),
+        _tubeRegion(config.sim.vehicle.tubeRegion),
+        _initialState{ config.players.at(playerId).initialPosition.x, config.players.at(playerId).initialPosition.y, config.players.at(playerId).initialPosition.theta },
+        _prevTimestamp(startTimestamp),
+        _state{0},
         _outtake(false),
         _prevOuttakeButtonState(false)
 {
@@ -32,34 +47,10 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp, in
         _alliance = "Red";
     }
 
-    // Set initial state (so we can reset to it later if needed)
-    _initialState.x = config.players.at(playerId).initialPosition.x;
-    _initialState.y = config.players.at(playerId).initialPosition.y;
-    _initialState.theta = config.players.at(playerId).initialPosition.theta;
-
     // Set pose
     _state.pose.x = _initialState.x;
     _state.pose.y = _initialState.y;
     _state.pose.theta = _initialState.theta;
-
-    // Make bounding polygons
-    _boundingPolygonFrontLeft = config.sim.vehicle.boundingPolygonFrontLeft;
-    _boundingPolygonFrontRight = config.sim.vehicle.boundingPolygonFrontRight;
-    _boundingPolygonRearLeft = config.sim.vehicle.boundingPolygonRearLeft;
-    _boundingPolygonRearRight = config.sim.vehicle.boundingPolygonRearRight;
-
-    _boundingPolygonBumperFrontLeft = config.sim.vehicle.boundingPolygonBumperFrontLeft;
-    _boundingPolygonBumperFrontRight = config.sim.vehicle.boundingPolygonBumperFrontRight;
-    _boundingPolygonBumperLeft = config.sim.vehicle.boundingPolygonBumperLeft;
-    _boundingPolygonBumperRight = config.sim.vehicle.boundingPolygonBumperRight;
-    _boundingPolygonBumperRearLeft = config.sim.vehicle.boundingPolygonBumperRearLeft;
-    _boundingPolygonBumperRearRight = config.sim.vehicle.boundingPolygonBumperRearRight;
-
-    // Make ingestible/ingested regions
-    _ingestibleRegionCenter = config.sim.vehicle.ingestibleRegionCenter;
-    _ingestibleRegionLeft = config.sim.vehicle.ingestibleRegionLeft;
-    _ingestibleRegionRight = config.sim.vehicle.ingestibleRegionRight;
-    _tubeRegion = config.sim.vehicle.tubeRegion;
 }
 
 

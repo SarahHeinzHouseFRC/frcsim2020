@@ -68,10 +68,17 @@ public:
         } assets;
         struct
         {
-            Geometry::Polygon2d exteriorPolygon;
-            std::vector<Geometry::Polygon2d> interiorPolygons;
-            Geometry::Polygon2d blueGoalPolygon;
-            Geometry::Polygon2d redGoalPolygon;
+            Geometry::Polygon2d exteriorWall;
+            Geometry::Polygon2d rightTrenchRightWall;
+            Geometry::Polygon2d rightTrenchLeftWall;
+            Geometry::Polygon2d leftTrenchRightWall;
+            Geometry::Polygon2d leftTrenchLeftWall;
+            Geometry::Polygon2d rightColumn;
+            Geometry::Polygon2d topColumn;
+            Geometry::Polygon2d leftColumn;
+            Geometry::Polygon2d bottomColumn;
+            Geometry::Polygon2d blueGoalRegion;
+            Geometry::Polygon2d redGoalRegion;
             Geometry::Vertex2d blueOuttake;
             Geometry::Vertex2d redOuttake;
         } field;

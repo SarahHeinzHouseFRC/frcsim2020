@@ -2,7 +2,7 @@
 # Copyright (c) 2020 FRC Team 3260
 
 players:
-  - { team: "3260", alliance: "Blue", initialPosition: { x: 0.0, y: -197.0, theta: 90 }, hasLidar: true } # Player 1
+  - { team: "3260", alliance: "Blue", initialPosition: { x: 0.0, y: 0.0, theta: 90 }, hasLidar: true } # Player 1
   - { team: "1234", alliance: "Red", initialPosition: { x: 0.0, y: 197.0, theta: -90 }, hasLidar: false }  # Player 2
   - { team: "234", alliance: "Blue", initialPosition: { x: 60.0, y: -197.0, theta: 90 }, hasLidar: false } # Player 3
   - { team: "34", alliance: "Red", initialPosition: { x: -60.0, y: 197.0, theta: -90 }, hasLidar: false }  # Player 4
@@ -29,7 +29,7 @@ sim:
     gamePieceModelFile: "/data/models/gamepiece2020.wrl" # Path to 3D WRL model of the game piece
     fontFile: "/data/fonts/helvetica.ttf"                # Path to font file for HUD text
   field:
-    exteriorPolygon:                                     # Exterior wall
+    exteriorWall:                                        # Exterior wall
       - { x: 161.81, y: 288.58 }
       - { x: 90.94, y: 314.96 }
       - { x: 84.00, y: 314.96 }
@@ -46,57 +46,56 @@ sim:
       - { x: -50.00, y: -314.96 }
       - { x: 90.94, y: -314.96 }
       - { x: 161.81, y: -288.58 }
-    blueGoalPolygon:                                     # Blue goal polygon
+    rightTrenchRightWall:                                # Right trench right wall
+      - { x: 161.81, y: -59.84 }
+      - { x: 161.81, y: -29.92 }
+      - { x: 159.84, y: -29.92 }
+      - { x: 159.84, y: -59.84 }
+    rightTrenchLeftWall:                                 # Right trench left wall
+      - { x: 107.48, y: -59.84 }
+      - { x: 107.48, y: -29.92 }
+      - { x: 105.51, y: -29.92 }
+      - { x: 105.51, y: -59.84 }
+    leftTrenchRightWall:                                 # Left trench right wall
+      - { x: -159.84, y: 29.92 }
+      - { x: -159.84, y: 59.84 }
+      - { x: -161.81, y: 59.84 }
+      - { x: -161.81, y: 29.92 }
+    leftTrenchLeftWall:                                  # Left trench left wall
+      - { x: -105.51, y: 29.92 }
+      - { x: -105.51, y: 59.84 }
+      - { x: -107.48, y: 59.84 }
+      - { x: -107.48, y: 29.92 }
+    rightColumn:                                         # Right column
+      - { x: 105.12, y: -47.64 }
+      - { x: 100.39, y: -36.61 }
+      - { x: 89.37, y: -41.34 }
+      - { x: 94.09, y: -52.36 }
+    topColumn:                                           # Top column
+      - { x: 44.88, y: 97.64 }
+      - { x: 40.55, y: 108.27 }
+      - { x: 29.53, y: 103.54 }
+      - { x: 33.86, y: 92.52 }
+    leftColumn:                                          # Left column
+      - { x: -89.37, y: 41.34 }
+      - { x: -94.09, y: 52.36 }
+      - { x: -105.12, y: 47.64 }
+      - { x: -100.39, y: 36.61 }
+    bottomColumn:                                        # Bottom column
+      - { x: -29.53, y: -103.54 }
+      - { x: -33.86, y: -92.52 }
+      - { x: -44.88, y: -96.85 }
+      - { x: -40.55, y: -108.27 }
+    blueGoalRegion:                                      # Blue goal region
       - { x: -84.00, y: -314.96 }
       - { x: -84.00, y: -354.96 }
       - { x: -50.00, y: -354.96 }
       - { x: -50.00, y: -314.96 }
-    redGoalPolygon:                                      # Red goal polygon
+    redGoalRegion:                                       # Red goal region
       - { x: 84.00, y: 314.96 }
       - { x: 84.00, y: 354.96 }
       - { x: 50.00, y: 354.96 }
       - { x: 50.00, y: 314.96 }
-    interiorPolygons:
-      -                                                  # Right trench right wall
-        - { x: 161.81, y: -59.84 }
-        - { x: 161.81, y: -29.92 }
-        - { x: 159.84, y: -29.92 }
-        - { x: 159.84, y: -59.84 }
-      -                                                  # Right trench left wall
-        - { x: 107.48, y: -59.84 }
-        - { x: 107.48, y: -29.92 }
-        - { x: 105.51, y: -29.92 }
-        - { x: 105.51, y: -59.84 }
-      -                                                  # Left trench right wall
-        - { x: -159.84, y: 29.92 }
-        - { x: -159.84, y: 59.84 }
-        - { x: -161.81, y: 59.84 }
-        - { x: -161.81, y: 29.92 }
-      -                                                  # Left trench left wall
-        - { x: -105.51, y: 29.92 }
-        - { x: -105.51, y: 59.84 }
-        - { x: -107.48, y: 59.84 }
-        - { x: -107.48, y: 29.92 }
-      -                                                  # Right column
-        - { x: 105.12, y: -47.64 }
-        - { x: 100.39, y: -36.61 }
-        - { x: 89.37, y: -41.34 }
-        - { x: 94.09, y: -52.36 }
-      -                                                  # Top column
-        - { x: 44.88, y: 97.64 }
-        - { x: 40.55, y: 108.27 }
-        - { x: 29.53, y: 103.54 }
-        - { x: 33.86, y: 92.52 }
-      -                                                  # Left column
-        - { x: -89.37, y: 41.34 }
-        - { x: -94.09, y: 52.36 }
-        - { x: -105.12, y: 47.64 }
-        - { x: -100.39, y: 36.61 }
-      -                                                  # Bottom column
-        - { x: -29.53, y: -103.54 }
-        - { x: -33.86, y: -92.52 }
-        - { x: -44.88, y: -96.85 }
-        - { x: -40.55, y: -108.27 }
     blueOuttake: { x: -61.00, y: 314.96 }
     redOuttake: { x: 61.00, y: -314.96 }
   vehicle:

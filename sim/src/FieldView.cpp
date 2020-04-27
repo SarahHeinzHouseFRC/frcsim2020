@@ -58,7 +58,7 @@ osg::ref_ptr<osg::Geode> FieldView::drawGround(const ConfigReader& config)
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
     osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
     double minX=0, maxX=0, minY=0, maxY=0;
-    for (const auto& vertex : config.sim.field.exteriorPolygon.vertices())
+    for (const auto& vertex : config.sim.field.exteriorWall.vertices())
     {
         if (minX > vertex.x) { minX = vertex.x; }
         if (maxX < vertex.x) { maxX = vertex.x; }
@@ -86,10 +86,23 @@ osg::ref_ptr<osg::Geode> FieldView::drawBoundary(const ConfigReader& config)
     double defaultHeight = 0.67;
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
 
-    // Draw exterior bounds
+    std::vector<Geometry::Polygon2d> fieldPolygons {
+            config.sim.field.exteriorWall,
+            config.sim.field.rightTrenchRightWall,
+            config.sim.field.rightTrenchLeftWall,
+            config.sim.field.leftTrenchRightWall,
+            config.sim.field.leftTrenchLeftWall,
+            config.sim.field.rightColumn,
+            config.sim.field.topColumn,
+            config.sim.field.leftColumn,
+            config.sim.field.bottomColumn,
+    };
+
+    // Draw field interior and exterior polygons
+    for (const auto& polygon : fieldPolygons)
     {
         osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-        for (const auto& edge : config.sim.field.exteriorPolygon.edges())
+        for (const auto& edge : polygon.edges())
         {
             vertices->push_back(osg::Vec3(edge.a.x, edge.a.y, 0));
             vertices->push_back(osg::Vec3(edge.b.x, edge.b.y, 0));
@@ -100,23 +113,6 @@ osg::ref_ptr<osg::Geode> FieldView::drawBoundary(const ConfigReader& config)
         geode->addDrawable(geom);
     }
 
-    // Draw interior bounds
-    {
-        for (const auto& polygon : config.sim.field.interiorPolygons)
-        {
-            osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-            for (const auto& edge : polygon.edges())
-            {
-                vertices->push_back(osg::Vec3(edge.a.x, edge.a.y, 0));
-                vertices->push_back(osg::Vec3(edge.b.x, edge.b.y, 0));
-                vertices->push_back(osg::Vec3(edge.b.x, edge.b.y, defaultHeight));
-                vertices->push_back(osg::Vec3(edge.a.x, edge.a.y, defaultHeight));
-            }
-            osg::ref_ptr<osg::Geometry> geom = ViewUtils::drawQuads(vertices, Color(Color::Green, 127));
-            geode->addDrawable(geom);
-        }
-    }
-
     return geode;
 }
 
@@ -125,22 +121,20 @@ osg::ref_ptr<osg::Geode> FieldView::drawBoundary(const ConfigReader& config)
 osg::ref_ptr<osg::Geode> FieldView::drawGoals(const ConfigReader& config)
 {
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+
+    std::vector<std::tuple<Geometry::Polygon2d, Color>> goalRegions {
+            { config.sim.field.blueGoalRegion, Color::Blue },
+            { config.sim.field.redGoalRegion, Color::Red },
+    };
+
+    for (const auto& [polygon, color] : goalRegions)
     {
         osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-        for (const auto& vertex : config.sim.field.blueGoalPolygon.vertices())
+        for (const auto& vertex : polygon.vertices())
         {
             vertices->push_back(osg::Vec3(vertex.x, vertex.y, 0.1));
         }
-        osg::ref_ptr<osg::Geometry> geom = ViewUtils::drawLineLoop(vertices, Color::Blue);
-        geode->addDrawable(geom);
-    }
-    {
-        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-        for (const auto& vertex : config.sim.field.redGoalPolygon.vertices())
-        {
-            vertices->push_back(osg::Vec3(vertex.x, vertex.y, 0.1));
-        }
-        osg::ref_ptr<osg::Geometry> geom = ViewUtils::drawLineLoop(vertices, Color::Red);
+        osg::ref_ptr<osg::Geometry> geom = ViewUtils::drawLineLoop(vertices, color);
         geode->addDrawable(geom);
     }
 

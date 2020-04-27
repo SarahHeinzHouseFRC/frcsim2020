@@ -111,13 +111,17 @@ void ConfigReader::parseSimAssetsConfig(const YAML::Node &assetsConfig)
 
 void ConfigReader::parseSimFieldConfig(const YAML::Node& fieldConfig)
 {
-    sim.field.exteriorPolygon = parsePolygon(fieldConfig["exteriorPolygon"]);
-    for (const auto& interiorPolygon : fieldConfig["interiorPolygons"])
-    {
-        sim.field.interiorPolygons.emplace_back(parsePolygon(interiorPolygon));
-    }
-    sim.field.blueGoalPolygon = parsePolygon(fieldConfig["blueGoalPolygon"]);
-    sim.field.redGoalPolygon = parsePolygon(fieldConfig["redGoalPolygon"]);
+    sim.field.exteriorWall = parsePolygon(fieldConfig["exteriorWall"]);
+    sim.field.rightTrenchRightWall = parsePolygon(fieldConfig["rightTrenchRightWall"]);
+    sim.field.rightTrenchLeftWall = parsePolygon(fieldConfig["rightTrenchLeftWall"]);
+    sim.field.leftTrenchRightWall = parsePolygon(fieldConfig["leftTrenchRightWall"]);
+    sim.field.leftTrenchLeftWall = parsePolygon(fieldConfig["leftTrenchLeftWall"]);
+    sim.field.rightColumn = parsePolygon(fieldConfig["rightColumn"]);
+    sim.field.topColumn = parsePolygon(fieldConfig["topColumn"]);
+    sim.field.leftColumn = parsePolygon(fieldConfig["leftColumn"]);
+    sim.field.bottomColumn = parsePolygon(fieldConfig["bottomColumn"]);
+    sim.field.blueGoalRegion = parsePolygon(fieldConfig["blueGoalRegion"]);
+    sim.field.redGoalRegion = parsePolygon(fieldConfig["redGoalRegion"]);
     sim.field.blueOuttake = parseVertex(fieldConfig["blueOuttake"]);
     sim.field.redOuttake = parseVertex(fieldConfig["redOuttake"]);
 }

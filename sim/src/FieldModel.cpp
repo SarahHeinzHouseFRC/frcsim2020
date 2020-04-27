@@ -15,19 +15,20 @@ FieldModel::FieldModel(const ConfigReader& config, double startTimestamp) :
         _blueScore(0),
         _redScore(0),
         _prevOuttakeButtonState(0),
-        _blueGoal(config.sim.field.blueGoalPolygon),
-        _redGoal(config.sim.field.redGoalPolygon),
+        _exteriorWall(config.sim.field.exteriorWall),
+        _rightTrenchRightWall(config.sim.field.rightTrenchRightWall),
+        _rightTrenchLeftWall(config.sim.field.rightTrenchLeftWall),
+        _leftTrenchRightWall(config.sim.field.leftTrenchRightWall),
+        _leftTrenchLeftWall(config.sim.field.leftTrenchLeftWall),
+        _rightColumn(config.sim.field.rightColumn),
+        _topColumn(config.sim.field.topColumn),
+        _leftColumn(config.sim.field.leftColumn),
+        _bottomColumn(config.sim.field.bottomColumn),
+        _blueGoalRegion(config.sim.field.blueGoalRegion),
+        _redGoalRegion(config.sim.field.redGoalRegion),
         _blueOuttake(config.sim.field.blueOuttake),
         _redOuttake(config.sim.field.redOuttake)
 {
-    // Exterior polygon
-    _exteriorPolygon = Polygon2d(config.sim.field.exteriorPolygon);
-
-    // Interior polygons
-    for (const auto& interiorPolygon : config.sim.field.interiorPolygons)
-    {
-        _interiorPolygons.emplace_back(interiorPolygon);
-    }
 }
 
 

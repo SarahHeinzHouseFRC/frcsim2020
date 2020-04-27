@@ -57,13 +57,10 @@ PhysicsEngine::PhysicsEngine(const ConfigReader& config,
     _lidar = std::make_unique<PhysicsEngineLidar>(_world.get(), config);
 
     // Field static bodies
-    initFieldBodies(_world.get(), fieldModel);
+    initFieldBodies(_world.get(), config, fieldModel);
 
-    // Vehicle dynamic body
-    for (const auto& vehicleModel : vehicleModels)
-    {
-        _vehiclePhysicsModels.push_back(initVehiclePhysicsModel(_world.get(), vehicleModel));
-    }
+    // Vehicle dynamic bodies
+    _vehiclePhysicsModels = initVehiclePhysicsModels(_world.get(), config, vehicleModels);
 
     // Game piece dynamic bodies
     _gamePieceBodies = initGamePieceBodies(_world.get(), gamePieceModels);
@@ -342,22 +339,22 @@ void PhysicsEngine::reset(const FieldModel& fieldModel, std::vector<VehicleModel
 
 
 
-void PhysicsEngine::initFieldBodies(b2World* world, const FieldModel& fieldModel)
+void PhysicsEngine::initFieldBodies(b2World* world, const ConfigReader& config, const FieldModel& fieldModel)
 {
+    // Init field static bodies
     std::vector<Geometry::Polygon2d> fieldPolygons {
-            fieldModel._exteriorWall,
-            fieldModel._exteriorWall,
-            fieldModel._rightTrenchRightWall,
-            fieldModel._rightTrenchLeftWall,
-            fieldModel._leftTrenchRightWall,
-            fieldModel._leftTrenchLeftWall,
-            fieldModel._rightColumn,
-            fieldModel._topColumn,
-            fieldModel._leftColumn,
-            fieldModel._bottomColumn,
+            config.sim.field.exteriorWall,
+            config.sim.field.exteriorWall,
+            config.sim.field.rightTrenchRightWall,
+            config.sim.field.rightTrenchLeftWall,
+            config.sim.field.leftTrenchRightWall,
+            config.sim.field.leftTrenchLeftWall,
+            config.sim.field.rightColumn,
+            config.sim.field.topColumn,
+            config.sim.field.leftColumn,
+            config.sim.field.bottomColumn,
     };
 
-    // Field static bodies
     for (const auto& polygon : fieldPolygons)
     {
         for (const auto& edge : polygon.edges())
@@ -378,9 +375,10 @@ void PhysicsEngine::initFieldBodies(b2World* world, const FieldModel& fieldModel
         }
     }
 
+    // Init field goal regions
     std::vector<std::tuple<b2PolygonShape&, Geometry::Polygon2d>> goalRegions {
-            { _blueGoalRegion, fieldModel._blueGoalRegion },
-            { _redGoalRegion, fieldModel._redGoalRegion },
+            { _blueGoalRegion, config.sim.field.blueGoalRegion },
+            { _redGoalRegion, config.sim.field.redGoalRegion },
     };
 
     for (auto& [shape, polygon] : goalRegions)
@@ -410,82 +408,89 @@ void PhysicsEngine::initFieldBodies(b2World* world, const FieldModel& fieldModel
 
 
 
-VehiclePhysicsModel PhysicsEngine::initVehiclePhysicsModel(b2World* world, const VehicleModel& vehicleModel)
+std::vector<VehiclePhysicsModel> PhysicsEngine::initVehiclePhysicsModels(b2World* world, const ConfigReader& config, const std::vector<VehicleModel>& vehicleModels)
 {
-    VehiclePhysicsModel vehiclePhysicsModel;
+    std::vector<VehiclePhysicsModel> vehiclePhysicsModels;
 
-    // Define the dynamic body. We set its position and call the body factory.
-    b2BodyDef vehicleBodyDef;
-    vehicleBodyDef.type = b2_dynamicBody;
-    vehicleBodyDef.position.Set(vehicleModel._state.pose.x, vehicleModel._state.pose.y);
-    vehicleBodyDef.angle = vehicleModel._state.pose.theta;
-    vehiclePhysicsModel.body = world->CreateBody(&vehicleBodyDef);
-
-    std::vector<std::tuple<Polygon2d, float, int, int>> boundingPolygons {
-            { vehicleModel._boundingPolygonFrontLeft, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
-            { vehicleModel._boundingPolygonRearLeft, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
-            { vehicleModel._boundingPolygonFrontRight, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
-            { vehicleModel._boundingPolygonRearRight, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
-            { vehicleModel._boundingPolygonBumperFrontLeft, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
-            { vehicleModel._boundingPolygonBumperFrontRight, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
-            { vehicleModel._boundingPolygonBumperLeft, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
-            { vehicleModel._boundingPolygonBumperRight, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
-            { vehicleModel._boundingPolygonBumperRearLeft, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
-            { vehicleModel._boundingPolygonBumperRearRight, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
-    };
-
-    for (const auto& [polygon, density, categoryBits, maskBits] : boundingPolygons)
+    for (const auto& vehicleModel : vehicleModels)
     {
-        b2FixtureDef vehicleFixtureDef;
-        b2PolygonShape vehicleShape;
-        b2Vec2 vertices[polygon.numVertices()];
-        for (int i=0; i<polygon.numVertices(); i++)
-        {
-            Vertex2d v = polygon.vertices().at(i);
-            vertices[i] = b2Vec2(v.x, v.y);
-        }
-        vehicleShape.Set(vertices, polygon.numVertices());
-        vehicleFixtureDef.shape = &vehicleShape;
-        vehicleFixtureDef.density = density;
-        vehicleFixtureDef.friction = 0.3f;
-        vehicleFixtureDef.filter.categoryBits = categoryBits;
-        vehicleFixtureDef.filter.maskBits = maskBits;
+        VehiclePhysicsModel vehiclePhysicsModel;
 
-        // Add the shape to the body
-        vehiclePhysicsModel.body->CreateFixture(&vehicleFixtureDef);
+        // Define the dynamic body. We set its position and call the body factory.
+        b2BodyDef vehicleBodyDef;
+        vehicleBodyDef.type = b2_dynamicBody;
+        vehicleBodyDef.position.Set(vehicleModel._state.pose.x, vehicleModel._state.pose.y);
+        vehicleBodyDef.angle = vehicleModel._state.pose.theta;
+        vehiclePhysicsModel.body = world->CreateBody(&vehicleBodyDef);
+
+        std::vector<std::tuple<Polygon2d, float, int, int>> boundingPolygons {
+                { config.sim.vehicle.boundingPolygonFrontLeft, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
+                { config.sim.vehicle.boundingPolygonRearLeft, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
+                { config.sim.vehicle.boundingPolygonFrontRight, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
+                { config.sim.vehicle.boundingPolygonRearRight, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
+                { config.sim.vehicle.boundingPolygonBumperFrontLeft, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
+                { config.sim.vehicle.boundingPolygonBumperFrontRight, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
+                { config.sim.vehicle.boundingPolygonBumperLeft, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
+                { config.sim.vehicle.boundingPolygonBumperRight, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
+                { config.sim.vehicle.boundingPolygonBumperRearLeft, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
+                { config.sim.vehicle.boundingPolygonBumperRearRight, vehicleModel._mass / 0.047f, CATEGORY_O, MASK_O },
+        };
+
+        for (const auto& [polygon, density, categoryBits, maskBits] : boundingPolygons)
+        {
+            b2FixtureDef vehicleFixtureDef;
+            b2PolygonShape vehicleShape;
+            b2Vec2 vertices[polygon.numVertices()];
+            for (int i=0; i<polygon.numVertices(); i++)
+            {
+                Vertex2d v = polygon.vertices().at(i);
+                vertices[i] = b2Vec2(v.x, v.y);
+            }
+            vehicleShape.Set(vertices, polygon.numVertices());
+            vehicleFixtureDef.shape = &vehicleShape;
+            vehicleFixtureDef.density = density;
+            vehicleFixtureDef.friction = 0.3f;
+            vehicleFixtureDef.filter.categoryBits = categoryBits;
+            vehicleFixtureDef.filter.maskBits = maskBits;
+
+            // Add the shape to the body
+            vehiclePhysicsModel.body->CreateFixture(&vehicleFixtureDef);
+        }
+
+        std::vector<std::tuple<Polygon2d, b2PolygonShape&, float, int, int>> regionPolygons {
+                { vehicleModel._ingestibleRegionCenter, vehiclePhysicsModel.ingestibleRegionCenterShape, 0, CATEGORY_A, MASK_A },
+                { vehicleModel._ingestibleRegionLeft, vehiclePhysicsModel.ingestibleRegionLeftShape, 0, CATEGORY_A, MASK_A },
+                { vehicleModel._ingestibleRegionRight, vehiclePhysicsModel.ingestibleRegionRightShape, 0, CATEGORY_A, MASK_A },
+                { vehicleModel._tubeRegion, vehiclePhysicsModel.tubeRegionShape, 0, CATEGORY_B, MASK_B },
+        };
+
+        for (const auto& [polygon, shape, density, categoryBits, maskBits] : regionPolygons)
+        {
+            b2FixtureDef vehicleFixtureDef;
+            b2Vec2 vertices[polygon.numVertices()];
+            for (int i=0; i<polygon.numVertices(); i++)
+            {
+                Vertex2d v = polygon.vertices().at(i);
+                vertices[i] = b2Vec2(v.x, v.y);
+            }
+            shape.Set(vertices, polygon.numVertices());
+            vehicleFixtureDef.shape = &shape;
+            vehicleFixtureDef.density = density;
+            vehicleFixtureDef.friction = 0.3f;
+            vehicleFixtureDef.filter.categoryBits = categoryBits;
+            vehicleFixtureDef.filter.maskBits = maskBits;
+
+            // Add the shape to the body
+            vehiclePhysicsModel.body->CreateFixture(&vehicleFixtureDef);
+        }
+
+        // Add user data
+        vehiclePhysicsModel.body->SetUserData((void*) &vehicleModel);
+
+        vehiclePhysicsModels.push_back(vehiclePhysicsModel);
     }
 
-    std::vector<std::tuple<Polygon2d, b2PolygonShape&, float, int, int>> regionPolygons {
-            { vehicleModel._ingestibleRegionCenter, vehiclePhysicsModel.ingestibleRegionCenterShape, 0, CATEGORY_A, MASK_A },
-            { vehicleModel._ingestibleRegionLeft, vehiclePhysicsModel.ingestibleRegionLeftShape, 0, CATEGORY_A, MASK_A },
-            { vehicleModel._ingestibleRegionRight, vehiclePhysicsModel.ingestibleRegionRightShape, 0, CATEGORY_A, MASK_A },
-            { vehicleModel._tubeRegion, vehiclePhysicsModel.tubeRegionShape, 0, CATEGORY_B, MASK_B },
-    };
-
-    for (const auto& [polygon, shape, density, categoryBits, maskBits] : regionPolygons)
-    {
-        b2FixtureDef vehicleFixtureDef;
-        b2Vec2 vertices[polygon.numVertices()];
-        for (int i=0; i<polygon.numVertices(); i++)
-        {
-            Vertex2d v = polygon.vertices().at(i);
-            vertices[i] = b2Vec2(v.x, v.y);
-        }
-        shape.Set(vertices, polygon.numVertices());
-        vehicleFixtureDef.shape = &shape;
-        vehicleFixtureDef.density = density;
-        vehicleFixtureDef.friction = 0.3f;
-        vehicleFixtureDef.filter.categoryBits = categoryBits;
-        vehicleFixtureDef.filter.maskBits = maskBits;
-
-        // Add the shape to the body
-        vehiclePhysicsModel.body->CreateFixture(&vehicleFixtureDef);
-    }
-
-    // Add user data
-    vehiclePhysicsModel.body->SetUserData((void*) &vehicleModel);
-
-    return vehiclePhysicsModel;
+    return vehiclePhysicsModels;
 }
 
 

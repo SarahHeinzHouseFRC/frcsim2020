@@ -105,12 +105,12 @@ private:
     /**
      * Initializes field body from field model
      */
-    void initFieldBodies(b2World* world, const FieldModel& fieldModel);
+    void initFieldBodies(b2World* world, const ConfigReader& config, const FieldModel& fieldModel);
 
     /**
      * Initializes vehicle body from vehicle model
      */
-    VehiclePhysicsModel initVehiclePhysicsModel(b2World* world, const VehicleModel& vehicleModel);
+    std::vector<VehiclePhysicsModel> initVehiclePhysicsModels(b2World* world, const ConfigReader& config, const std::vector<VehicleModel>& vehicleModels);
 
     /**
      * Initializes all game pieces from their models

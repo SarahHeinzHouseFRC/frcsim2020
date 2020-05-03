@@ -118,6 +118,8 @@ struct SimState
         float intakeLeftMotorSpeed;   // Meters/sec
         float intakeRightMotorSpeed;  // Meters/sec
         float tubeMotorSpeed;         // Meters/sec
+        float leftDriveMotorSpeed;    // Rads/sec
+        float rightDriveMotorSpeed;   // Rads/sec
     };
 
     struct FieldState
@@ -194,6 +196,10 @@ struct SimState
             writer.Double(v.intakeRightMotorSpeed);
             writer.Key("tubeMotorSpeed");
             writer.Double(v.tubeMotorSpeed);
+            writer.Key("leftDriveMotorSpeed");
+            writer.Double(v.leftDriveMotorSpeed);
+            writer.Key("rightDriveMotorSpeed");
+            writer.Double(v.rightDriveMotorSpeed);
             writer.EndObject();
         }
         writer.EndArray();
@@ -248,6 +254,8 @@ struct SimState
             vehicle.intakeLeftMotorSpeed = (*itr)["intakeLeftMotorSpeed"].GetFloat();
             vehicle.intakeRightMotorSpeed = (*itr)["intakeRightMotorSpeed"].GetFloat();
             vehicle.tubeMotorSpeed = (*itr)["tubeMotorSpeed"].GetFloat();
+            vehicle.leftDriveMotorSpeed = (*itr)["leftDriveMotorSpeed"].GetFloat();
+            vehicle.rightDriveMotorSpeed = (*itr)["rightDriveMotorSpeed"].GetFloat();
             vehicles.push_back(vehicle);
         }
 

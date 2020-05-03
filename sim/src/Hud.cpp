@@ -14,7 +14,7 @@
 #define M_TO_FT 3.28084
 
 
-Hud::Hud(const ConfigReader& config) : _width(225)
+Hud::Hud(const ConfigReader& config, int playerId) : _width(225)
 {
     _camera = new osg::Camera;
 
@@ -58,7 +58,7 @@ Hud::Hud(const ConfigReader& config) : _width(225)
     float y = 0;
 
     y -= 34;
-    auto title = new HudTopLabel("Robot Sim", _padding, y, H1_FONT_SIZE, config.sim.assets.fontFile);
+    auto title = new HudTopLabel("FRC Sim 2020", _padding, y, H1_FONT_SIZE, config.sim.assets.fontFile);
     _labelsGeode->addChild(title);
 
     y -= 20;
@@ -66,7 +66,11 @@ Hud::Hud(const ConfigReader& config) : _width(225)
     subtitle->setColor(osg::Vec4(0.8, 0.8, 1, 1));
     _labelsGeode->addChild(subtitle);
 
-    for (int i=0; i<config.players.size(); i++)
+    y -= 10;
+
+    // Are we showing connected status just for one player or for all of them?
+    int numPlayers = (playerId >= 0) ? 1 : config.players.size();
+    for (int i=0; i<numPlayers; i++)
     {
         y -= 35;
         constexpr float margin = 12.5;
@@ -120,8 +124,11 @@ Hud::Hud(const ConfigReader& config) : _width(225)
 
     y = 100;
     _labelsGeode->addChild(new HudBottomLabel("[1] Top-down view", _padding, y, P_FONT_SIZE, config.sim.assets.fontFile));
-    y -= 20;
-    _labelsGeode->addChild(new HudBottomLabel("[2] Orbit view", _padding, y, P_FONT_SIZE, config.sim.assets.fontFile));
+    if (numPlayers == 1)
+    {
+        y -= 20;
+        _labelsGeode->addChild(new HudBottomLabel("[2] Orbit view", _padding, y, P_FONT_SIZE, config.sim.assets.fontFile));
+    }
     y -= 20;
     _labelsGeode->addChild(new HudBottomLabel("[F] Toggle full screen", _padding, y, P_FONT_SIZE, config.sim.assets.fontFile));
     y -= 20;
@@ -157,20 +164,10 @@ void Hud::displayConnectionStatus(const std::vector<bool>& connected)
     {
         HudLabel* label = _connectedLabels.at(i);
         HudBox* labelBoundingBox = _connectedBoxes.at(i);
-        if (connected.at(i))
-        {
-            char tmp[255];
-            sprintf(tmp, "Player %d connected", i+1);
-            label->setText(tmp);
-            labelBoundingBox->setColor(Color::Green);
-        }
-        else
-        {
-            char tmp[255];
-            sprintf(tmp, "Player %d disconnected", i+1);
-            label->setText(tmp);
-            labelBoundingBox->setColor(Color::Red);
-        }
+        char tmp[255];
+        sprintf(tmp, connected.at(i) ? "Player %d connected" : "Player %d disconnected", i+1);
+        label->setText(tmp);
+        labelBoundingBox->setColor(connected.at(i) ? Color::Green : Color::Red);
         osg::BoundingBox bb = label->getBoundingBox();
         labelBoundingBox->setSize(bb, 5);
     }
@@ -178,26 +175,38 @@ void Hud::displayConnectionStatus(const std::vector<bool>& connected)
 
 
 
+void Hud::displayConnectionStatus(bool connected, int playerId)
+{
+    HudLabel* label = _connectedLabels.at(0);
+    HudBox* labelBoundingBox = _connectedBoxes.at(0);
+
+    char tmp[255];
+    sprintf(tmp, connected ? "Player %d connected" : "Player %d disconnected", playerId+1);
+    label->setText(tmp);
+    labelBoundingBox->setColor(connected ? Color::Green : Color::Red);
+
+    osg::BoundingBox bb = label->getBoundingBox();
+    labelBoundingBox->setSize(bb, 5);
+}
+
+
+
 void Hud::displayTimerStatus(bool running, double timerValue)
 {
-    if (timerValue <= 0)
+    if (timerValue == 0)
     {
         _timer->setColor(Color::Red);
     }
-    else if (timerValue <= 10)
+    else if (running && timerValue <= 10)
     {
         _timer->setColor(Color::Yellow);
-    }
-    else if (!running)
-    {
-        _timer->setColor(Color::Black);
     }
     else
     {
         _timer->setColor(Color::Black);
     }
     char tmp[1024];
-    sprintf(tmp, "%d:%02d", (int) timerValue / 60, (int) timerValue % 60);
+    sprintf(tmp, "%d:%02d", (int) timerValue / 60, (int) std::ceil(timerValue) % 60);
     _timer->setText(tmp);
 }
 
@@ -214,18 +223,20 @@ void Hud::displayFieldScore(int blueScore, int redScore)
 
 
 
-void Hud::displayVehicleState(const VehicleModel& vehicleModel)
+void Hud::displayVehicleState(const SimState& state, int playerId)
 {
+    if (state.vehicles.size()-1 > playerId) { return; }
+    SimState::VehicleState vehicleState = state.vehicles.at(playerId);
+
     char tmp[1024];
 
-    double theta = vehicleModel._state.pose.theta*RADS_TO_DEG;
+    double theta = vehicleState.theta*RADS_TO_DEG;
     while (theta < 0) { theta += 360; }
     while (theta > 360) { theta -= 360; }
 
-    sprintf(tmp, "Pose: \n    X: %.1f ft \n    Y: %.1f ft \n    Theta: %.0f deg", vehicleModel._state.pose.x*M_TO_FT, vehicleModel._state.pose.y*M_TO_FT, theta);
+    sprintf(tmp, "Pose: \n    X: %.1f ft \n    Y: %.1f ft \n    Theta: %.0f deg", vehicleState.x*M_TO_FT, vehicleState.y*M_TO_FT, theta);
     _vehiclePoseState->setText(tmp);
 
-    sprintf(tmp, "Drivetrain: \n    Left motor: %.0f RPM \n    Right motor: %.0f RPM", vehicleModel._state.leftDriveMotorSpeed*RADS_PER_SEC_TO_RPM, vehicleModel._state.rightDriveMotorSpeed*RADS_PER_SEC_TO_RPM);
+    sprintf(tmp, "Drivetrain: \n    Left motor: %.0f RPM \n    Right motor: %.0f RPM", vehicleState.leftDriveMotorSpeed*RADS_PER_SEC_TO_RPM, vehicleState.rightDriveMotorSpeed*RADS_PER_SEC_TO_RPM);
     _vehicleDrivetrainState->setText(tmp);
 }
-

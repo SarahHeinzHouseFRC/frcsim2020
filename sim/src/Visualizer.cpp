@@ -4,7 +4,6 @@
 
 #include <osgGA/TerrainManipulator>
 #include <osgGA/NodeTrackerManipulator>
-#include <osgGA/KeySwitchMatrixManipulator>
 #include <osgViewer/ViewerEventHandlers>
 #include "Color.h"
 #include "Visualizer.h"
@@ -14,31 +13,19 @@ Visualizer::Visualizer(Scene &scene, Hud& hud, bool headless) : _scene(scene), _
 {
     if (headless) { return; }
     // Initialize key switch manipulator
-    osg::ref_ptr<osgGA::KeySwitchMatrixManipulator> keyswitchManipulator = new osgGA::KeySwitchMatrixManipulator;
+    _keySwitchManipulator = new osgGA::KeySwitchMatrixManipulator;
 
     // Initialize terrain manipulator
     osg::ref_ptr<osgGA::TerrainManipulator> terrainManip = new osgGA::TerrainManipulator;
     terrainManip->setAllowThrow(false);
-    keyswitchManipulator->addMatrixManipulator('1', "Terrain", terrainManip);
+    _keySwitchManipulator->addMatrixManipulator('1', "Terrain", terrainManip);
 
-    // Initialize node tracker manipulator
-    osg::ref_ptr<osgGA::NodeTrackerManipulator> nodeTrackerManip = new osgGA::NodeTrackerManipulator;
-    osg::Vec3d pos = _scene.getVehiclePosition();
-    nodeTrackerManip->setHomePosition(osg::Vec3d(pos.x()-5, pos.y(), pos.z()+1),
-                                      osg::Vec3d(pos.x(), pos.y(), pos.z()),
-                                      osg::Vec3d(0, 0, 1));
-    nodeTrackerManip->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_AZIM);
-    nodeTrackerManip->setRotationMode(osgGA::NodeTrackerManipulator::ELEVATION_AZIM);
-    nodeTrackerManip->setTrackNode(_scene.getVehicleNode());
-    nodeTrackerManip->setAllowThrow(false);
-    keyswitchManipulator->addMatrixManipulator('2', "Trackball", nodeTrackerManip);
-
-    _viewer.setCameraManipulator(keyswitchManipulator);
+    _viewer.setCameraManipulator(_keySwitchManipulator);
     _viewer.getCamera()->setClearColor(Color::Black);
     _viewer.setUpViewInWindow(0, 0, _windowWidth, _windowHeight);
     osgViewer::Viewer::Windows windows;
     _viewer.getWindows(windows);
-    windows.at(0)->setWindowName("Robot Simulator");
+    windows.at(0)->setWindowName("FRC Simulator 2020");
     _viewer.setSceneData(_scene.getRoot());
 
     _viewer.addEventHandler(new osgViewer::StatsHandler);
@@ -50,6 +37,23 @@ Visualizer::Visualizer(Scene &scene, Hud& hud, bool headless) : _scene(scene), _
     _viewer.addSlave(camera, false);
     _hud.onWindowResize(_windowWidth, _windowHeight);
     _scene.getRoot()->addChild(camera);
+}
+
+
+
+Visualizer::Visualizer(Scene &scene, Hud& hud, int playerId) : Visualizer(scene, hud)
+{
+    // Initialize node tracker manipulator
+    osg::ref_ptr<osgGA::NodeTrackerManipulator> nodeTrackerManip = new osgGA::NodeTrackerManipulator;
+    osg::Vec3d pos = _scene.getVehiclePosition(playerId);
+    nodeTrackerManip->setHomePosition(osg::Vec3d(pos.x()-5, pos.y(), pos.z()+1),
+                                      osg::Vec3d(pos.x(), pos.y(), pos.z()),
+                                      osg::Vec3d(0, 0, 1));
+    nodeTrackerManip->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_AZIM);
+    nodeTrackerManip->setRotationMode(osgGA::NodeTrackerManipulator::ELEVATION_AZIM);
+    nodeTrackerManip->setTrackNode(_scene.getVehicleNode(playerId));
+    nodeTrackerManip->setAllowThrow(false);
+    _keySwitchManipulator->addMatrixManipulator('2', "Trackball", nodeTrackerManip);
 }
 
 

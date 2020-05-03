@@ -16,7 +16,7 @@ public:
     /**
      * Constructor
      */
-    VehicleView(const ConfigReader& config, int id);
+    VehicleView(const ConfigReader& config, int playerId);
 
     /**
      * Updates the vehicle view based on the vehicle model
@@ -38,22 +38,22 @@ private:
     /**
      * Draws the collision boundary of the vehicle
      */
-    osg::ref_ptr<osg::Geode> drawCollisionBoundary(const ConfigReader& config, int id);
+    osg::ref_ptr<osg::Geode> drawCollisionBoundary(const ConfigReader& config);
 
     /**
      * Draws the bumpers around the vehicle
      */
-    osg::ref_ptr<osg::Geode> drawBumpers(const ConfigReader& config, int id);
+    osg::ref_ptr<osg::Geode> drawBumpers(const ConfigReader& config, int playerId);
 
     /**
      * Draws the ingestible region of the vehicle
      */
-    osg::ref_ptr<osg::Geode> drawIngestibleRegions(const ConfigReader& config, int id);
+    osg::ref_ptr<osg::Geode> drawIngestibleRegions(const ConfigReader& config);
 
     /**
      * Draws info about the vehicle, player number, etc.
      */
-    osg::ref_ptr<osg::Geode> drawInfo(const ConfigReader& config, int id, const std::string& fontFile);
+    osg::ref_ptr<osg::Geode> drawInfo(const ConfigReader& config, int playerId, const std::string& fontFile);
 
     osg::ref_ptr<osg::Node> _vehicleNode;
     osg::ref_ptr<osg::Geode> _vehicleBounds;

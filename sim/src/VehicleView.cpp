@@ -11,7 +11,7 @@
 #include "Color.h"
 
 
-VehicleView::VehicleView(const ConfigReader& config, int id) :
+VehicleView::VehicleView(const ConfigReader& config, int playerId) :
         _wheelRadius(config.sim.vehicle.drivetrain.wheelRadius),
         _centerIngestibleRegionCenter(config.sim.vehicle.ingestibleRegionCenter.center()),
         _intakeCenterMotorMaxSpeed(config.sim.vehicle.intake.centerMotorMaxSpeed),
@@ -27,7 +27,7 @@ VehicleView::VehicleView(const ConfigReader& config, int id) :
         _vehicleNode = drawVehicle(config);
         addChild(_vehicleNode);
 
-        osg::ref_ptr<osg::Geode> bumpers = drawBumpers(config, id);
+        osg::ref_ptr<osg::Geode> bumpers = drawBumpers(config, playerId);
         addChild(bumpers);
     }
     else
@@ -36,13 +36,13 @@ VehicleView::VehicleView(const ConfigReader& config, int id) :
         addChild(_vehicleNode);
     }
 
-    _vehicleBounds = drawCollisionBoundary(config, id);
+    _vehicleBounds = drawCollisionBoundary(config);
     addChild(_vehicleBounds);
 
-    osg::ref_ptr<osg::Geode> ingestibleRegions = drawIngestibleRegions(config, id);
+    osg::ref_ptr<osg::Geode> ingestibleRegions = drawIngestibleRegions(config);
     addChild(ingestibleRegions);
 
-    osg::ref_ptr<osg::Geode> info = drawInfo(config, id, config.sim.assets.fontFile);
+    osg::ref_ptr<osg::Geode> info = drawInfo(config, playerId, config.sim.assets.fontFile);
     addChild(info);
 }
 
@@ -154,7 +154,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawVehicle(const ConfigReader &config)
 
 
 
-osg::ref_ptr<osg::Geode> VehicleView::drawCollisionBoundary(const ConfigReader& config, int id)
+osg::ref_ptr<osg::Geode> VehicleView::drawCollisionBoundary(const ConfigReader& config)
 {
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
     {
@@ -202,9 +202,9 @@ osg::ref_ptr<osg::Geode> VehicleView::drawCollisionBoundary(const ConfigReader& 
 
 
 
-osg::ref_ptr<osg::Geode> VehicleView::drawBumpers(const ConfigReader& config, int id)
+osg::ref_ptr<osg::Geode> VehicleView::drawBumpers(const ConfigReader& config, int playerId)
 {
-    Color color = config.players.at(id).alliance == "Blue" ? Color::Blue : Color::Red;
+    Color color = config.players.at(playerId).alliance == "Blue" ? Color::Blue : Color::Red;
 
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
     {
@@ -272,7 +272,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawBumpers(const ConfigReader& config, in
 
 
 
-osg::ref_ptr<osg::Geode> VehicleView::drawIngestibleRegions(const ConfigReader& config, int id)
+osg::ref_ptr<osg::Geode> VehicleView::drawIngestibleRegions(const ConfigReader& config)
 {
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
 
@@ -345,9 +345,9 @@ osg::ref_ptr<osg::Geode> VehicleView::drawIngestibleRegions(const ConfigReader& 
 
 
 
-osg::ref_ptr<osg::Geode> VehicleView::drawInfo(const ConfigReader& config, int id, const std::string& fontFile)
+osg::ref_ptr<osg::Geode> VehicleView::drawInfo(const ConfigReader& config, int playerId, const std::string& fontFile)
 {
-    Color color = config.players.at(id).alliance == "Blue" ? Color::Blue : Color::Red;
+    Color color = config.players.at(playerId).alliance == "Blue" ? Color::Blue : Color::Red;
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
 
     // Draw stalk
@@ -359,7 +359,7 @@ osg::ref_ptr<osg::Geode> VehicleView::drawInfo(const ConfigReader& config, int i
 
     // Draw text
     osg::ref_ptr<osgText::Text> text = new osgText::Text;
-    text->setText("Player " + std::to_string(id+1) + ": Team " + config.players.at(id).team);
+    text->setText("Player " + std::to_string(playerId+1) + ": Team " + config.players.at(playerId).team);
     text->setFont(fontFile);
     text->setCharacterSize(0.2);
     text->setAlignment(osgText::TextBase::CENTER_BOTTOM);

@@ -39,12 +39,12 @@ public:
     /**
      * Returns a pointer to the vehicle node (for the Visualizer to center its view on the robot
      */
-    osg::ref_ptr<osg::Node> getVehicleNode() const { return _vehicleViews[0]->getVehicleNode(); }
+    osg::ref_ptr<osg::Node> getVehicleNode(int playerId) const { return _vehicleViews.at(playerId)->getVehicleNode(); }
 
     /**
      * Returns the position of the vehicle in the scene
      */
-    osg::Vec3d getVehiclePosition() const { return _vehicleViews[0]->getPosition(); }
+    osg::Vec3d getVehiclePosition(int playerId) const { return _vehicleViews.at(playerId)->getPosition(); }
 
 private:
     osg::ref_ptr<osg::Group> _root;

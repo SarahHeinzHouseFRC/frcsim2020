@@ -5,6 +5,8 @@
 #include <string>
 #include "SimAgent.h"
 
+#define NUM_ALLOWABLE_DROPPED_PACKETS 50000
+
 
 SimAgent::SimAgent(const ConfigReader& config) :
         _numDroppedPackets(0), _verbose(config.verbose)
@@ -63,5 +65,5 @@ bool SimAgent::rxSimState()
 bool SimAgent::isConnected() const
 {
     // As long as we've heard from the controls <= 100 packets ago, we're still connected
-    return _numDroppedPackets < 100;
+    return _numDroppedPackets < NUM_ALLOWABLE_DROPPED_PACKETS;
 }

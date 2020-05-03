@@ -30,7 +30,7 @@ public:
     /**
      * Constructor
      */
-    VehicleModel(const ConfigReader& config, double startTimestamp, int id);
+    VehicleModel(const ConfigReader& config, double startTimestamp, int playerId);
 
     /**
      * Updates the robot model to the new time

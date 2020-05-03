@@ -172,7 +172,6 @@ int main(int argc, char** argv)
             hud.displayConnectionStatus(connected);
             hud.displayTimerStatus(s.isTimerRunning, s.timer);
             hud.displayFieldScore(s.blueScore, s.redScore);
-//            hud.displayVehicleState(wm.vehicleModel(i));
 
             // Step the visualizer
             vis.step();

@@ -21,7 +21,7 @@ public:
     /**
      * Constructor
      */
-    Hud(const ConfigReader& config);
+    Hud(const ConfigReader& config, int playerId=-1);
 
     /**
      * Returns the HUD's camera
@@ -36,9 +36,15 @@ public:
     void onWindowResize(int width, int height);
 
     /**
-     * Displays "connected" or "disconnected"
+     * Displays "connected" or "disconnected" for each player on the sim HUD
      */
     void displayConnectionStatus(const std::vector<bool>& connected);
+
+    /**
+     * Displays "connected" or "disconnected" for a single player on the sim view HUD
+     * @param connected
+     */
+    void displayConnectionStatus(bool connected, int playerId);
 
     /**
      * Displays the countdown timer
@@ -53,9 +59,9 @@ public:
     void displayFieldScore(int blueScore, int redScore);
 
     /**
-     * Displays robot state
+     * Displays vehicle state
      */
-    void displayVehicleState(const VehicleModel& vehicleModel);
+    void displayVehicleState(const SimState& state, int playerId);
 
 private:
     osg::Camera* _camera;

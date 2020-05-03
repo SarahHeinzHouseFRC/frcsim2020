@@ -18,10 +18,6 @@ int main(int argc, char** argv)
 {
     // Configure from command line arguments
     ArgumentParser args(argc, argv);
-    std::string configPath = (args.contains("--config") ? args.getValue("--config") : DEFAULT_CONFIG_FILE);
-    bool verbose = args.contains("--verbose") || args.contains("-v");
-    bool debugView = args.contains("--debug-view");
-    int player = args.contains("--player") ? std::stoi(args.getValue("--player")) : 1;
     if (args.contains("--help") || args.contains("-h"))
     {
         std::cout << "\nUsage: ./robot_sim [flags]\n"
@@ -34,6 +30,10 @@ int main(int argc, char** argv)
                      "  --verbose                Increase output verbosity\n";
         return 0;
     }
+    std::string configPath = (args.contains("--config") ? args.getValue("--config") : DEFAULT_CONFIG_FILE);
+    bool verbose = args.contains("--verbose") || args.contains("-v");
+    bool debugView = args.contains("--debug-view");
+    int playerId = args.contains("--player") ? std::stoi(args.getValue("--player")) - 1 : 0;
 
     // Read config file
     ConfigReader config;
@@ -49,18 +49,23 @@ int main(int argc, char** argv)
     config.verbose = verbose;
     config.debugView = debugView;
     config.headless = false;
+    if (playerId > config.players.size()-1)
+    {
+        std::cout << "Only " << config.players.size() << " players configured, choose 1-" << config.players.size() << std::endl;
+        return 0;
+    }
 
-    // Initialize comms with core
-    config.sim.comms.simViewPort = 10000 + 10*(player-1);
-    config.simView.port = 12000 + 10*(player-1);
+    // Initialize comms with sim
+    config.sim.comms.simViewPort = 10000 + 10*(playerId);
+    config.simView.port = 12000 + 10*(playerId);
     SimAgent simAgent(config);
 
     // Visualize vehicle and field
     Scene scene(config);
-    Hud hud(config);
+    Hud hud(config, playerId);
 
     // Visualize the scene
-    Visualizer vis(scene, hud);
+    Visualizer vis(scene, hud, playerId);
 
     // Launch rx comms in background thread
     std::thread rxThread([&]()
@@ -69,6 +74,17 @@ int main(int argc, char** argv)
         {
             // Receive commands
             bool rx = simAgent.rxSimState();
+        }
+    });
+
+    std::thread txThread([&]()
+    {
+        while (!vis.done())
+        {
+            // Transmit heartbeat
+            simAgent.txHeartbeat();
+
+            usleep(1e4);
         }
     });
 
@@ -82,12 +98,10 @@ int main(int argc, char** argv)
             scene.update(state);
 
             // Update the hud
-            bool connected = true;
-            if (!simAgent.isConnected()) { connected = false; }
-//            hud.displayConnectionStatus(connected);
+            hud.displayConnectionStatus(simAgent.isConnected(), playerId);
             hud.displayTimerStatus(state.isTimerRunning, state.timer);
             hud.displayFieldScore(state.blueScore, state.redScore);
-//            hud.displayVehicleState(wm.vehicleModel(i));
+            hud.displayVehicleState(state, playerId);
 
             // Step the visualizer
             vis.step();

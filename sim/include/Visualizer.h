@@ -7,6 +7,7 @@
 
 
 #include <osgViewer/Viewer>
+#include <osgGA/KeySwitchMatrixManipulator>
 #include "Scene.h"
 #include "Hud.h"
 
@@ -23,6 +24,11 @@ public:
     Visualizer(Scene& scene, Hud& hud, bool headless=false);
 
     /**
+     * Constructor for a specific player
+     */
+    Visualizer(Scene& scene, Hud& hud, int playerId);
+
+    /**
      * Steps the visualizer forward
      */
     void step();
@@ -34,6 +40,7 @@ public:
 
 private:
     osgViewer::Viewer _viewer;
+    osg::ref_ptr<osgGA::KeySwitchMatrixManipulator> _keySwitchManipulator;
     int _windowWidth;
     int _windowHeight;
     Scene& _scene;

@@ -86,6 +86,8 @@ SimState WorldModel::getSimState()
         v.intakeLeftMotorSpeed = (float) vehicle._state.intakeLeftMotorSpeed;
         v.intakeRightMotorSpeed = (float) vehicle._state.intakeRightMotorSpeed;
         v.tubeMotorSpeed = (float) vehicle._state.tubeMotorSpeed;
+        v.leftDriveMotorSpeed = (float) vehicle._state.rightDriveMotorSpeed;
+        v.rightDriveMotorSpeed = (float) vehicle._state.leftDriveMotorSpeed;
         s.vehicles.push_back(v);
     }
 

@@ -29,9 +29,9 @@ enum CollisionMask
 {
     MASK_A = CATEGORY_C | CATEGORY_O, // INGESTIBLE_REGION
     MASK_B = CATEGORY_OMEGA | CATEGORY_O | CATEGORY_C, // TUBE_REGION
-    MASK_C = CATEGORY_ALPHA | CATEGORY_O | CATEGORY_A | CATEGORY_B | CATEGORY_C, // GOAL_REGION
-    MASK_O = CATEGORY_OMEGA | CATEGORY_ALPHA | CATEGORY_BETA | CATEGORY_O | CATEGORY_A | CATEGORY_B | CATEGORY_C, // BOUNDARY
-    MASK_OMEGA = ~CATEGORY_A, // UNINGESTED_GAME_PIECE
+    MASK_C = CATEGORY_A | CATEGORY_B | CATEGORY_C | CATEGORY_O | CATEGORY_OMEGA | CATEGORY_ALPHA, // GOAL_REGION
+    MASK_O = CATEGORY_A | CATEGORY_B | CATEGORY_C | CATEGORY_O | CATEGORY_OMEGA | CATEGORY_ALPHA | CATEGORY_BETA, // BOUNDARY
+    MASK_OMEGA = CATEGORY_B | CATEGORY_C | CATEGORY_O | CATEGORY_OMEGA | CATEGORY_ALPHA | CATEGORY_BETA, // UNINGESTED_GAME_PIECE
     MASK_ALPHA = CATEGORY_C | CATEGORY_O | CATEGORY_OMEGA | CATEGORY_ALPHA | CATEGORY_BETA, // INGESTIBLE_GAME_PIECE
     MASK_BETA = CATEGORY_O | CATEGORY_ALPHA | CATEGORY_BETA, // INGESTED_GAME_PIECE
 };
@@ -241,29 +241,57 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
             b2Vec2 gamePiecePosLocal = _vehicleBody->GetLocalPoint(gamePieceBody->GetPosition());
             b2Vec2 vecToGamePiece = gamePiecePosLocal - rearRightCornerLocal;
             float dist = -b2Dot(rearEdgePerp, vecToGamePiece);
-            model->_state.pose.z = dist * (0.45 / 0.51);
+            model->_state.pose.vz = 0;
+            model->_state.pose.z = dist * (0.45 / 0.65) + model->_radius;
             model->_state.ingestion = GamePieceModel::TUBE;
         }
         else if (inBlueGoalRegion)
         {
-            model->_state.pose.z = 0.45;
+            model->_state.pose.vz = 0;
+            model->_state.pose.z = 0.38 + model->_radius;
             model->_state.ingestion = GamePieceModel::BLUE_LOW_GOAL;
             _blueGoalGamePieceBodies.push_back(gamePieceBody);
         }
         else if (inRedGoalRegion)
         {
-            model->_state.pose.z = 0.45;
+            model->_state.pose.vz = 0;
+            model->_state.pose.z = 0.38 + model->_radius;
             model->_state.ingestion = GamePieceModel::RED_LOW_GOAL;
             _redGoalGamePieceBodies.push_back(gamePieceBody);
         }
         else
         {
             b2Filter filter = gamePieceBody->GetFixtureList()[0].GetFilterData();
-            filter.categoryBits = CATEGORY_OMEGA;
-            filter.maskBits = MASK_OMEGA;
+
+            if (model->_state.pose.z > 0)
+            {
+                // Allow balls to go into the goal as long as they're off the ground
+                filter.categoryBits = CATEGORY_BETA;
+                filter.maskBits = MASK_BETA;
+            }
+            else
+            {
+                // All other balls on the ground are not allowed into the goal
+                filter.categoryBits = CATEGORY_OMEGA;
+                filter.maskBits = MASK_OMEGA;
+            }
+
             gamePieceBody->GetFixtureList()[0].SetFilterData(filter);
 
-            model->_state.pose.z = 0;
+            if (model->_state.pose.z > 0)
+            {
+                // When balls are unsupported, they should fall to the floor
+                const double az = -9.81;
+                model->_state.pose.vz += elapsedTime * az;
+                model->_state.pose.z += model->_state.pose.vz;
+            }
+            else
+            {
+                // Balls on the floor should stay on the floor
+                model->_state.pose.vz = 0;
+                model->_state.pose.z = 0;
+            }
+
             model->_state.ingestion = GamePieceModel::NOT_INGESTED;
         }
     }

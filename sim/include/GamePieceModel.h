@@ -29,7 +29,7 @@ public:
      * Constructor
      */
     GamePieceModel(double radius, double x, double y) : _initialX(x), _initialY(y),
-            _radius(radius), _state({ { x, y, 0, 0, 0 } }) {};
+            _radius(radius), _state({ { x, y, 0, 0 }, NOT_INGESTED }) {};
 
     /**
      * Reset
@@ -59,7 +59,7 @@ private:
         struct
         {
             double x, y, z;
-            double vx, vy;
+            double vz;
         } pose;
         IngestionState ingestion;
     } _state;

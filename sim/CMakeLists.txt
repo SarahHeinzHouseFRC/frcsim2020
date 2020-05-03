@@ -23,10 +23,10 @@ set(SRCS
         src/ConfigReader.cpp
         src/Scene.cpp
         src/Hud.cpp
+        src/HudElement.cpp
         src/Visualizer.cpp
         src/Time.cpp
         src/Color.cpp
-        src/Label.cpp
         src/UdpNode.cpp
         src/PhysicsEngine.cpp
         src/Geometry.cpp

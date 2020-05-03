@@ -9,7 +9,7 @@
 #include <vector>
 #include <osg/Camera>
 #include <osgText/Text>
-#include "Label.h"
+#include "HudElement.h"
 #include "VehicleModel.h"
 #include "ConfigReader.h"
 #include "Types.h"
@@ -41,11 +41,6 @@ public:
     void displayConnectionStatus(bool isConnected);
 
     /**
-     * Displays robot state
-     */
-    void displayVehicleState(const VehicleModel& vehicleModel);
-
-    /**
      * Displays the countdown timer
      * @param running Whether timer is currently counting down or not
      * @param timerValue Current value (sec)
@@ -53,9 +48,14 @@ public:
     void displayTimerStatus(bool running, double timerValue);
 
     /**
-     * Displays number of collisions
+     * Displays score
      */
-    void displayNumCollisions(int numCollisions);
+    void displayFieldScore(std::tuple<int, int> score);
+
+    /**
+     * Displays robot state
+     */
+    void displayVehicleState(const VehicleModel& vehicleModel);
 
 private:
     osg::Camera* _camera;
@@ -65,12 +65,13 @@ private:
     osg::ref_ptr<osg::Geometry> _geom;
     osg::ref_ptr<osg::Vec3Array> _vertices;
     int _width;
-    std::vector<Label*> _labels;
-    osg::ref_ptr<Label> _connected;
-    osg::ref_ptr<Label> _vehiclePoseState;
-    osg::ref_ptr<Label> _vehicleDrivetrainState;
-    osg::ref_ptr<Label> _timer;
-    osg::ref_ptr<Label> _numCollisions;
+    osg::ref_ptr<HudLabel> _connected;
+    osg::ref_ptr<HudLabel> _timer;
+    osg::ref_ptr<HudLabel> _blueScore;
+    osg::ref_ptr<HudLabel> _redScore;
+    osg::ref_ptr<HudLabel> _vehiclePoseState;
+    osg::ref_ptr<HudLabel> _vehicleDrivetrainState;
+    float _padding = 15;
 };
 
 

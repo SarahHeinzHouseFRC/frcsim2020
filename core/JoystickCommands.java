@@ -11,21 +11,21 @@ public class JoystickCommands
     public int yLeftJoystick; // Integer from -512 to 512
     public int xRightJoystick; // Integer from -512 to 512
     public int yRightJoystick; // Integer from -512 to 512
-    public int upDpad; // Boolean value 0 or 1
-    public int downDpad; // Boolean value 0 or 1
-    public int leftDpad; // Boolean value 0 or 1
-    public int rightDpad; // Boolean value 0 or 1
+    public int upDpad; // Integer value 0 or 1
+    public int downDpad; // Integer value 0 or 1
+    public int leftDpad; // Integer value 0 or 1
+    public int rightDpad; // Integer value 0 or 1
     public int leftTrigger; // Integer from 0 to 512
     public int rightTrigger; // Integer from 0 to 512
-    public int leftBumper; // Boolean value 0 or 1
-    public int rightBumper; // Boolean value 0 or 1
-    public int a; // Boolean value 0 or 1
-    public int b; // Boolean value 0 or 1
-    public int x; // Boolean value 0 or 1
-    public int y; // Boolean value 0 or 1
-    public int back; // Boolean value 0 or 1
-    public int guide; // Boolean value 0 or 1
-    public int start; // Boolean value 0 or 1
+    public int leftBumper; // Integer value 0 or 1
+    public int rightBumper; // Integer value 0 or 1
+    public int a; // Integer value 0 or 1
+    public int b; // Integer value 0 or 1
+    public int x; // Integer value 0 or 1
+    public int y; // Integer value 0 or 1
+    public int back; // Integer value 0 or 1
+    public int guide; // Integer value 0 or 1
+    public int start; // Integer value 0 or 1
 
     public void fromJson(String str)
     {

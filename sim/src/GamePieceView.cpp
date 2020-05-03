@@ -14,13 +14,13 @@ GamePieceView::GamePieceView(const ConfigReader& config, const GamePieceModel& g
 {
     if (config.debugView)
     {
-        _node = makeView(gamePieceModel);
-        addChild(_node);
+        _gamePieceNode = drawGamePiece(gamePieceModel);
+        addChild(_gamePieceNode);
     }
     else
     {
-        _node = osgDB::readNodeFile(config.sim.assets.gamePieceModelFile);
-        addChild(_node);
+        _gamePieceNode = osgDB::readNodeFile(config.sim.assets.gamePieceModelFile);
+        addChild(_gamePieceNode);
     }
     setPosition(osg::Vec3(gamePieceModel._state.pose.x, gamePieceModel._state.pose.y, 0));
 }
@@ -40,13 +40,7 @@ void GamePieceView::update(const GamePieceModel& gamePieceModel)
                 break;
 
             case GamePieceModel::CENTER_INTAKE:
-                _shape->setColor(Color::Orange);
-                break;
-
             case GamePieceModel::LEFT_INTAKE:
-                _shape->setColor(Color::Orange);
-                break;
-
             case GamePieceModel::RIGHT_INTAKE:
                 _shape->setColor(Color::Orange);
                 break;
@@ -54,13 +48,21 @@ void GamePieceView::update(const GamePieceModel& gamePieceModel)
             case GamePieceModel::TUBE:
                 _shape->setColor(Color::Green);
                 break;
+
+            case GamePieceModel::BLUE_LOW_GOAL:
+                _shape->setColor(Color::Blue);
+                break;
+
+            case GamePieceModel::RED_LOW_GOAL:
+                _shape->setColor(Color::Red);
+                break;
         }
     }
 }
 
 
 
-osg::ref_ptr<osg::Geode> GamePieceView::makeView(const GamePieceModel& gamePieceModel)
+osg::ref_ptr<osg::Geode> GamePieceView::drawGamePiece(const GamePieceModel& gamePieceModel)
 {
     _shape = new osg::ShapeDrawable(new osg::Sphere(osg::Vec3d(0, 0, 0), gamePieceModel._radius));
     _shape->setColor(Color::Yellow);

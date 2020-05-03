@@ -5,14 +5,17 @@
 #ifndef ROBOT_SIM_FIELDMODEL_H
 #define ROBOT_SIM_FIELDMODEL_H
 
+#include <tuple>
 #include "ConfigReader.h"
 #include "Geometry.h"
 #include "BaseModel.h"
+#include "Types.h"
 
 
 class FieldModel : public BaseModel
 {
 friend class FieldView;
+friend class PhysicsEngine;
 public:
     /**
      * Constructor
@@ -25,17 +28,13 @@ public:
     void update(double currTimestamp);
 
     /**
-     * Returns exterior polygon
+     * Updates the field's internal parameters given new commands
+     * @param commands New commands
      */
-    Geometry::Polygon2d exteriorPolygon() const { return _exteriorPolygon; }
+    void processCommands(const CoreCommands& commands);
 
     /**
-     * Returns interior polygons
-     */
-    std::vector<Geometry::Polygon2d> interiorPolygons() const { return _interiorPolygons; }
-
-    /**
-     * Retuuns the model type
+     * Returns the model type
      */
     virtual ModelType modelType() { return FIELD_MODEL; }
 
@@ -50,17 +49,28 @@ public:
     int getCollisionCount() { return _collisionCount; }
 
     /**
+     * Returns the current score
+     */
+    std::tuple<int, int> getScore() { return { _blueScore, _redScore }; }
+
+    /**
      * Resets the collision count
      */
     void reset() { _collisionCount = 0; _inCollision = false; }
 
 private:
+    int _prevOuttakeButtonState;
     double _currTimestamp;
     double _timeLastCollision;
     bool _inCollision;
     int _collisionCount;
     Geometry::Polygon2d _exteriorPolygon;
     std::vector<Geometry::Polygon2d> _interiorPolygons;
+    Geometry::Polygon2d _blueGoal;
+    Geometry::Polygon2d _redGoal;
+    int _blueScore;
+    int _redScore;
+    bool _outtake; // Signals to physics engine to outtake a ball
 };
 
 

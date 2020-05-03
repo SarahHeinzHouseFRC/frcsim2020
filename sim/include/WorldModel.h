@@ -42,6 +42,11 @@ public:
      */
     FieldModel& fieldModel() { return _fieldModel; }
 
+    /**
+     * Returns the current score
+     */
+    std::tuple<int, int> getScore() { return _fieldModel.getScore(); }
+
 private:
     FieldModel _fieldModel;
     VehicleModel _vehicleModel;

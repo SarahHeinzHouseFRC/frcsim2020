@@ -3,7 +3,6 @@
  */
 
 #include <cmath>
-#include <ConfigReader.h>
 #include "VehicleModel.h"
 
 using namespace Geometry;
@@ -46,7 +45,7 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
     _ingestibleRegionCenter = std::vector<Vertex2d>{{0.51, -0.11}, {0.51, 0.11}, {0.05, 0.11}, {0.05, -0.11}};
     _ingestibleRegionLeft = std::vector<Vertex2d>{{0.51, 0.11}, {0.51, 0.26}, {0.30, 0.26}, {0.30, 0.11}};
     _ingestibleRegionRight = std::vector<Vertex2d>{{0.51, -0.26}, {0.51, -0.11}, {0.30, -0.11}, {0.30, -0.26}};
-    _tubeRegion = std::vector<Vertex2d>{{0.05, -0.18}, {0.05, 0.18}, {-0.51, 0.18}, {-0.51, -0.18}};
+    _tubeRegion = std::vector<Vertex2d>{{0.05, -0.18}, {0.05, 0.18}, {-0.60, 0.18}, {-0.60, -0.18}};
 }
 
 

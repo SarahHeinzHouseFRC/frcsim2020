@@ -12,13 +12,40 @@ using namespace Geometry;
 #define MU_GAME_PIECE 0.1
 
 
+enum CollisionCategory
+{
+    CATEGORY_A = 0x0001, // INGESTIBLE_REGION
+    CATEGORY_B = 0x0002, // TUBE_REGION
+    CATEGORY_C = 0x0004, // GOAL_REGION
+    CATEGORY_O = 0x0008, // BOUNDARY
+    CATEGORY_OMEGA = 0x0010, // UNINGESTED_GAME_PIECE
+    CATEGORY_ALPHA = 0x0020, // INGESTIBLE_GAME_PIECE
+    CATEGORY_BETA = 0x0040, // INGESTED_GAME_PIECE
+};
+
+
+
+enum CollisionMask
+{
+    MASK_A = CATEGORY_C | CATEGORY_O, // INGESTIBLE_REGION
+    MASK_B = CATEGORY_OMEGA | CATEGORY_O | CATEGORY_C, // TUBE_REGION
+    MASK_C = CATEGORY_A | CATEGORY_B | CATEGORY_C | CATEGORY_O | CATEGORY_OMEGA | CATEGORY_ALPHA, // GOAL_REGION
+    MASK_O = CATEGORY_A | CATEGORY_B | CATEGORY_C | CATEGORY_O | CATEGORY_OMEGA | CATEGORY_ALPHA | CATEGORY_BETA, // BOUNDARY
+    MASK_OMEGA = CATEGORY_B | CATEGORY_C | CATEGORY_O | CATEGORY_OMEGA | CATEGORY_ALPHA | CATEGORY_BETA, // UNINGESTED_GAME_PIECE
+    MASK_ALPHA = CATEGORY_C | CATEGORY_O | CATEGORY_OMEGA | CATEGORY_ALPHA | CATEGORY_BETA, // INGESTIBLE_GAME_PIECE
+    MASK_BETA = CATEGORY_O | CATEGORY_ALPHA | CATEGORY_BETA, // INGESTED_GAME_PIECE
+};
+
+
+
 PhysicsEngine::PhysicsEngine(const FieldModel& fieldModel,
                              const VehicleModel& vehicleModel,
                              const std::vector<GamePieceModel>& gamePieceModels,
                              double timestamp) :
         _prevTimestamp(timestamp),
         _gravity(0.0f, 0.0f),
-        _muGamePiece(MU_GAME_PIECE)
+        _muGamePiece(MU_GAME_PIECE),
+        _outtaken(0)
 {
     _world = std::make_unique<b2World>(_gravity);
 
@@ -52,20 +79,33 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
     _vehicleBody->SetLinearVelocity(b2Vec2(vehicleModel._state.pose.vx, vehicleModel._state.pose.vy));
     _vehicleBody->SetAngularVelocity(vehicleModel._state.pose.omega);
 
-    // Manually apply friction to the game pieces
+    // Outtake one ball if field calls for it
+    if (fieldModel._outtake && !_blueGoalGamePieceBodies.empty())
     {
-        for (const auto& gamePieceBody : _gamePieceBodies)
+        // TODO: This framework is really starting to break down, should the physics engine really be handling this?
+        auto* gamePieceBody = _blueGoalGamePieceBodies.front();
+        gamePieceBody->SetTransform(b2Vec2(-37.25*0.0254, 314.96*0.0254), 0);
+        gamePieceBody->SetLinearVelocity({ 0, -1 });
+        _outtaken++;
+    }
+    fieldModel._outtake = false;
+
+    // Manually apply friction to the game pieces
+    for (const auto& gamePieceBody : _gamePieceBodies)
+    {
+        b2Vec2 velocity = gamePieceBody->GetLinearVelocity();
+        if (velocity.LengthSquared() > 0)
         {
-            b2Vec2 velocity = gamePieceBody->GetLinearVelocity();
-            if (velocity.LengthSquared() > 0)
-            {
-                b2Vec2 frictionForce = -velocity;
-                frictionForce.Normalize();
-                frictionForce *= _muGamePiece;
-                gamePieceBody->ApplyForceToCenter(frictionForce, true);
-            }
+            b2Vec2 frictionForce = -velocity;
+            frictionForce.Normalize();
+            frictionForce *= _muGamePiece;
+            gamePieceBody->ApplyForceToCenter(frictionForce, true);
         }
     }
+
+    // Instruct the world to perform a single step of simulation.
+    // It is generally best to keep the time step and iterations fixed.
+    _world->Step(elapsedTime, _velocityIterations, _positionIterations);
 
     // Manually move ingestible/tube game pieces
     for (b2Body* gamePieceBody : _ingestibleCenterGamePieceBodies)
@@ -112,10 +152,6 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
         gamePieceBody->SetLinearVelocity(velocity);
     }
 
-    // Instruct the world to perform a single step of simulation.
-    // It is generally best to keep the time step and iterations fixed.
-    _world->Step(elapsedTime, _velocityIterations, _positionIterations);
-
     // Update the vehicle model
     {
         b2Vec2 position = _vehicleBody->GetPosition();
@@ -145,32 +181,57 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
     _ingestibleLeftGamePieceBodies.clear();
     _ingestibleRightGamePieceBodies.clear();
     _tubeGamePieceBodies.clear();
+    _blueGoalGamePieceBodies.clear();
+    _redGoalGamePieceBodies.clear();
     for (const auto& gamePieceBody : _gamePieceBodies)
     {
         b2Transform vehicleTf = _vehicleBody->GetTransform();
+        b2Transform fieldTf({ 0, 0 }, b2Rot(0));
         b2Vec2 gamePiecePosition = gamePieceBody->GetWorldCenter();
         bool overlapCenter = _ingestibleRegionCenterShape.TestPoint(vehicleTf, gamePiecePosition);
         bool overlapLeft = _ingestibleRegionLeftShape.TestPoint(vehicleTf, gamePiecePosition);
         bool overlapRight = _ingestibleRegionRightShape.TestPoint(vehicleTf, gamePiecePosition);
         bool overlapTube = _tubeRegion.TestPoint(vehicleTf, gamePiecePosition);
+        bool inBlueGoalRegion = _blueGoalRegion.TestPoint(fieldTf, gamePiecePosition);
+        bool inRedGoalRegion = _redGoalRegion.TestPoint(fieldTf, gamePiecePosition);
         auto model = (GamePieceModel*) gamePieceBody->GetUserData();
         if (overlapCenter)
         {
+            b2Filter filter = gamePieceBody->GetFixtureList()[0].GetFilterData();
+            filter.categoryBits = CATEGORY_ALPHA;
+            filter.maskBits = MASK_ALPHA;
+            gamePieceBody->GetFixtureList()[0].SetFilterData(filter);
+
             _ingestibleCenterGamePieceBodies.push_back(gamePieceBody);
             model->_state.ingestion = GamePieceModel::CENTER_INTAKE;
         }
         else if (overlapLeft)
         {
+            b2Filter filter = gamePieceBody->GetFixtureList()[0].GetFilterData();
+            filter.categoryBits = CATEGORY_ALPHA;
+            filter.maskBits = MASK_ALPHA;
+            gamePieceBody->GetFixtureList()[0].SetFilterData(filter);
+
             _ingestibleLeftGamePieceBodies.push_back(gamePieceBody);
             model->_state.ingestion = GamePieceModel::LEFT_INTAKE;
         }
         else if (overlapRight)
         {
+            b2Filter filter = gamePieceBody->GetFixtureList()[0].GetFilterData();
+            filter.categoryBits = CATEGORY_ALPHA;
+            filter.maskBits = MASK_ALPHA;
+            gamePieceBody->GetFixtureList()[0].SetFilterData(filter);
+
             _ingestibleRightGamePieceBodies.push_back(gamePieceBody);
             model->_state.ingestion = GamePieceModel::RIGHT_INTAKE;
         }
         else if (overlapTube)
         {
+            b2Filter filter = gamePieceBody->GetFixtureList()[0].GetFilterData();
+            filter.categoryBits = CATEGORY_BETA;
+            filter.maskBits = MASK_BETA;
+            gamePieceBody->GetFixtureList()[0].SetFilterData(filter);
+
             _tubeGamePieceBodies.push_back(gamePieceBody);
             b2Vec2 rearLeftCornerLocal(0.05, 0.11);
             b2Vec2 rearRightCornerLocal(0.05, -0.11);
@@ -180,15 +241,63 @@ void PhysicsEngine::update(FieldModel& fieldModel, VehicleModel& vehicleModel, s
             b2Vec2 gamePiecePosLocal = _vehicleBody->GetLocalPoint(gamePieceBody->GetPosition());
             b2Vec2 vecToGamePiece = gamePiecePosLocal - rearRightCornerLocal;
             float dist = -b2Dot(rearEdgePerp, vecToGamePiece);
-            model->_state.pose.z = dist * (0.45 / 0.51);
+            model->_state.pose.vz = 0;
+            model->_state.pose.z = dist * (0.45 / 0.65) + model->_radius;
             model->_state.ingestion = GamePieceModel::TUBE;
+        }
+        else if (inBlueGoalRegion)
+        {
+            model->_state.pose.vz = 0;
+            model->_state.pose.z = 0.38 + model->_radius;
+            model->_state.ingestion = GamePieceModel::BLUE_LOW_GOAL;
+            _blueGoalGamePieceBodies.push_back(gamePieceBody);
+        }
+        else if (inRedGoalRegion)
+        {
+            model->_state.pose.vz = 0;
+            model->_state.pose.z = 0.38 + model->_radius;
+            model->_state.ingestion = GamePieceModel::RED_LOW_GOAL;
+            _redGoalGamePieceBodies.push_back(gamePieceBody);
         }
         else
         {
-            model->_state.pose.z = 0;
+            b2Filter filter = gamePieceBody->GetFixtureList()[0].GetFilterData();
+
+            if (model->_state.pose.z > 0)
+            {
+                // Allow balls to go into the goal as long as they're off the ground
+                filter.categoryBits = CATEGORY_BETA;
+                filter.maskBits = MASK_BETA;
+            }
+            else
+            {
+                // All other balls on the ground are not allowed into the goal
+                filter.categoryBits = CATEGORY_OMEGA;
+                filter.maskBits = MASK_OMEGA;
+            }
+
+            gamePieceBody->GetFixtureList()[0].SetFilterData(filter);
+
+            if (model->_state.pose.z > 0)
+            {
+                // When balls are unsupported, they should fall to the floor
+                const double az = -9.81;
+                model->_state.pose.vz += elapsedTime * az;
+                model->_state.pose.z += model->_state.pose.vz;
+            }
+            else
+            {
+                // Balls on the floor should stay on the floor
+                model->_state.pose.vz = 0;
+                model->_state.pose.z = 0;
+            }
+
             model->_state.ingestion = GamePieceModel::NOT_INGESTED;
         }
     }
+
+    fieldModel._blueScore = _blueGoalGamePieceBodies.size() + _outtaken;
+    fieldModel._redScore = _redGoalGamePieceBodies.size();
 
     _prevTimestamp = currTimestamp;
 }
@@ -215,7 +324,7 @@ void PhysicsEngine::reset(const FieldModel& fieldModel, const VehicleModel& vehi
 void PhysicsEngine::initFieldBodies(b2World* world, const FieldModel& fieldModel)
 {
     // Field exterior static body
-    Polygon2d exteriorPolygon = fieldModel.exteriorPolygon();
+    Polygon2d exteriorPolygon = fieldModel._exteriorPolygon;
     for (const auto& edge : exteriorPolygon.edges())
     {
         b2BodyDef wallDef;
@@ -224,12 +333,17 @@ void PhysicsEngine::initFieldBodies(b2World* world, const FieldModel& fieldModel
         b2Vec2 v2(edge.b.x, edge.b.y);
         b2EdgeShape wallShape;
         wallShape.Set(v1, v2);
-        wallBody->CreateFixture(&wallShape, 0);
+        b2FixtureDef fixtureDef;
+        fixtureDef.shape = &wallShape;
+        fixtureDef.density = 0;
+        fixtureDef.filter.categoryBits = CATEGORY_O;
+        fixtureDef.filter.maskBits = MASK_O;
+        wallBody->CreateFixture(&fixtureDef);
         wallBody->SetUserData((void*) &fieldModel);
     }
 
     // Field interior static bodies
-    for (const auto& interiorPolygon : fieldModel.interiorPolygons())
+    for (const auto& interiorPolygon : fieldModel._interiorPolygons)
     {
         for (const auto& edge : interiorPolygon.edges())
         {
@@ -239,9 +353,61 @@ void PhysicsEngine::initFieldBodies(b2World* world, const FieldModel& fieldModel
             b2Vec2 v2(edge.b.x, edge.b.y);
             b2EdgeShape wallShape;
             wallShape.Set(v1, v2);
-            wallBody->CreateFixture(&wallShape, 0);
+            b2FixtureDef fixtureDef;
+            fixtureDef.shape = &wallShape;
+            fixtureDef.density = 0;
+            fixtureDef.filter.categoryBits = CATEGORY_O;
+            fixtureDef.filter.maskBits = MASK_O;
+            wallBody->CreateFixture(&fixtureDef);
             wallBody->SetUserData((void*) &fieldModel);
         }
+    }
+
+    // Goal regions
+    {
+        b2BodyDef goalBodyDef;
+        b2Body* goalBody = world->CreateBody(&goalBodyDef);
+        int numVertices = fieldModel._blueGoal.numVertices();
+        b2Vec2 vertices[numVertices];
+        for (int i=0; i<numVertices; i++)
+        {
+            Vertex2d v = fieldModel._blueGoal.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        _blueGoalRegion.Set(vertices, numVertices);
+        b2FixtureDef fixtureDef;
+        fixtureDef.shape = &_blueGoalRegion;
+        fixtureDef.density = 0;
+        fixtureDef.friction = 0.3f;
+        fixtureDef.filter.categoryBits = CATEGORY_C;
+        fixtureDef.filter.maskBits = MASK_C;
+
+        // Add the shape to the body
+        goalBody->CreateFixture(&fixtureDef);
+        goalBody->SetUserData((void*) &fieldModel);
+    }
+
+    {
+        b2BodyDef goalBodyDef;
+        b2Body* goalBody = world->CreateBody(&goalBodyDef);
+        int numVertices = fieldModel._redGoal.numVertices();
+        b2Vec2 vertices[numVertices];
+        for (int i=0; i<numVertices; i++)
+        {
+            Vertex2d v = fieldModel._redGoal.vertices().at(i);
+            vertices[i] = b2Vec2(v.x, v.y);
+        }
+        _redGoalRegion.Set(vertices, numVertices);
+        b2FixtureDef fixtureDef;
+        fixtureDef.shape = &_redGoalRegion;
+        fixtureDef.density = 0;
+        fixtureDef.friction = 0.3f;
+        fixtureDef.filter.categoryBits = CATEGORY_C;
+        fixtureDef.filter.maskBits = MASK_C;
+
+        // Add the shape to the body
+        goalBody->CreateFixture(&fixtureDef);
+        goalBody->SetUserData((void*) &fieldModel);
     }
 }
 
@@ -271,6 +437,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -291,6 +459,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -311,6 +481,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -331,6 +503,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -351,6 +525,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -371,6 +547,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -391,6 +569,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -411,6 +591,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -431,6 +613,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -451,6 +635,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &vehicleShape;
         vehicleFixtureDef.density = (vehicleModel._mass) / 0.047f;
         vehicleFixtureDef.friction = 0.3f;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_O;
+        vehicleFixtureDef.filter.maskBits = MASK_O;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -470,8 +656,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &_ingestibleRegionCenterShape;
         vehicleFixtureDef.density = 0;
         vehicleFixtureDef.friction = 0.3f;
-        vehicleFixtureDef.filter.categoryBits = 0x0002;
-        vehicleFixtureDef.filter.maskBits = 0x0002;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_A;
+        vehicleFixtureDef.filter.maskBits = MASK_A;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -491,8 +677,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &_ingestibleRegionLeftShape;
         vehicleFixtureDef.density = 0;
         vehicleFixtureDef.friction = 0.3f;
-        vehicleFixtureDef.filter.categoryBits = 0x0002;
-        vehicleFixtureDef.filter.maskBits = 0x0002;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_A;
+        vehicleFixtureDef.filter.maskBits = MASK_A;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -512,8 +698,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &_ingestibleRegionRightShape;
         vehicleFixtureDef.density = 0;
         vehicleFixtureDef.friction = 0.3f;
-        vehicleFixtureDef.filter.categoryBits = 0x0002;
-        vehicleFixtureDef.filter.maskBits = 0x0002;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_A;
+        vehicleFixtureDef.filter.maskBits = MASK_A;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -533,8 +719,8 @@ b2Body* PhysicsEngine::initVehicleBody(b2World* world, const VehicleModel& vehic
         vehicleFixtureDef.shape = &_tubeRegion;
         vehicleFixtureDef.density = 0;
         vehicleFixtureDef.friction = 0.3f;
-        vehicleFixtureDef.filter.categoryBits = 0x0002;
-        vehicleFixtureDef.filter.maskBits = 0x0002;
+        vehicleFixtureDef.filter.categoryBits = CATEGORY_B;
+        vehicleFixtureDef.filter.maskBits = MASK_B;
 
         // Add the shape to the body
         vehicleBody->CreateFixture(&vehicleFixtureDef);
@@ -568,6 +754,8 @@ std::vector<b2Body*> PhysicsEngine::initGamePieceBodies(b2World* world, const st
 
         gamePieceFixtureDef.density = 1.0f;
         gamePieceFixtureDef.friction = 0.3f;
+        gamePieceFixtureDef.filter.categoryBits = CATEGORY_OMEGA;
+        gamePieceFixtureDef.filter.maskBits = MASK_OMEGA;
         gamePieceBody->CreateFixture(&gamePieceFixtureDef);
         gamePieceBody->SetUserData((void*) &gamePieceModel);
         gamePieceBodies.push_back(gamePieceBody);

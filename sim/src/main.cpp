@@ -96,6 +96,7 @@ int main(int argc, char** argv)
                     rxCommands.clear();
                 }
                 wm.vehicleModel().processCommands(rxCommands);
+                wm.fieldModel().processCommands(rxCommands);
             }
         }
     });
@@ -119,9 +120,9 @@ int main(int argc, char** argv)
 
             // Update the hud
             hud.displayConnectionStatus(coreAgent.isConnected());
-            hud.displayVehicleState(wm.vehicleModel());
             hud.displayTimerStatus(timer.isRunning(), timer.getValue());
-            hud.displayNumCollisions(wm.fieldModel().getCollisionCount());
+            hud.displayFieldScore(wm.getScore());
+            hud.displayVehicleState(wm.vehicleModel());
 
             // Step the visualizer
             vis.step();

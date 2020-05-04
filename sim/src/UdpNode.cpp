@@ -4,7 +4,7 @@
 
 #include "UdpNode.h"
 
-#define MAXLINE 1024
+#define MAXLINE 8192
 
 
 UdpNode::UdpNode(uint16_t rxPort, const std::string& txIp, uint16_t txPort) : _rxAddr{0}, _txAddr{0}
@@ -32,7 +32,7 @@ UdpNode::UdpNode(uint16_t rxPort, const std::string& txIp, uint16_t txPort) : _r
     if (bind(_sockfd, (const struct sockaddr *)&_rxAddr,
     sizeof(_rxAddr)) < 0)
     {
-        perror("UdpNode: Bind failed");
+        printf("UdpNode: Bind failed on port %d\n", rxPort);
         exit(EXIT_FAILURE);
     }
 }
@@ -61,12 +61,19 @@ std::string UdpNode::receive()
     struct sockaddr_in cliaddr;
     memset(&cliaddr, 0, sizeof(cliaddr));
     char buffer[MAXLINE];
-    int len, n;
-    n = recvfrom(_sockfd, (char *) buffer, MAXLINE, MSG_DONTWAIT, ( struct sockaddr *) &cliaddr, (socklen_t*) &len);
-    if (n >= MAXLINE)
+    int len = sizeof(struct sockaddr_in);
+    int n = recvfrom(_sockfd, (char *) buffer, MAXLINE, MSG_DONTWAIT, ( struct sockaddr *) &cliaddr, (socklen_t*) &len);
+    if (cliaddr.sin_port == _txAddr.sin_port)
     {
-        printf("UdpNode: Large message received, buffer overflow!\n");
+        if (n >= MAXLINE)
+        {
+            printf("UdpNode: Large message received, buffer overflow!\n");
+        }
+        buffer[n] = '\0';
+        return buffer;
     }
-    buffer[n] = '\0';
-    return buffer;
+    else
+    {
+        return "";
+    }
 }

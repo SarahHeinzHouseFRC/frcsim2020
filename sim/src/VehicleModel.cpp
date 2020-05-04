@@ -8,7 +8,9 @@
 using namespace Geometry;
 
 
-VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
+VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp, int playerId) :
+        _team(config.players.at(playerId).team),
+        _alliance(config.players.at(playerId).alliance),
         _prevTimestamp(startTimestamp),
         _state{0},
         _leftDriveMotorMaxSpeed(config.sim.vehicle.drivetrain.leftMotorMaxSpeed),
@@ -20,32 +22,44 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp) :
         _wheelRadius(config.sim.vehicle.drivetrain.wheelRadius),
         _drivetrainWidth(config.sim.vehicle.drivetrain.width),
         _wheelTrack(config.sim.vehicle.drivetrain.wheelTrack),
-        _mass(config.sim.vehicle.mass)
+        _mass(config.sim.vehicle.mass),
+        _outtake(false),
+        _prevOuttakeButtonState(false)
 {
-    // Set initial state
-    _initialState = { config.sim.vehicle.initialState.x, config.sim.vehicle.initialState.y, config.sim.vehicle.initialState.theta };
+    // Account for bad inputs
+    if (_alliance != "Blue" && _alliance != "Red")
+    {
+        _alliance = "Red";
+    }
+
+    // Set initial state (so we can reset to it later if needed)
+    _initialState.x = config.players.at(playerId).initialPosition.x;
+    _initialState.y = config.players.at(playerId).initialPosition.y;
+    _initialState.theta = config.players.at(playerId).initialPosition.theta;
+
+    // Set pose
     _state.pose.x = _initialState.x;
     _state.pose.y = _initialState.y;
     _state.pose.theta = _initialState.theta;
 
     // Make bounding polygons
-    _boundingPolygonFrontLeft = std::vector<Vertex2d>{{0.20, 0.11}, {0.20, 0.31}, {0.05, 0.31}, {0.05, 0.11}};
-    _boundingPolygonFrontRight = std::vector<Vertex2d>{{0.20, -0.31}, {0.20, -0.11}, {0.05, -0.11}, {0.05, -0.31}};
-    _boundingPolygonRearLeft = std::vector<Vertex2d>{{0.05, 0.18}, {0.05, 0.31}, {-0.51, 0.31}, {-0.51, 0.18}};
-    _boundingPolygonRearRight = std::vector<Vertex2d>{{0.05, -0.31}, {0.05, -0.18}, {-0.51, -0.18}, {-0.51, -0.31}};
+    _boundingPolygonFrontLeft = config.sim.vehicle.boundingPolygonFrontLeft;
+    _boundingPolygonFrontRight = config.sim.vehicle.boundingPolygonFrontRight;
+    _boundingPolygonRearLeft = config.sim.vehicle.boundingPolygonRearLeft;
+    _boundingPolygonRearRight = config.sim.vehicle.boundingPolygonRearRight;
 
-    _boundingPolygonBumperFrontLeft = std::vector<Vertex2d>{ {0.30, 0.16}, {0.30, 0.31}, {0.20, 0.31}, {0.20, 0.16} };
-    _boundingPolygonBumperFrontRight = std::vector<Vertex2d>{ {0.30, -0.31}, {0.30, -0.16}, {0.20, -0.16}, {0.20, -0.31} };
-    _boundingPolygonBumperLeft = std::vector<Vertex2d>{ {0.30, 0.31}, {0.30, 0.40}, {-0.60, 0.40}, {-0.60, 0.31} };
-    _boundingPolygonBumperRight = std::vector<Vertex2d>{ {0.30, -0.40}, {0.30, -0.31}, {-0.60, -0.31}, {-0.60, -0.40} };
-    _boundingPolygonBumperRearLeft = std::vector<Vertex2d>{ {-0.51, 0.18}, {-0.51, 0.31}, {-0.60, 0.31}, {-0.60, 0.18} };
-    _boundingPolygonBumperRearRight = std::vector<Vertex2d>{ {-0.51, -0.31}, {-0.51, -0.18}, {-0.60, -0.18}, {-0.60, -0.31} };
+    _boundingPolygonBumperFrontLeft = config.sim.vehicle.boundingPolygonBumperFrontLeft;
+    _boundingPolygonBumperFrontRight = config.sim.vehicle.boundingPolygonBumperFrontRight;
+    _boundingPolygonBumperLeft = config.sim.vehicle.boundingPolygonBumperLeft;
+    _boundingPolygonBumperRight = config.sim.vehicle.boundingPolygonBumperRight;
+    _boundingPolygonBumperRearLeft = config.sim.vehicle.boundingPolygonBumperRearLeft;
+    _boundingPolygonBumperRearRight = config.sim.vehicle.boundingPolygonBumperRearRight;
 
     // Make ingestible/ingested regions
-    _ingestibleRegionCenter = std::vector<Vertex2d>{{0.51, -0.11}, {0.51, 0.11}, {0.05, 0.11}, {0.05, -0.11}};
-    _ingestibleRegionLeft = std::vector<Vertex2d>{{0.51, 0.11}, {0.51, 0.26}, {0.30, 0.26}, {0.30, 0.11}};
-    _ingestibleRegionRight = std::vector<Vertex2d>{{0.51, -0.26}, {0.51, -0.11}, {0.30, -0.11}, {0.30, -0.26}};
-    _tubeRegion = std::vector<Vertex2d>{{0.05, -0.18}, {0.05, 0.18}, {-0.60, 0.18}, {-0.60, -0.18}};
+    _ingestibleRegionCenter = config.sim.vehicle.ingestibleRegionCenter;
+    _ingestibleRegionLeft = config.sim.vehicle.ingestibleRegionLeft;
+    _ingestibleRegionRight = config.sim.vehicle.ingestibleRegionRight;
+    _tubeRegion = config.sim.vehicle.tubeRegion;
 }
 
 
@@ -105,6 +119,15 @@ void VehicleModel::processCommands(const CoreCommands& commands)
     _state.intakeLeftMotorSpeed = (commands.intakeLeftMotorSpeed / 512.0) * _intakeLeftMotorMaxSpeed;
     _state.intakeRightMotorSpeed = (commands.intakeRightMotorSpeed / 512.0) * _intakeRightMotorMaxSpeed;
     _state.tubeMotorSpeed = (commands.tubeMotorSpeed / 512.0) * _tubeMotorMaxSpeed;
+
+    // Request the world to outtake a ball when outtake button switches from high to low
+    int currOuttakeButtonState = commands.outtake;
+    if (currOuttakeButtonState && !_prevOuttakeButtonState)
+    {
+        _outtake = true;
+    }
+
+    _prevOuttakeButtonState = currOuttakeButtonState;
 }
 
 

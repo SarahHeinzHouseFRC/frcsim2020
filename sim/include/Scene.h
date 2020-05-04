@@ -24,12 +24,12 @@ public:
     /**
      * Constructs the scene
      */
-    Scene(const ConfigReader& config, const WorldModel& wm);
+    Scene(const ConfigReader& config);
 
     /**
      * Updates the scene given the robot's current state
      */
-    void update(const WorldModel& wm);
+    void update(const SimState& simState);
 
     /**
      * Returns the root node of the scene
@@ -39,16 +39,16 @@ public:
     /**
      * Returns a pointer to the vehicle node (for the Visualizer to center its view on the robot
      */
-    osg::ref_ptr<osg::Node> getVehicleNode() const { return _vehicleView->getVehicleNode(); }
+    osg::ref_ptr<osg::Node> getVehicleNode(int playerId) const { return _vehicleViews.at(playerId)->getVehicleNode(); }
 
     /**
      * Returns the position of the vehicle in the scene
      */
-    osg::Vec3d getVehiclePosition() const { return _vehicleView->getPosition(); }
+    osg::Vec3d getVehiclePosition(int playerId) const { return _vehicleViews.at(playerId)->getPosition(); }
 
 private:
     osg::ref_ptr<osg::Group> _root;
-    osg::ref_ptr<VehicleView> _vehicleView;
+    std::vector<osg::ref_ptr<VehicleView>> _vehicleViews;
     osg::ref_ptr<FieldView> _fieldView;
     std::vector<osg::ref_ptr<GamePieceView>> _gamePieceViews;
 };

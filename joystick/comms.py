@@ -2,10 +2,9 @@
 # Copyright (c) 2020 FRC Team 3260
 #
 
-from PyQt4.QtCore import *
-import sys
 import socket
 import time
+import json
 
 
 class Comms:
@@ -52,15 +51,23 @@ class ControllerState:
         self.start = ButtonState()  # 0 or 1
 
     def toJson(self):
-        return "{ 'leftJoystick': [ %04d, %04d ], 'rightJoystick': [ %04d, %04d ], 'dpad': [ %01d, %01d, %01d, %01d ], 'leftTrigger': %04d, 'rightTrigger': %04d, 'leftBumper': %01d, 'rightBumper': %01d, 'a': %01d, 'b': %01d, 'x': %01d, 'y': %01d, 'back': %01d, 'guide': %01d, 'start': %01d }" % \
-            (self.left_joystick.x, self.left_joystick.y, self.right_joystick.x, self.right_joystick.y,
-             self.dpad.up.pressed, self.dpad.down.pressed, self.dpad.left.pressed, self.dpad.right.pressed,
-             self.left_trigger.value, self.right_trigger.value,
-             self.left_bumper.pressed, self.right_bumper.pressed,
-             self.a.pressed, self.b.pressed, self.x.pressed, self.y.pressed,
-             self.back.pressed,
-             self.guide.pressed,
-             self.start.pressed)
+        ret = {
+            "leftJoystick": [self.left_joystick.x, self.left_joystick.y],
+            "rightJoystick": [self.right_joystick.x, self.right_joystick.y],
+            "dpad": [self.dpad.up.pressed, self.dpad.down.pressed, self.dpad.left.pressed, self.dpad.right.pressed],
+            "leftTrigger": self.left_trigger.value,
+            "rightTrigger": self.right_trigger.value,
+            "leftBumper": self.left_bumper.pressed,
+            "rightBumper": self.right_bumper.pressed,
+            "a": self.a.pressed,
+            "b": self.b.pressed,
+            "x": self.x.pressed,
+            "y": self.y.pressed,
+            "back": self.back.pressed,
+            "start": self.start.pressed,
+            "guide": self.guide.pressed
+        }
+        return json.dumps(ret)
 
 
 class JoystickState:

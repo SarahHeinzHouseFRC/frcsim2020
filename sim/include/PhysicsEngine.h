@@ -5,10 +5,25 @@
 #ifndef ROBOT_SIM_PHYSICSENGINE_H
 #define ROBOT_SIM_PHYSICSENGINE_H
 
-#include "box2d/box2d.h"
+#include "Box2D/Box2D.h"
 #include "FieldModel.h"
 #include "VehicleModel.h"
 #include "GamePieceModel.h"
+
+
+struct VehiclePhysicsModel
+{
+    b2Body* body;
+    b2PolygonShape ingestibleRegionCenterShape;
+    b2PolygonShape ingestibleRegionLeftShape;
+    b2PolygonShape ingestibleRegionRightShape;
+    b2PolygonShape tubeRegionShape;
+    std::vector<b2Body*> ingestibleCenterGamePieceBodies; // Game pieces in the center ingestible region
+    std::vector<b2Body*> ingestibleLeftGamePieceBodies; // Game pieces in the left ingestible region
+    std::vector<b2Body*> ingestibleRightGamePieceBodies; // Game pieces in the right ingestible region
+    std::vector<b2Body*> tubeGamePieceBodies; // Game pieces in the tube region
+};
+
 
 
 class PhysicsEngine
@@ -22,17 +37,19 @@ public:
     /**
      * Constructor
      */
-    PhysicsEngine(const FieldModel& fieldModel, const VehicleModel& vehicleModel, const std::vector<GamePieceModel>& gamePieceModels, double timestamp);
+    PhysicsEngine(const FieldModel& fieldModel, const std::vector<VehicleModel>& vehicleModels, const std::vector<GamePieceModel>& gamePieceModels, double timestamp);
+
+    // TODO: Add destructor that destroys all bodies
 
     /**
      * Detects collisions between the field and field actors
      */
-    void update(FieldModel& fieldModel, VehicleModel& vehicleModel, std::vector<GamePieceModel>& gamePieceModels, double currTimestamp);
+    void update(FieldModel& fieldModel, std::vector<VehicleModel>& vehicleModels, std::vector<GamePieceModel>& gamePieceModels, double currTimestamp);
 
     /**
      * Deletes all box2d bodies and recreates from them from the models
      */
-    void reset(const FieldModel& fieldModel, const VehicleModel& vehicleModel, const std::vector<GamePieceModel>& gamePieceModels);
+    void reset(const FieldModel& fieldModel, std::vector<VehicleModel>& vehicleModels, const std::vector<GamePieceModel>& gamePieceModels);
 
 private:
     class CollisionListener : public b2ContactListener
@@ -92,7 +109,7 @@ private:
     /**
      * Initializes vehicle body from vehicle model
      */
-    b2Body* initVehicleBody(b2World* world, const VehicleModel& vehicleModel);
+    VehiclePhysicsModel initVehiclePhysicsModel(b2World* world, const VehicleModel& vehicleModel);
 
     /**
      * Initializes all game pieces from their models
@@ -101,26 +118,19 @@ private:
 
     b2Vec2 _gravity;
     std::unique_ptr<b2World> _world;
-    b2Body* _vehicleBody;
-    b2PolygonShape _ingestibleRegionCenterShape;
-    b2PolygonShape _ingestibleRegionLeftShape;
-    b2PolygonShape _ingestibleRegionRightShape;
-    b2PolygonShape _tubeRegion;
+    std::vector<VehiclePhysicsModel> _vehiclePhysicsModels;
     b2PolygonShape _blueGoalRegion;
     b2PolygonShape _redGoalRegion;
     b2CircleShape _gamePieceShape;
     std::vector<b2Body*> _gamePieceBodies;
-    std::vector<b2Body*> _ingestibleCenterGamePieceBodies; // Game pieces in the center ingestible region
-    std::vector<b2Body*> _ingestibleLeftGamePieceBodies; // Game pieces in the left ingestible region
-    std::vector<b2Body*> _ingestibleRightGamePieceBodies; // Game pieces in the right ingestible region
-    std::vector<b2Body*> _tubeGamePieceBodies; // Game pieces in the tube region
     std::vector<b2Body*> _redGoalGamePieceBodies; // Game pieces in the red goal region
     std::vector<b2Body*> _blueGoalGamePieceBodies; // Game pieces in the blue goal region
     int32 _velocityIterations;
     int32 _positionIterations;
     double _prevTimestamp;
     float _muGamePiece;
-    int _outtaken; // Count of how many balls have been outtaken (so we can calculate score)
+    int _blueOuttaken; // Count of how many balls have been outtaken from blue goal (so we can calculate score)
+    int _redOuttaken; // Count of how many balls have been outtaken from red goal (so we can calculate score)
 };
 
 

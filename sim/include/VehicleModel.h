@@ -20,11 +20,17 @@ class VehicleModel : public BaseModel
 friend class VehicleView;
 friend class Hud;
 friend class PhysicsEngine;
+friend class WorldModel;
 public:
+    /**
+     * Default constructor
+     */
+    VehicleModel() = default;
+
     /**
      * Constructor
      */
-    VehicleModel(const ConfigReader& config, double startTimestamp);
+    VehicleModel(const ConfigReader& config, double startTimestamp, int playerId);
 
     /**
      * Updates the robot model to the new time
@@ -69,6 +75,8 @@ private:
      */
     static double wrapAngle(double val) { while (val > 2*M_PI) { val -= 2*M_PI; } while (val < 0) { val += 2*M_PI; } return val; }
 
+    std::string _team;
+    std::string _alliance;
     Geometry::Polygon2d _boundingPolygonFrontLeft; // Front left bounding polygon of the vehicle in vehicle frame
     Geometry::Polygon2d _boundingPolygonFrontRight; // Front right bounding polygon of the vehicle in vehicle frame
     Geometry::Polygon2d _boundingPolygonRearLeft; // Rear left bounding polygon of the vehicle in vehicle frame
@@ -94,6 +102,8 @@ private:
     double _drivetrainWidth; // Needed to calculate turning radius
     double _mass; // Needed to calculate density for collision checker
     double _prevTimestamp; // Needed to calculate how much time has passed since last update()
+    bool _outtake; // Whether or not this vehicle has requested the field to outtake
+    bool _prevOuttakeButtonState; // Whether or not the controller was previously requesting an outtake
 
     struct
     {

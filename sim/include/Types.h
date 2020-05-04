@@ -6,22 +6,43 @@
 #define ROBOT_SIM_TYPES_H
 
 #include <string>
+#include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
 
 
 struct SensorState
 {
-    int leftDriveEncoderPosition; // 0-1023
-    int rightDriveEncoderPosition; // 0-1023
-    int elevatorEncoderPosition; // 0-1023
+    int leftDriveEncoder;  // 0-1023
+    int rightDriveEncoder; // 0-1023
+    int elevatorEncoder;   // 0-1023
 
     /**
-     * Returns this state's information in JSON form
+     * Returns the sensor state as a JSON string
      */
-    std::string asJson()
+    std::string toJson()
     {
-        char tmp[1024];
-        sprintf(tmp, "{ 'leftDriveEncoder': %04d, 'rightDriveEncoder': %04d, 'elevatorEncoder': %04d }", leftDriveEncoderPosition, rightDriveEncoderPosition, elevatorEncoderPosition);
-        return tmp;
+        const char msg[] = R"({ "leftDriveEncoder": 0, "rightDriveEncoder": 0, "elevatorEncoder": 0 })";
+        rapidjson::Document d;
+        d.Parse(msg);
+        d["leftDriveEncoder"] = leftDriveEncoder;
+        d["rightDriveEncoder"] = rightDriveEncoder;
+        d["elevatorEncoder"] = elevatorEncoder;
+
+        rapidjson::StringBuffer sb;
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+        d.Accept(writer);
+        return sb.GetString();
+    }
+
+    /**
+     * Resets all fields to default values
+     */
+    void clear()
+    {
+        leftDriveEncoder = 0;
+        rightDriveEncoder = 0;
+        elevatorEncoder = 0;
     }
 };
 
@@ -48,21 +69,26 @@ struct CoreCommands
     };
 
     /**
-     * Constructor from JSON string
+     * Deserialization from JSON string
      */
-    explicit CoreCommands(const std::string& json)
+    void fromJson(const std::string& json)
     {
-        leftDriveMotorSpeed = std::stoi(json.substr(25, 4));
-        rightDriveMotorSpeed = std::stoi(json.substr(55, 4));
-        intakeCenterMotorSpeed = std::stoi(json.substr(87, 4));
-        intakeLeftMotorSpeed = std::stoi(json.substr(117, 4));
-        intakeRightMotorSpeed = std::stoi(json.substr(148, 4));
-        tubeMotorSpeed = std::stoi(json.substr(172, 4));
-        timerStartStop = std::stoi(json.substr(196, 1));
-        reset = std::stoi(json.substr(208, 1));
-        outtake = std::stoi(json.substr(222, 1));
+        rapidjson::Document d;
+        d.Parse(json.c_str());
+        leftDriveMotorSpeed    = d["leftDriveMotorSpeed"].GetInt();
+        rightDriveMotorSpeed   = d["rightDriveMotorSpeed"].GetInt();
+        intakeCenterMotorSpeed = d["intakeCenterMotorSpeed"].GetInt();
+        intakeLeftMotorSpeed   = d["intakeLeftMotorSpeed"].GetInt();
+        intakeRightMotorSpeed  = d["intakeRightMotorSpeed"].GetInt();
+        tubeMotorSpeed         = d["tubeMotorSpeed"].GetInt();
+        timerStartStop         = d["timerStartStop"].GetInt();
+        reset                  = d["reset"].GetInt();
+        outtake                = d["outtake"].GetInt();
     }
 
+    /**
+     * Resets all fields to default values
+     */
     void clear()
     {
         leftDriveMotorSpeed = 0;
@@ -73,6 +99,185 @@ struct CoreCommands
         tubeMotorSpeed = 0;
         timerStartStop = 0;
         reset = 0;
+        outtake = 0;
+    }
+};
+
+
+
+struct SimState
+{
+    struct VehicleState
+    {
+        std::string team;             // Team number
+        std::string alliance;         // "Blue" or "Red"
+        float x;                      // Meters
+        float y;                      // Meters
+        float theta;                  // Radians
+        float intakeCenterMotorSpeed; // Meters/sec
+        float intakeLeftMotorSpeed;   // Meters/sec
+        float intakeRightMotorSpeed;  // Meters/sec
+        float tubeMotorSpeed;         // Meters/sec
+        float leftDriveMotorSpeed;    // Rads/sec
+        float rightDriveMotorSpeed;   // Rads/sec
+    };
+
+    struct FieldState
+    {
+        bool inCollision;
+    };
+
+    struct GamePieceState
+    {
+        float x; // Meters
+        float y; // Meters
+        float z; // Meters
+        int ingestionState;
+    };
+
+    int blueScore;
+    int redScore;
+    bool isTimerRunning;
+    double timer;
+    FieldState field;
+    std::vector<VehicleState> vehicles;
+    std::vector<GamePieceState> gamePieces;
+
+    /**
+     * Default constructor
+     */
+    SimState()
+    {
+        clear();
+    };
+
+    /**
+     * Serialization to JSON string
+     */
+    std::string toJson()
+    {
+        rapidjson::StringBuffer s;
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+
+        writer.StartObject();
+        writer.Key("blueScore");
+        writer.Int(blueScore);
+        writer.Key("redScore");
+        writer.Int(redScore);
+        writer.Key("isTimerRunning");
+        writer.Bool(isTimerRunning);
+        writer.Key("timer");
+        writer.Double(timer);
+        writer.Key("field");
+        writer.StartObject();
+        writer.Key("inCollision");
+        writer.Bool(field.inCollision);
+        writer.EndObject();
+        writer.Key("vehicles");
+        writer.StartArray();
+        for (const auto& v : vehicles)
+        {
+            writer.StartObject();
+            writer.Key("team");
+            writer.String(v.team.c_str());
+            writer.Key("alliance");
+            writer.String(v.alliance.c_str());
+            writer.Key("x");
+            writer.Double(v.x);
+            writer.Key("y");
+            writer.Double(v.y);
+            writer.Key("theta");
+            writer.Double(v.theta);
+            writer.Key("intakeCenterMotorSpeed");
+            writer.Double(v.intakeCenterMotorSpeed);
+            writer.Key("intakeLeftMotorSpeed");
+            writer.Double(v.intakeLeftMotorSpeed);
+            writer.Key("intakeRightMotorSpeed");
+            writer.Double(v.intakeRightMotorSpeed);
+            writer.Key("tubeMotorSpeed");
+            writer.Double(v.tubeMotorSpeed);
+            writer.Key("leftDriveMotorSpeed");
+            writer.Double(v.leftDriveMotorSpeed);
+            writer.Key("rightDriveMotorSpeed");
+            writer.Double(v.rightDriveMotorSpeed);
+            writer.EndObject();
+        }
+        writer.EndArray();
+        writer.Key("gamePieces");
+        writer.StartArray();
+        for (const auto& g : gamePieces)
+        {
+            writer.StartObject();
+            writer.Key("x");
+            writer.Double(g.x);
+            writer.Key("y");
+            writer.Double(g.y);
+            writer.Key("z");
+            writer.Double(g.z);
+            writer.Key("ingestionState");
+            writer.Int(g.ingestionState);
+            writer.EndObject();
+        }
+        writer.EndArray();
+        writer.EndObject();
+        return s.GetString();
+    }
+
+    /**
+     * Constructor from JSON string
+     */
+    void fromJson(const std::string& json)
+    {
+        using namespace rapidjson;
+
+        clear();
+
+        Document d;
+        d.Parse(json.c_str());
+        isTimerRunning = d["isTimerRunning"].GetBool();
+        timer = d["timer"].GetFloat();
+        blueScore = d["blueScore"].GetInt();
+        redScore = d["redScore"].GetInt();
+
+        field.inCollision = d["field"]["inCollision"].GetBool();
+
+        const Value& v = d["vehicles"];
+        for (auto itr = v.Begin(); itr != v.End(); ++itr)
+        {
+            VehicleState vehicle{};
+            vehicle.team = (*itr)["team"].GetString();
+            vehicle.alliance = (*itr)["alliance"].GetString();
+            vehicle.x = (*itr)["x"].GetFloat();
+            vehicle.y = (*itr)["y"].GetFloat();
+            vehicle.theta = (*itr)["theta"].GetFloat();
+            vehicle.intakeCenterMotorSpeed = (*itr)["intakeCenterMotorSpeed"].GetFloat();
+            vehicle.intakeLeftMotorSpeed = (*itr)["intakeLeftMotorSpeed"].GetFloat();
+            vehicle.intakeRightMotorSpeed = (*itr)["intakeRightMotorSpeed"].GetFloat();
+            vehicle.tubeMotorSpeed = (*itr)["tubeMotorSpeed"].GetFloat();
+            vehicle.leftDriveMotorSpeed = (*itr)["leftDriveMotorSpeed"].GetFloat();
+            vehicle.rightDriveMotorSpeed = (*itr)["rightDriveMotorSpeed"].GetFloat();
+            vehicles.push_back(vehicle);
+        }
+
+        const Value& g = d["gamePieces"];
+        for (auto itr = g.Begin(); itr != g.End(); ++itr)
+        {
+            GamePieceState gamePiece{};
+            gamePiece.x = (*itr)["x"].GetFloat();
+            gamePiece.y = (*itr)["y"].GetFloat();
+            gamePiece.z = (*itr)["z"].GetFloat();
+            gamePiece.ingestionState = (*itr)["ingestionState"].GetFloat();
+            gamePieces.push_back(gamePiece);
+        }
+    }
+
+    /**
+     * Resets all fields to default values
+     */
+    void clear()
+    {
+        vehicles.clear();
+        gamePieces.clear();
     }
 };
 

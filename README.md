@@ -1,7 +1,7 @@
 # SHARP Team 3260 FRC Simulator #
-This project consists of the core robot code (Java), a mock Xbox controller (Python), and a vehicle simulator (C++)
-which communicate over UDP using JSON-ish strings (will be converted to proper JSON soon). This code was tested and run
-in Ubuntu 18.04.
+This project consists of the core robot code (Java), a mock Xbox controller (Python), a vehicle simulator (C++), and
+additional views of the field (C++), which communicate over UDP using JSON strings. This code was tested and run in
+Ubuntu 18.04.
 
 Among many other benefits, this software allows an FRC software team to rapidly develop and test their software
 independently of the hardware team, availability of hte robot, and availability of physical joysticks; game strategy
@@ -13,14 +13,16 @@ For details on each of the three components included, please see the specific do
   - [Joystick](joystick/README.md)
   - [Core](core/README.md)
   - [Sim](sim/README.md)
+  - [Sim View](sim/README.md)
 
 ```
-      +----------------+      Commands      +----------------+     Commands       +----------------+
-      |                | -----------------> |                | -----------------> |                |
-      |   Joystick     |                    |      Core      |                    |     Vehicle    |
-      |                | <----------------- |                | <----------------- |                |
-      +----------------+     Heartbeat      +----------------+       State        +----------------+
++----------------+    Commands    +----------------+   Commands     +----------------+     State      +----------------+
+|                | -------------> |                | -------------> |                | -------------> |                |
+|   Joystick     |                |      Core      |                |   Vehicle Sim  |                |    Sim View    |
+|                | <------------- |                | <------------- |                | <------------- |                |
++----------------+    Heartbeat   +----------------+     State      +----------------+   Heartbeat    +----------------+
 ```
+
 
 ## Feature List ##
   - [x] Fully-featured PyQt-based virtual Xbox controller that publishes commands over UDP as JSON.
@@ -31,8 +33,8 @@ For details on each of the three components included, please see the specific do
   - [x] OpenSceneGraph-based 3D visualization with included CAD models of the robot and field.
   - [x] Realistic 2.5D physics built on top of the popular [Box2D](https://box2d.org/) physics library.
   - [x] Match timer and reset functionality of field and robot for practicing matches/driver tryouts.
+  - [x] Support for up to 6 simultaneous robots.
   - [ ] Support for Xbox One, PS4, and other controllers.
-  - [ ] Support for up to 6 simultaneous robots.
   - [ ] Log replay and mode to play against your own phantom.
   - [ ] Move to a 3D physics engine (NVIDIA PhysX or ODE).
 
@@ -44,18 +46,18 @@ install, run:
 ```sh
 sudo apt install python-pip
 pip install PyYAML
-sudo apt install python-qt4 # Needed for virtual controller
-sudo apt install xboxdrv # Needed for physical controller
+sudo apt install python-qt4 # Can skip this if only running virtual controller
+sudo apt install xboxdrv    # Can skip this if only running physical controller
 ```
 To launch the virtual controller, run:
 ```sh
 cd joystick/
-python main.py virtual
+python main.py virtual --player $N # Replace $N with a number 1-6
 ```
 To launch with a physical controller, plug in the controller to a USB port and run:
 ```sh
 cd joystick/
-sudo python main.py physical # Sudo is an unfortunate side effect of xboxdrv, hopefully remove this soon
+sudo python main.py physical --player $N # Sudo is an unfortunate side effect of xboxdrv, hopefully remove this soon
 ```
 Unfortunately, the Xbox controller library currently used in this application requires sudo permissions to launch. This
 will hopefully be fixed soon by using the xbox360controller Python package instead, which supports more controllers,
@@ -67,21 +69,20 @@ python main.py virtual --help
 ```
 
 ### Core ###
-JDK is required to compile the core. To install it, run
+JDK and Gradle are required to compile the core. To install them, run
 ```sh
-sudo apt install default-jdk
+sudo apt install openjdk-8-jdk-headless
 ```
 To compile and run the core, run:
 ```sh
 cd core/
-javac *.java
-java Main
+./gradlew run --args='--player $N' # Replace $N with a number 1-6
 ```
 
 ### Sim ###
 To install the dependencies for the sim, run:
 ```sh
-sudo apt install cmake libopenscenegraph-3.4-dev libyaml-cpp-dev
+sudo apt install cmake libopenscenegraph-3.4-dev libyaml-cpp-dev rapidjson-dev libbox2d-dev
 ```
 To download the (optional) visual assets, download each from here:
   - [Field 3D model](https://www.dropbox.com/s/1p1i1cbpkj8jp9x/field2020.wrl?dl=0)
@@ -107,63 +108,88 @@ mkdir build
 cd build/
 cmake ..
 make -j8
-./robot_sim # Note that this can take >30s to launch because the 3D models are so large, optionally use --debug-view
+./sim # Adding --debug-view will allow faster launching, but with simpler graphics
 ```
 Because the CAD models for the robot and field are large and can slow down the launch time and runtime performance of
 the visualization, you can optionally launch the simulator with a lightweight visualization using:
 ```sh
-./robot_sim --debug-view
+./sim --debug-view
 ```
 To see all options available in the sim, use:
 ```sh
-./robot_sim --help
+./sim --help
+```
+
+
+## Sim View ##
+The sim view is built using most of the same files as the sim. Therefore, the dependencies are the same as above,
+including the CAD models and font file.
+
+To compile and run the sim view, run:
+```sh
+cd sim/build
+make -j8
+./simView # Adding --debug-view will allow faster launching, but with simpler graphics
+```
+Because the CAD models for the robot and field are large and can slow down the launch time and runtime performance of
+the visualization, you can optionally launch the simulator with a lightweight visualization using:
+```sh
+./sim --debug-view
+```
+To launch as a different player, use:
+```sh
+./sim --player $N # Replace $N with a number 1-6
 ```
 
 
 ## Configuration File ##
 All three applications refer to the same YAML config file at launch, which is located at `config/robotConfig.yml`.
-Options for changing the IPs and ports are available, as well as some configuration options to change the vehicle and
-field shapes.
+Options for changing the team numbers, alliance numbers, and IPs and ports are available, as well as some configuration
+options to change the vehicle and field shapes.
 
 
 ## Interface Control Document (ICD) ##
-This section defines the interfaces between all three components of the simulator. They communicate over UDP using a
-JSON-ish specification. Eventually this will transition to using real JSON, but for now I took some shortcuts and
-implemented something simple and human-readable, but not easily extensible to get started. Using real JSON will help
-others interface and develop more components that plug into this simulator.
+This section defines the interfaces between all three components of the simulator. They communicate over UDP using JSON
+messages. JSON was used to make the interface easily extensible and allow others to develop more components that plug
+into this simulator, for example, from ROS.
+
 
 ### Joystick -> Core ###
 The joystick sends the user's commands to the robot's core logic over UDP as JSON-ish strings. In the default
 configuration, these commands are sent to localhost:4000. A sample of this message string follows:
-```json
-{ 'leftJoystick': [ 0000, 0000 ], 'rightJoystick': [ 0000, 0000 ], 'dpad': [ 0, 0, 0, 0 ], 'leftTrigger': 0000, 'rightTrigger': 0000, 'leftBumper': 0, 'rightBumper': 0, 'a': 0, 'b': 0, 'x': 0, 'y': 0, 'back': 0, 'guide': 0, 'start': 0 }
+```json5
+{
+    "leftJoystick": [
+        0,             // Left joystick's x-displacement (-512 - 512)
+        0              // Left joystick's y-displacement (-512 - 512)
+    ],
+    "rightJoystick": [
+        0,             // Right joystick's x-displacement (-512 - 512)
+        0              // Right joystick's y-displacement (-512 - 512)
+    ],
+    "dpad": [
+        0,             // Dpad up (0 or 1)
+        0,             // Dpad down (0 or 1)
+        0,             // Dpad left (0 or 1)
+        0              // Dpad right (0 or 1)
+    ],
+    "leftTrigger": 0,  // Left trigger (0 - 512)
+    "rightTrigger": 0, // Right trigger (0 - 512)
+    "leftBumper": 0,   // Left bumper (0 or 1)
+    "rightBumper": 0,  // Right bumper (0 or 1)
+    "a": 0,            // A button (0 or 1)
+    "b": 0,            // B button (0 or 1)
+    "x": 0,            // X button (0 or 1)
+    "y": 0,            // Y button (0 or 1)
+    "back": 0,         // Back button (0 or 1)
+    "start": 0,        // Guide button (0 or 1)
+    "guide": 0         // Start button (0 or 1)
+}
 ```
-
-| Character(s)  | Description                     | Range      |
-| --------------| ------------------------------- | ---------- |
-| 20-24         | Left joystick's x-displacement  | -512 - 512 |
-| 26-30         | Left joystick's y-displacement  | -512 - 512 |
-| 53-57         | Right joystick's x-displacement | -512 - 512 |
-| 59-63         | Right joystick's y-displacement | -512 - 512 |
-| 77-78         | Dpad up                         | 0 or 1     |
-| 80-81         | Dpad down                       | 0 or 1     |
-| 83-84         | Dpad left                       | 0 or 1     |
-| 86-87         | Dpad right                      | 0 or 1     |
-| 106-110       | Left trigger                    | 0 - 512    |
-| 128-132       | Right trigger                   | 0 - 512    |
-| 148-149       | Left bumper                     | 0 or 1     |
-| 166-167       | Right bumper                    | 0 or 1     |
-| 174-175       | A button                        | 0 or 1     |
-| 182-183       | B button                        | 0 or 1     |
-| 190-191       | X button                        | 0 or 1     |
-| 198-199       | Y button                        | 0 or 1     |
-| 209-210       | Back button                     | 0 or 1     |
-| 221-222       | Guide button                    | 0 or 1     |
-| 233-234       | Start button                    | 0 or 1     |
 
 ### Core -> Joystick ###
 The core logic also sends back an empty JSON string to the joystick of the following format:
-```json
+```json5
 {}
 ```
 The purpose of this empty message is to serve as a "heartbeat" to let the joystick know whether the controls logic is
@@ -173,30 +199,49 @@ still alive. This allows the joystick to display a "connected" or "disconnected"
 The core logic performs whatever logic (PID, traction control, etc.) given the commands from the joystick and the
 vehicle's state from the sim and then construct new commands to send to the vehicle. The message sent to the vehicle has
 the following form:
-```json
-{ 'leftDriveMotorSpeed': 0000, 'rightDriveMotorSpeed': 0000, 'intakeCenterMotorSpeed': 0000, 'intakeLeftMotorSpeed': 0000, 'intakeRightMotorSpeed': 0000, 'tubeMotorSpeed': 0000, 'timerStartStop': 0, 'reset': 0, 'outtake': 0 }
+```json5
+{
+    "leftDriveMotorSpeed": 0,    // Left drive motor speed (-512 - 512)
+    "rightDriveMotorSpeed": 0,   // Right drive motor speed (-512 - 512)
+    "intakeCenterMotorSpeed": 0, // Intake center motor speed (-512 - 512)
+    "intakeLeftMotorSpeed": 0,   // Intake left motor speed (-512 - 512)
+    "intakeRightMotorSpeed": 0,  // Intake right motor speed (-512 - 512)
+    "tubeMotorSpeed": 0,         // Tube motor speed (-512 - 512)
+    "timerStartStop": 0,         // Timer start/stop (0 or 1)
+    "reset": 0,                  // Reset (0 or 1)
+    "outtake": 0                 // Outtake (0 or 1)
+}
 ```
-
-| Character(s)  | Description                     | Range      |
-| --------------| ------------------------------- | ---------- |
-| 25-29         | Left drive motor speed          | -512 - 512 |
-| 55-59         | Right drive motor speed         | -512 - 512 |
-| 87-91         | Intake center motor speed       | -512 - 512 |
-| 117-121       | Intake left motor speed         | -512 - 512 |
-| 148-152       | Intake right motor speed        | -512 - 512 |
-| 172-176       | Tube motor speed                | -512 - 512 |
-| 196-197       | Timer start/stop                | 0 or 1     |
-| 208-209       | Reset                           | 0 or 1     |
-| 222-223       | Outtake                         | 0 or 1     |
 
 ### Sim -> Core ###
 The vehicle continuously sends state information back to the controls logic. This message has the following form:
-```json
-{ 'leftDriveEncoder': 0000, 'rightDriveEncoder': 0000, 'elevatorEncoder': 0000 }
+```json5
+{
+    "leftDriveEncoder": 0,  // Left drive encoder ticks (0 - 1024)
+    "rightDriveEncoder": 0, // Right drive encoder ticks (0 - 1024)
+    "elevatorEncoder": 0    // Elevator encoder ticks (0 - 1024)
+}
 ```
 
-| Character(s)  | Description                     | Range    |
-| --------------| ------------------------------- | -------- |
-| 22-26         | Left drive encoder ticks        | 0 - 1024 |
-| 49-53         | Right drive encoder ticks       | 0 - 1024 |
-| 74-78         | Elevator encoder ticks          | 0 - 1024 |
+### Sim -> Sim View ###
+```json5
+{
+    "vehicles": [
+        {
+            "player": 1,        // 1-6
+            "team": "3260",
+            "alliance": "Blue", // "Blue" or "Red"
+            "x": 0,             // Meters
+            "y": 0,             // Meters
+            "theta": 0          // Radians (not wrapped)
+        }
+    ],
+    "gamePieces": [
+        {
+            "x": 0, // Meters
+            "y": 0, // Meters
+            "z": 0  // Meters
+        }
+    ]
+}
+```

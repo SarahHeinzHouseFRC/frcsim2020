@@ -13,6 +13,7 @@ class GamePieceModel : public BaseModel
 {
 friend class GamePieceView;
 friend class PhysicsEngine;
+friend class WorldModel;
 public:
     enum IngestionState
     {

@@ -106,6 +106,16 @@ public:
     HudBox(float x, float y, float width, float height, const Color& color);
 
     /**
+     * Recolors the box
+     */
+    void setColor(const Color& color);
+
+    /**
+     * Changes the size of the box
+     */
+    void setSize(const osg::BoundingBox& bb, float padding=0);
+
+    /**
      * Repositions itself according to x, y from the top left of the window
      * @param windowWidth
      * @param windowHeight
@@ -113,7 +123,7 @@ public:
     virtual void onWindowResize(int windowWidth, int windowHeight);
 
 private:
-    float _x, _y, _width, _height;
+    float _x, _y, _width, _height, _windowHeight;
     osg::ref_ptr<osg::Vec3Array> _vertices;
     osg::ref_ptr<osg::Vec4Array> _colors;
 };

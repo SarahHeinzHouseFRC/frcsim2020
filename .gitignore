@@ -1,3 +1,7 @@
 # Build files
 build/
 *.class
+.gradle/
+.classpath
+.project
+.settings/

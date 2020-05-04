@@ -38,7 +38,7 @@ class CommsQThread(QThread):
 
 class VirtualXboxController(QMainWindow):
 
-    def __init__(self, comms_config, verbose, parent=None):
+    def __init__(self, player, comms_config, verbose, parent=None):
         super(VirtualXboxController, self).__init__(parent)
         self.setWindowTitle("Xbox Controller")
         self.setStyleSheet("background-color: gray")
@@ -59,6 +59,12 @@ class VirtualXboxController(QMainWindow):
         self.setCentralWidget(self.controller)
         self.adjustSize()
 
+        self.player = QLabel(self)
+        self.player.setAlignment(Qt.AlignCenter)
+        self.player.setText("Player " + str(player))
+        self.player.move(self.width()/2 - self.player.width()/2, 400)
+        self.player.setStyleSheet("background-color: rgba(0,1,0,0); color: darkgray; font: 24px")
+
         self.help_text = QLabel(self)
         self.help_text.setAlignment(Qt.AlignCenter)
         self.help_text.setText("Hold H for hotkeys\nHold I for info\nPress Esc to quit")
@@ -67,7 +73,7 @@ class VirtualXboxController(QMainWindow):
         self.help_text.setStyleSheet("background-color: rgba(0,0,0,0); color: white")
         print self.geometry()
 
-        print "Controller: Launched"
+        print "Controller: Launched player", player
 
     def keyPressEvent(self, event):
         """

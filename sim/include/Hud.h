@@ -21,7 +21,7 @@ public:
     /**
      * Constructor
      */
-    Hud(const ConfigReader& config);
+    Hud(const ConfigReader& config, int playerId=-1);
 
     /**
      * Returns the HUD's camera
@@ -36,9 +36,15 @@ public:
     void onWindowResize(int width, int height);
 
     /**
-     * Displays "connected" or "disconnected"
+     * Displays "connected" or "disconnected" for each player on the sim HUD
      */
-    void displayConnectionStatus(bool isConnected);
+    void displayConnectionStatus(const std::vector<bool>& connected);
+
+    /**
+     * Displays "connected" or "disconnected" for a single player on the sim view HUD
+     * @param connected
+     */
+    void displayConnectionStatus(bool connected, int playerId);
 
     /**
      * Displays the countdown timer
@@ -50,12 +56,12 @@ public:
     /**
      * Displays score
      */
-    void displayFieldScore(std::tuple<int, int> score);
+    void displayFieldScore(int blueScore, int redScore);
 
     /**
-     * Displays robot state
+     * Displays vehicle state
      */
-    void displayVehicleState(const VehicleModel& vehicleModel);
+    void displayVehicleState(const SimState& state, int playerId);
 
 private:
     osg::Camera* _camera;
@@ -65,7 +71,8 @@ private:
     osg::ref_ptr<osg::Geometry> _geom;
     osg::ref_ptr<osg::Vec3Array> _vertices;
     int _width;
-    osg::ref_ptr<HudLabel> _connected;
+    std::vector<HudLabel*> _connectedLabels;
+    std::vector<HudBox*> _connectedBoxes;
     osg::ref_ptr<HudLabel> _timer;
     osg::ref_ptr<HudLabel> _blueScore;
     osg::ref_ptr<HudLabel> _redScore;

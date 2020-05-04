@@ -45,12 +45,12 @@ public:
     /**
      * Whether or not we're connected to the controls
      */
-    bool isConnected();
+    bool isConnected() const;
 
 private:
     SensorState _sensorState;
     CoreCommands _coreCommands;
-    UdpNode *_comms;
+    std::unique_ptr<UdpNode> _comms;
     bool _verbose;
     int _numDroppedPackets; ///< Count of how many packets have been missed
 };

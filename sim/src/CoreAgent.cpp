@@ -5,11 +5,16 @@
 #include <string>
 #include "CoreAgent.h"
 
+#define NUM_ALLOWABLE_DROPPED_PACKETS 150
+
 
 CoreAgent::CoreAgent(const ConfigReader& config) :
         _sensorState{0}, _coreCommands{}, _numDroppedPackets(0), _verbose(config.verbose)
 {
-    _comms = new UdpNode(config.sim.comms.port, config.core.ip, config.core.vehiclePort);
+    _comms = std::make_unique<UdpNode>(config.sim.comms.corePort, config.core.ip, config.core.simPort);
+
+    std::cout << "Rx from core at 127.0.0.1:" << config.sim.comms.corePort << std::endl;
+    std::cout << "Tx to core at " << config.core.ip << ":" << config.core.simPort << std::endl;
 }
 
 
@@ -17,7 +22,12 @@ CoreAgent::CoreAgent(const ConfigReader& config) :
 void CoreAgent::txSensorState()
 {
     // Transmit state
-    std::string msg = _sensorState.asJson();
+    std::string msg = _sensorState.toJson();
+
+    if (_verbose)
+    {
+        printf("CoreAgent: Sent %s\n", msg.c_str());
+    }
 
     _comms->send(msg);
 }
@@ -26,8 +36,9 @@ void CoreAgent::txSensorState()
 
 bool CoreAgent::rxCoreCommands()
 {
+    _coreCommands.clear();
     std::string msg = _comms->receive();
-    if (msg[0] == '{')
+    if (msg.length() > 0 && msg[0] == '{')
     {
         if (_verbose)
         {
@@ -35,7 +46,7 @@ bool CoreAgent::rxCoreCommands()
         }
 
         // Translate received commands from JSON and store into _coreCommands
-        _coreCommands = CoreCommands(msg);
+        _coreCommands.fromJson(msg);
 
         // Reset dropped packets count
         _numDroppedPackets = 0;
@@ -52,8 +63,8 @@ bool CoreAgent::rxCoreCommands()
 
 
 
-bool CoreAgent::isConnected()
+bool CoreAgent::isConnected() const
 {
     // As long as we've heard from the controls <= 100 packets ago, we're still connected
-    return _numDroppedPackets < 100;
+    return _numDroppedPackets < NUM_ALLOWABLE_DROPPED_PACKETS;
 }

@@ -2,34 +2,35 @@
 # Copyright (c) 2020 FRC Team 3260
 
 players:
-  - { team: "3260", alliance: "Blue", initialPosition: { x: 0.0, y: 0.0, theta: 90 }, hasLidar: true } # Player 1
-  - { team: "1234", alliance: "Red", initialPosition: { x: 0.0, y: 197.0, theta: -90 }, hasLidar: false }  # Player 2
-  - { team: "234", alliance: "Blue", initialPosition: { x: 60.0, y: -197.0, theta: 90 }, hasLidar: false } # Player 3
-  - { team: "34", alliance: "Red", initialPosition: { x: -60.0, y: 197.0, theta: -90 }, hasLidar: false }  # Player 4
-  - { team: "41", alliance: "Blue", initialPosition: { x: -60.0, y: -197.0, theta: 90 }, hasLidar: false } # Player 5
-  - { team: "412", alliance: "Red", initialPosition: { x: 60.0, y: 197.0, theta: -90 }, hasLidar: false }  # Player 6
+  - { team: "3260", alliance: "Blue", initialPosition: { x: 0.0, y: 0.0, theta: 90.0 }, hasLidar: true }     # Player 1
+  - { team: "1234", alliance: "Red", initialPosition: { x: 0.0, y: 197.0, theta: -90.0 }, hasLidar: false }  # Player 2
+  - { team: "234", alliance: "Blue", initialPosition: { x: 60.0, y: -197.0, theta: 90.0 }, hasLidar: false } # Player 3
+  - { team: "34", alliance: "Red", initialPosition: { x: -60.0, y: 197.0, theta: -90.0 }, hasLidar: false }  # Player 4
+  - { team: "41", alliance: "Blue", initialPosition: { x: -60.0, y: -197.0, theta: 90.0 }, hasLidar: false } # Player 5
+  - { team: "412", alliance: "Red", initialPosition: { x: 60.0, y: 197.0, theta: -90.0 }, hasLidar: false }  # Player 6
 
 joystick:
-  ip: "127.0.0.1"                                        # IP address where joystick is running
-  port: 2000                                             # Port where core should send its status
+  ip: "127.0.0.1"                                            # IP address where joystick is running
+  port: 2000                                                 # Port where core should send its status
 
 core:
-  ip: "127.0.0.1"                                        # IP address where core is running
-  joystickPort: 4000                                     # Port where joystick should send its commands
-  simPort: 6000                                          # Port where sim should send its state
+  ip: "127.0.0.1"                                            # IP address where core is running
+  joystickPort: 4000                                         # Port where joystick should send its commands
+  simPort: 6000                                              # Port where sim should send its state
 
 sim:
   comms:
-    ip: "127.0.0.1"                                      # IP address where sim is running
-    corePort: 8000                                       # Port where core should send its commands
-    simViewPort: 10000                                   # Port where simView should send its state
+    ip: "127.0.0.1"                                          # IP address where sim is running
+    corePort: 8000                                           # Port where core should send its commands
+    simViewPort: 10000                                       # Port where simView should send its state
   assets:
-    fieldModelFile: "/data/models/field2020.wrl"         # Path to 3D WRL model of the field
-    vehicleModelFile: "/data/models/vehicle2020.wrl"     # Path to 3D WRL model of the vehicle
-    gamePieceModelFile: "/data/models/gamepiece2020.wrl" # Path to 3D WRL model of the game piece
-    fontFile: "/data/fonts/helvetica.ttf"                # Path to font file for HUD text
+    fieldModelFile: "/data/models/field2020.wrl"             # Path to 3D WRL model of the field
+    vehicleBlueModelFile: "/data/models/vehicleBlue2020.wrl" # Path to 3D WRL model of the blue vehicle
+    vehicleRedModelFile: "/data/models/vehicleRed2020.wrl"   # Path to 3D WRL model of the red vehicle
+    gamePieceModelFile: "/data/models/gamepiece2020.wrl"     # Path to 3D WRL model of the game piece
+    fontFile: "/data/fonts/helvetica.ttf"                    # Path to font file for HUD text
   field:
-    exteriorWall:                                        # Exterior wall
+    exteriorWall:                                            # Exterior wall
       - { x: 161.81, y: 288.58 }
       - { x: 90.94, y: 314.96 }
       - { x: 84.00, y: 314.96 }
@@ -46,52 +47,52 @@ sim:
       - { x: -50.00, y: -314.96 }
       - { x: 90.94, y: -314.96 }
       - { x: 161.81, y: -288.58 }
-    rightTrenchRightWall:                                # Right trench right wall
+    rightTrenchRightWall:                                    # Right trench right wall
       - { x: 161.81, y: -59.84 }
       - { x: 161.81, y: -29.92 }
       - { x: 159.84, y: -29.92 }
       - { x: 159.84, y: -59.84 }
-    rightTrenchLeftWall:                                 # Right trench left wall
+    rightTrenchLeftWall:                                     # Right trench left wall
       - { x: 107.48, y: -59.84 }
       - { x: 107.48, y: -29.92 }
       - { x: 105.51, y: -29.92 }
       - { x: 105.51, y: -59.84 }
-    leftTrenchRightWall:                                 # Left trench right wall
+    leftTrenchRightWall:                                     # Left trench right wall
       - { x: -159.84, y: 29.92 }
       - { x: -159.84, y: 59.84 }
       - { x: -161.81, y: 59.84 }
       - { x: -161.81, y: 29.92 }
-    leftTrenchLeftWall:                                  # Left trench left wall
+    leftTrenchLeftWall:                                      # Left trench left wall
       - { x: -105.51, y: 29.92 }
       - { x: -105.51, y: 59.84 }
       - { x: -107.48, y: 59.84 }
       - { x: -107.48, y: 29.92 }
-    rightColumn:                                         # Right column
+    rightColumn:                                             # Right column
       - { x: 105.12, y: -47.64 }
       - { x: 100.39, y: -36.61 }
       - { x: 89.37, y: -41.34 }
       - { x: 94.09, y: -52.36 }
-    topColumn:                                           # Top column
+    topColumn:                                               # Top column
       - { x: 44.88, y: 97.64 }
       - { x: 40.55, y: 108.27 }
       - { x: 29.53, y: 103.54 }
       - { x: 33.86, y: 92.52 }
-    leftColumn:                                          # Left column
+    leftColumn:                                              # Left column
       - { x: -89.37, y: 41.34 }
       - { x: -94.09, y: 52.36 }
       - { x: -105.12, y: 47.64 }
       - { x: -100.39, y: 36.61 }
-    bottomColumn:                                        # Bottom column
+    bottomColumn:                                            # Bottom column
       - { x: -29.53, y: -103.54 }
       - { x: -33.86, y: -92.52 }
       - { x: -44.88, y: -96.85 }
       - { x: -40.55, y: -108.27 }
-    blueGoalRegion:                                      # Blue goal region
+    blueGoalRegion:                                          # Blue goal region
       - { x: -84.00, y: -314.96 }
       - { x: -84.00, y: -354.96 }
       - { x: -50.00, y: -354.96 }
       - { x: -50.00, y: -314.96 }
-    redGoalRegion:                                       # Red goal region
+    redGoalRegion:                                           # Red goal region
       - { x: 84.00, y: 314.96 }
       - { x: 84.00, y: 354.96 }
       - { x: 50.00, y: 354.96 }
@@ -99,97 +100,97 @@ sim:
     blueOuttake: { x: -61.00, y: 314.96 }
     redOuttake: { x: 61.00, y: -314.96 }
   vehicle:
-    boundingPolygonFrontLeft:                            # Vehicle's front left (inches)
+    boundingPolygonFrontLeft:                                # Vehicle's front left (inches)
       - { x: 7.87, y: 4.33 }
       - { x: 7.87, y: 12.20 }
       - { x: 1.97, y: 12.20 }
       - { x: 1.97, y: 4.33 }
-    boundingPolygonFrontRight:                           # Vehicle's front right (inches)
+    boundingPolygonFrontRight:                               # Vehicle's front right (inches)
       - { x: 7.87, y: -12.20 }
       - { x: 7.87, y: -4.33 }
       - { x: 1.97, y: -4.33 }
       - { x: 1.97, y: -12.20 }
-    boundingPolygonRearLeft:                             # Vehicle's rear left (inches)
+    boundingPolygonRearLeft:                                 # Vehicle's rear left (inches)
       - { x: 1.97, y: 7.09 }
       - { x: 1.97, y: 12.20 }
       - { x: -20.08, y: 12.20 }
       - { x: -20.08, y: 7.09 }
-    boundingPolygonRearRight:                            # Vehicle's rear right (inches)
+    boundingPolygonRearRight:                                # Vehicle's rear right (inches)
       - { x: 1.97, y: -12.20 }
       - { x: 1.97, y: -7.09 }
       - { x: -20.08, y: -7.09 }
       - { x: -20.08, y: -12.20 }
-    boundingPolygonBumperFrontLeft:                      # Bumper's front left polygon (inches)
+    boundingPolygonBumperFrontLeft:                          # Bumper's front left polygon (inches)
       - { x: 11.81, y: 6.30 }
       - { x: 11.81, y: 12.20 }
       - { x: 7.87, y: 12.20 }
       - { x: 7.87, y: 6.30 }
-    boundingPolygonBumperFrontRight:                     # Bumper's front right polygon (inches)
+    boundingPolygonBumperFrontRight:                         # Bumper's front right polygon (inches)
       - { x: 11.81, y: -12.20 }
       - { x: 11.81, y: -6.30 }
       - { x: 7.87, y: -6.30 }
       - { x: 7.87, y: -12.20 }
-    boundingPolygonBumperLeft:                           # Bumper's left side polygon (inches)
+    boundingPolygonBumperLeft:                               # Bumper's left side polygon (inches)
       - { x: 11.81, y: 12.20 }
       - { x: 11.81, y: 15.75 }
       - { x: -23.62, y: 15.75 }
       - { x: -23.62, y: 12.20 }
-    boundingPolygonBumperRight:                          # Bumper's right side polygon (inches)
+    boundingPolygonBumperRight:                              # Bumper's right side polygon (inches)
       - { x: 11.81, y: -15.75 }
       - { x: 11.81, y: -12.20 }
       - { x: -23.62, y: -12.20 }
       - { x: -23.62, y: -15.75 }
-    boundingPolygonBumperRearLeft:                       # Bumper's rear left polygon (inches)
+    boundingPolygonBumperRearLeft:                           # Bumper's rear left polygon (inches)
       - { x: -20.08, y: 7.09 }
       - { x: -20.08, y: 12.20 }
       - { x: -23.62, y: 12.20 }
       - { x: -23.62, y: 7.09 }
-    boundingPolygonBumperRearRight:                      # Bumper's rear right polygon (inches)
+    boundingPolygonBumperRearRight:                          # Bumper's rear right polygon (inches)
       - { x: -20.08, y: -12.20 }
       - { x: -20.08, y: -7.09 }
       - { x: -23.62, y: -7.09 }
       - { x: -23.62, y: -12.20 }
-    ingestibleRegionCenter:                              # Ingestible region's center polygon (inches)
+    ingestibleRegionCenter:                                  # Ingestible region's center polygon (inches)
       - { x: 20.08, y: -4.33 }
       - { x: 20.08, y: 4.33 }
       - { x: 1.97, y: 4.33 }
       - { x: 1.97, y: -4.33 }
-    ingestibleRegionLeft:                                # Ingestible region's left polygon (inches)
+    ingestibleRegionLeft:                                    # Ingestible region's left polygon (inches)
       - { x: 20.08, y: 4.33 }
       - { x: 20.08, y: 10.24 }
       - { x: 11.81, y: 10.24 }
       - { x: 11.81, y: 4.33 }
-    ingestibleRegionRight:                               # Ingestible region's right polygon (inches)
+    ingestibleRegionRight:                                   # Ingestible region's right polygon (inches)
       - { x: 20.08, y: -10.24 }
       - { x: 20.08, y: -4.33 }
       - { x: 11.81, y: -4.33 }
       - { x: 11.81, y: -10.24 }
-    tubeRegion:                                          # Ingestible region's tube polygon (inches)
+    tubeRegion:                                              # Ingestible region's tube polygon (inches)
       - { x: 1.97, y: -7.09 }
       - { x: 1.97, y: 7.09 }
       - { x: -23.62, y: 7.09 }
       - { x: -23.62, y: -7.09 }
-    weight: 154                                          # Pounds
+    weight: 154                                              # Pounds
     drivetrain:
-      wheelBase: 18                                      # Inches, distance between centers of front and rear wheels
-      wheelTrack: 22                                     # Inches, distance between centers of front wheels
-      wheelRadius: 3.0                                   # Inches
-      wheelWidth: 1.0                                    # Inches
-      leftMotorMaxSpeed: 833                             # RPM
-      rightMotorMaxSpeed: 833                            # RPM
+      wheelBase: 18                                          # Inches, distance between centers of front and rear wheels
+      wheelTrack: 22                                         # Inches, distance between centers of front wheels
+      wheelRadius: 3.0                                       # Inches
+      wheelWidth: 1.0                                        # Inches
+      leftMotorMaxSpeed: 833                                 # RPM
+      rightMotorMaxSpeed: 833                                # RPM
     intake:
-      centerMotorMaxSpeed: 25                            # RPM
-      leftMotorMaxSpeed: 25                              # RPM
-      rightMotorMaxSpeed: 25                             # RPM
-      tubeMotorMaxSpeed: 25                              # RPM
+      centerMotorMaxSpeed: 25                                # RPM
+      leftMotorMaxSpeed: 25                                  # RPM
+      rightMotorMaxSpeed: 25                                 # RPM
+      tubeMotorMaxSpeed: 25                                  # RPM
     lidar:
-      minRange: 0.75                                     # Meters
-      maxRange: 12                                       # Meters
-      laserFrequency: 8000                               # Hertz, laser fires per second
-      motorFrequency: 10                                 # Hertz, sweeps per second
+      minRange: 0.75                                         # Meters
+      maxRange: 12                                           # Meters
+      laserFrequency: 8000                                   # Hertz, laser fires per second
+      motorFrequency: 10                                     # Hertz, sweeps per second
   gamePiece:
-    radius: 3.50                                         # Inches
-    initialPositions:                                    # Inches (where (0, 0) is the center of the field)
+    radius: 3.50                                             # Inches
+    initialPositions:                                        # Inches (where (0, 0) is the center of the field)
       - { x: 47.24, y: 64.17 }
       - { x: 40.94, y: 79.53 }
       - { x: 16.54, y: 86.61 }
@@ -212,5 +213,5 @@ sim:
       - { x: -133.86, y: -72.05 }
 
 simView:
-  ip: "127.0.0.1"                                        # IP address where joystick is running
-  port: 12000                                            # Port where sim should send its status
+  ip: "127.0.0.1"                                            # IP address where joystick is running
+  port: 12000                                                # Port where sim should send its status

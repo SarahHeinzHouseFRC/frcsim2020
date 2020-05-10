@@ -102,7 +102,8 @@ void ConfigReader::parseSimCommsConfig(const YAML::Node& commsConfig)
 void ConfigReader::parseSimAssetsConfig(const YAML::Node &assetsConfig)
 {
     sim.assets.fieldModelFile = assetsConfig["fieldModelFile"].as<std::string>();
-    sim.assets.vehicleModelFile = assetsConfig["vehicleModelFile"].as<std::string>();
+    sim.assets.vehicleBlueModelFile = assetsConfig["vehicleBlueModelFile"].as<std::string>();
+    sim.assets.vehicleRedModelFile = assetsConfig["vehicleRedModelFile"].as<std::string>();
     sim.assets.gamePieceModelFile = assetsConfig["gamePieceModelFile"].as<std::string>();
     sim.assets.fontFile = assetsConfig["fontFile"].as<std::string>();
 }

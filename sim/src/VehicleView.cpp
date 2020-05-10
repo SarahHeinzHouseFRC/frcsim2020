@@ -5,6 +5,7 @@
 #include <osgDB/ReadFile>
 #include <osgText/Text>
 #include <iostream>
+#include <ConfigReader.h>
 #include "VehicleView.h"
 #include "ViewUtils.h"
 #include "Color.h"
@@ -39,7 +40,8 @@ VehicleView::VehicleView(const ConfigReader& config, int playerId) :
     }
     else
     {
-        _vehicleNode = osgDB::readNodeFile(config.sim.assets.vehicleModelFile);
+        std::string modelFile = config.players.at(playerId).alliance == "Blue" ? config.sim.assets.vehicleBlueModelFile : config.sim.assets.vehicleRedModelFile;
+        _vehicleNode = osgDB::readNodeFile(modelFile);
         addChild(_vehicleNode);
     }
 

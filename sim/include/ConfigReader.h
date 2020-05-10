@@ -61,10 +61,11 @@ public:
         } comms;
         struct
         {
-            std::string fieldModelFile;     // Path
-            std::string vehicleModelFile;   // Path
-            std::string gamePieceModelFile; // Path
-            std::string fontFile;           // Path
+            std::string fieldModelFile;       // Path
+            std::string vehicleBlueModelFile; // Path
+            std::string vehicleRedModelFile;  // Path
+            std::string gamePieceModelFile;   // Path
+            std::string fontFile;             // Path
         } assets;
         struct
         {

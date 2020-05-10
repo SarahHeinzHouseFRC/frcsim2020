@@ -122,19 +122,27 @@ Hud::Hud(const ConfigReader& config, int playerId) : _width(225)
     _vehicleDrivetrainState = new HudTopLabel("", _padding, y, P_FONT_SIZE, config.sim.assets.fontFile);
     _labelsGeode->addChild(_vehicleDrivetrainState);
 
-    y = 100;
-    _labelsGeode->addChild(new HudBottomLabel("[1] Top-down view", _padding, y, P_FONT_SIZE, config.sim.assets.fontFile));
+    std::vector<std::string> hotKeys = {
+            "[F] Toggle full screen",
+            "[S] Toggle stats",
+            "[Space] Reset view"
+    };
+
     if (numPlayers == 1)
     {
-        y -= 20;
-        _labelsGeode->addChild(new HudBottomLabel("[2] Orbit view", _padding, y, P_FONT_SIZE, config.sim.assets.fontFile));
+        std::vector<std::string> playerSpecificHotKeys = {
+                "[1] Top-down view",
+                "[2] Orbit view"
+        };
+        hotKeys.insert(hotKeys.begin(), playerSpecificHotKeys.begin(), playerSpecificHotKeys.end());
     }
-    y -= 20;
-    _labelsGeode->addChild(new HudBottomLabel("[F] Toggle full screen", _padding, y, P_FONT_SIZE, config.sim.assets.fontFile));
-    y -= 20;
-    _labelsGeode->addChild(new HudBottomLabel("[S] Toggle stats", _padding, y, P_FONT_SIZE, config.sim.assets.fontFile));
-    y -= 20;
-    _labelsGeode->addChild(new HudBottomLabel("[Space] Reset view", _padding, y, P_FONT_SIZE, config.sim.assets.fontFile));
+
+    y = 20.0f * hotKeys.size();
+    for (const auto& hotKey : hotKeys)
+    {
+        _labelsGeode->addChild(new HudBottomLabel(hotKey, _padding, y, P_FONT_SIZE, config.sim.assets.fontFile));
+        y -= 20;
+    }
 }
 
 

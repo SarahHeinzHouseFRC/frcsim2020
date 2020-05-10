@@ -14,14 +14,14 @@ To launch the virtual controller, run:
 cd joystick/
 python main.py virtual --player $N # Replace $N with a number 1-6
 ```
-To launch with a physical controller, plug in the controller to a USB port and run:
+Unfortunately, the Xbox controller library currently used in this application requires sudo permissions to launch. This
+will hopefully be fixed soon by using the xbox360controller Python package instead, which works with more controllers,
+supports features such as rumble, and does not require superuser permissions. To launch with a physical controller, plug
+in the controller to a USB port and run:
 ```sh
 cd joystick/
-sudo python main.py physical --player $N # Sudo is an unfortunate side effect of xboxdrv, hopefully remove this soon
+sudo python main.py physical --player $N # Sudo is an unfortunate side effect of xboxdrv, hope to remove this soon
 ```
-Unfortunately, the Xbox controller library currently used in this application requires sudo permissions to launch. This
-will hopefully be fixed soon by using the xbox360controller Python package instead, which supports more controllers,
-other features such as rumble, and does not require superuser permissions.
 
 To see all options in the joystick application, use:
 ```sh
@@ -29,11 +29,11 @@ python main.py virtual --help
 ```
 
 ### Core ###
-JDK and Gradle are required to compile the core. To install them, run
+JDK is required to compile the core. To install a JDK, run
 ```sh
 sudo apt install openjdk-8-jdk-headless
 ```
-To compile and run the core, run:
+To automatically download Gradle, compile, and run the core, run:
 ```sh
 cd core/
 ./gradlew run --args='--player $N' # Replace $N with a number 1-6
@@ -46,7 +46,8 @@ sudo apt install cmake libopenscenegraph-3.4-dev libyaml-cpp-dev rapidjson-dev l
 ```
 To download the (optional) visual assets, download each from here:
   - [Field 3D model](https://www.dropbox.com/s/1p1i1cbpkj8jp9x/field2020.wrl?dl=0)
-  - [Robot 3D model](https://www.dropbox.com/s/ksr9qn4lipebdw8/vehicle2020.wrl?dl=0)
+  - [Blue robot 3D model](https://www.dropbox.com/s/1pobiyh0wz1eppm/vehicleBlue2020.wrl?dl=0)
+  - [Red robot 3D model](https://www.dropbox.com/s/r0ymy4oo0xdvl2i/vehicleRed2020.wrl?dl=0)
   - [Game piece 3D model](https://www.dropbox.com/s/crgws9oz5v3tcpp/gamepiece2020.wrl?dl=0)
   - [Helvetica font](https://www.dropbox.com/s/2a4qm5csm96wcku/helvetica.ttf?dl=0)
 
@@ -55,10 +56,11 @@ one of these files:
 ```yaml
 sim:
   assets:
-    fieldModelFile: "/your/path/to/field2020.wrl"         # Absolute path to 3D WRL model of the field
-    vehicleModelFile: "/your/path/to/vehicle2020.wrl"     # Absolute path to 3D WRL model of the vehicle
-    gamePieceModelFile: "/your/path/to/gamepiece2020.wrl" # Absolute path to 3D WRL model of the game piece
-    fontFile: "/your/path/to/helvetica.ttf"               # Absolute path to font file for HUD text
+    fieldModelFile: "/your/absolute/path/to/field2020.wrl"             # Absolute path to 3D WRL model of the field
+    vehicleBlueModelFile: "/your/absolute/path/to/vehicleBlue2020.wrl" # Absolute path to 3D WRL model of the vehicle
+    vehicleRedModelFile: "/your/absolute/path/to/vehicleRed2020.wrl"   # Absolute path to 3D WRL model of the vehicle
+    gamePieceModelFile: "/your/absolute/path/to/gamepiece2020.wrl"     # Absolute path to 3D WRL model of the game piece
+    fontFile: "/your/absolute/path/to/helvetica.ttf"                   # Absolute path to font file for HUD text
 ```
 
 To compile and run the sim, run:
@@ -68,12 +70,18 @@ mkdir build
 cd build/
 cmake ..
 make -j8
-./sim # Adding --debug-view will allow faster launching, but with simpler graphics
+./sim # Adding --debug-view will allow faster launching with simplified graphics
 ```
 Because the CAD models for the robot and field are large and can slow down the launch time and runtime performance of
 the visualization, you can optionally launch the simulator with a lightweight visualization using:
 ```sh
 ./sim --debug-view
+```
+If you'd prefer to give each player their own dedicated view, you can run the sim in an even more lightweight headless
+mode, which doesn't launch any visualization at all, and launch individual sim views to visualize instead. To launch the
+sim in headless mode, launch however many sim views you like and run:
+```sh
+./sim --headless
 ```
 To see all options available in the sim, use:
 ```sh
@@ -82,8 +90,8 @@ To see all options available in the sim, use:
 
 
 ## Sim View ##
-The sim view is built using most of the same files as the sim. Therefore, the dependencies are the same as above,
-including the CAD models and font file.
+The sim view is built using many of the same files as the sim. Therefore, the dependencies are the same as above,
+including the 3D models and font file.
 
 To compile and run the sim view, run:
 ```sh
@@ -91,12 +99,13 @@ cd sim/build
 make -j8
 ./simView # Adding --debug-view will allow faster launching, but with simpler graphics
 ```
-Because the CAD models for the robot and field are large and can slow down the launch time and runtime performance of
-the visualization, you can optionally launch the simulator with a lightweight visualization using:
+Because the 3D models for the robot and field are large and can slow down the launch time and runtime performance of the
+visualization, you can optionally launch the sim view with a lightweight visualization using:
 ```sh
-./sim --debug-view
+./simView --debug-view
 ```
-To launch as a different player, use:
+Launching individual sim views for each player also allows you to snap to your vehicle's first-person view. To launch as
+a different player, use:
 ```sh
 ./sim --player $N # Replace $N with a number 1-6
 ```

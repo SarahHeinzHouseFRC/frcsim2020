@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <thread>
+#include <mutex>
 #include "ArgumentParser.h"
 #include "ConfigReader.h"
 #include "Scene.h"
@@ -67,13 +68,17 @@ int main(int argc, char** argv)
     // Visualize the scene
     Visualizer vis(scene, hud, playerId);
 
+    std::mutex m;
+    SimState state;
+
     // Launch rx comms in background thread
     std::thread rxThread([&]()
     {
         while (!vis.done())
         {
             // Receive commands
-            bool rx = simAgent.rxSimState();
+            std::lock_guard<std::mutex> lock(m);
+            state = simAgent.rxSimState();
         }
     });
 
@@ -93,8 +98,8 @@ int main(int argc, char** argv)
     {
         while (!vis.done())
         {
+            m.lock();
             // Update the vehicle and field visualizations based on their models
-            SimState state = simAgent.getSimState();
             scene.update(state);
 
             // Update the hud
@@ -102,6 +107,7 @@ int main(int argc, char** argv)
             hud.displayTimerStatus(state.isTimerRunning, state.timer);
             hud.displayFieldScore(state.blueScore, state.redScore);
             hud.displayVehicleState(state, playerId);
+            m.unlock();
 
             // Step the visualizer
             vis.step();

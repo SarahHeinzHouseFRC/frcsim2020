@@ -116,8 +116,6 @@ public:
 
     /**
      * Repositions itself according to x, y from the top left of the window
-     * @param windowWidth
-     * @param windowHeight
      */
     virtual void onWindowResize(int windowWidth, int windowHeight);
 

@@ -96,29 +96,25 @@ int main(int argc, char** argv)
                 CoreAgent& coreAgent = coreAgents.at(i);
 
                 // Receive commands
-                bool rx = coreAgent.rxCoreCommands();
+                auto rxCommands = coreAgent.rxCoreCommands();
 
-                if (rx)
+                // If the user hit "start" on the joystick, then start/stop the countdown timer
+                timer.processCommand(rxCommands.timerStartStop, Time::now());
+
+                // If the user hit "guide" on the joystick, then reset the world
+                if (rxCommands.reset)
                 {
-                    // Update the vehicle's control surfaces based on the commands from core
-                    auto rxCommands = coreAgent.getCoreCommands();
-
-                    // If the user hits "start" on the joystick, then start/stop the countdown timer
-                    timer.processCommand(rxCommands.timerStartStop, Time::now());
-
-                    // If the user hits "guide" on the joystick, then reset the world
-                    if (rxCommands.reset)
-                    {
-                        reset = true;
-                    }
-
-                    // If the timer hits zero, stop allowing the controllers to update the vehicle
-                    if (timer.getValue() <= 0)
-                    {
-                        rxCommands.clear();
-                    }
-                    wm.vehicleModel(i).processCommands(rxCommands);
+                    reset = true;
                 }
+
+                // If the timer hits zero, stop allowing the controllers to update the vehicle
+                if (timer.getValue() == 0)
+                {
+                    rxCommands.clear();
+                }
+
+                // Update the vehicle's control surfaces based on the commands from core
+                wm.vehicleModel(i).processCommands(rxCommands);
             }
             usleep(100);
         }

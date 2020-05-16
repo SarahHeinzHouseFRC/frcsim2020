@@ -6,13 +6,13 @@
 
 #include "ConfigReader.h"
 #include "Types.h"
-#include "UdpNode.h"
+#include "AbstractAgent.h"
 
 
 /**
- * Receives commands and transmits robot state over comms.enc
+ * Receives commands from and transmits observations to core over comms
  */
-class CoreAgent
+class CoreAgent : public AbstractAgent
 {
 public:
     /**
@@ -26,30 +26,18 @@ public:
     void txSensorState();
 
     /**
-     * Receives robot commands
-     * @return True if successful rx, false otherwise
+     * Receives robot commands from core
+     * @return Latest core commands or empty commands if connection lost
      */
-    bool rxCoreCommands();
-
-    /**
-     * Get the last command received
-     */
-    CoreCommands getCoreCommands() const { return _coreCommands; }
+    CoreCommands rxCoreCommands();
 
     /**
      * State to be sent
      */
     void setSensorState(const SensorState& state) { _sensorState = state; }
 
-    /**
-     * Whether or not we're connected to the controls
-     */
-    bool isConnected() const;
-
 private:
     SensorState _sensorState;
     CoreCommands _coreCommands;
-    std::unique_ptr<UdpNode> _comms;
     bool _verbose;
-    int _numDroppedPackets; ///< Count of how many packets have been missed
 };

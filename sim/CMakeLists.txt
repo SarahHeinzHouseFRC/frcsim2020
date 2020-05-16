@@ -22,6 +22,7 @@ set(SIM_SRCS
         src/VehicleView.cpp
         src/GamePieceView.cpp
         src/ViewUtils.cpp
+        src/AbstractAgent.cpp
         src/CoreAgent.cpp
         src/SimViewAgent.cpp
         src/ConfigReader.cpp
@@ -53,6 +54,7 @@ set(SIM_VIEW_SRCS
         src/VehicleView.cpp
         src/GamePieceView.cpp
         src/ViewUtils.cpp
+        src/AbstractAgent.cpp
         src/SimAgent.cpp
         src/ConfigReader.cpp
         src/Scene.cpp

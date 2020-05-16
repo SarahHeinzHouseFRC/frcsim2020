@@ -110,6 +110,8 @@ following form:
             "intakeLeftMotorSpeed": 0.0,   // Left intake motor speed (rads/sec)
             "intakeRightMotorSpeed": 0.0,  // Right intake motor speed (rads/sec)
             "tubeMotorSpeed": 0.0,         // Tube motor speed (rads/sec)
+            "leftDriveMotorSpeed": 0.0,    // Left drive motor speed (rads/sec)
+            "rightDriveMotorSpeed": 0.0,   // Right drive motor speed (rads/sec)
             "lidarSweep": [
                 {
                     "azimuth": 0.0,        // Azimuth (0 - 2pi rads)

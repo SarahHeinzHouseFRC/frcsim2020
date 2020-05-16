@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_FIELDMODEL_H
-#define ROBOT_SIM_FIELDMODEL_H
+#pragma once
 
 #include <tuple>
 #include "ConfigReader.h"
@@ -75,6 +74,3 @@ private:
     int _blueScore;
     int _redScore;
 };
-
-
-#endif //ROBOT_SIM_FIELDMODEL_H

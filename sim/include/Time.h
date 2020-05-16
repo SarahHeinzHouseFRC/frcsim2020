@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_TIME_H
-#define ROBOT_SIM_TIME_H
+#pragma once
 
 
 /**
@@ -23,6 +22,3 @@ public:
      */
     static double now();
 };
-
-
-#endif //ROBOT_SIM_TIME_H

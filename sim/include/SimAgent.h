@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef SHARP2019_COREAGENT_H
-#define SHARP2019_COREAGENT_H
+#pragma once
 
 #include <mutex>
 #include "ConfigReader.h"
@@ -50,6 +49,3 @@ private:
     int _numDroppedPackets; ///< Count of how many packets have been missed
     std::mutex _m;
 };
-
-
-#endif //SHARP2019_COREAGENT_H

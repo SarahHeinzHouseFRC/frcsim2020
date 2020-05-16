@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_VEHICLEMODEL_H
-#define ROBOT_SIM_VEHICLEMODEL_H
+#pragma once
 
 #include "ConfigReader.h"
 #include "Types.h"
@@ -130,6 +129,3 @@ private:
         } pose;
     } _state;
 };
-
-
-#endif //ROBOT_SIM_VEHICLEMODEL_H

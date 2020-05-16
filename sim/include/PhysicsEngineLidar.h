@@ -2,8 +2,7 @@
  * Copyright (c) 2020 Team 3260
  */
 
-#ifndef SIM_PHYSICSENGINELIDAR_H
-#define SIM_PHYSICSENGINELIDAR_H
+#pragma once
 
 #include <vector>
 #include "Box2D/Box2D.h"
@@ -66,6 +65,3 @@ private:
     float _maxRange;
     float _numRaysPerSweep;
 };
-
-
-#endif //SIM_PHYSICSENGINELIDAR_H

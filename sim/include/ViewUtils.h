@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_VIEWUTILS_H
-#define ROBOT_SIM_VIEWUTILS_H
+#pragma once
 
 #include <osg/ShapeDrawable>
 #include <osg/Geometry>
@@ -53,6 +52,3 @@ private:
      */
     static osg::ref_ptr<osg::Geometry> drawGeometry(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color, GLenum primitive);
 };
-
-
-#endif //ROBOT_SIM_VIEWUTILS_H

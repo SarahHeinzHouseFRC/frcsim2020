@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef SHARP2019_SIMVIEWAGENT_H
-#define SHARP2019_SIMVIEWAGENT_H
+#pragma once
 
 #include "ConfigReader.h"
 #include "Types.h"
@@ -42,6 +41,3 @@ private:
     bool _verbose;
     int _numDroppedPackets; ///< Count of how many packets have been missed
 };
-
-
-#endif //SHARP2019_SIMVIEWAGENT_H

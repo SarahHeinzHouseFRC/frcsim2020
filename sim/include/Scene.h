@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_SCENE_H
-#define ROBOT_SIM_SCENE_H
+#pragma once
 
 #include <osg/Group>
 #include <osg/ShapeDrawable>
@@ -52,6 +51,3 @@ private:
     osg::ref_ptr<FieldView> _fieldView;
     std::vector<osg::ref_ptr<GamePieceView>> _gamePieceViews;
 };
-
-
-#endif //ROBOT_SIM_SCENE_H

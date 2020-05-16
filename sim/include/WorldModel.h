@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_WORLDMODEL_H
-#define ROBOT_SIM_WORLDMODEL_H
+#pragma once
 
 #include <vector>
 #include "ConfigReader.h"
@@ -59,6 +58,3 @@ private:
     PhysicsEngine _physicsEngine;
     std::vector<GamePieceModel> _gamePieceModels;
 };
-
-
-#endif //ROBOT_SIM_WORLDMODEL_H

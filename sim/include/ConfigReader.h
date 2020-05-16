@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_CONFIGREADER_H
-#define ROBOT_SIM_CONFIGREADER_H
+#pragma once
 
 #include <string>
 #include <yaml-cpp/yaml.h>
@@ -195,6 +194,3 @@ private:
      */
     static Geometry::Vertex2d parseVertex(const YAML::Node& node);
 };
-
-
-#endif //ROBOT_SIM_CONFIGREADER_H

@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_TYPES_H
-#define ROBOT_SIM_TYPES_H
+#pragma once
 
 #include <string>
 #include "rapidjson/document.h"
@@ -337,6 +336,3 @@ struct SimState
         gamePieces.clear();
     }
 };
-
-
-#endif //ROBOT_SIM_TYPES_H

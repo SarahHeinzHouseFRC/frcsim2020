@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_PHYSICSENGINE_H
-#define ROBOT_SIM_PHYSICSENGINE_H
+#pragma once
 
 #include "Box2D/Box2D.h"
 #include "FieldModel.h"
@@ -134,6 +133,3 @@ private:
     int _redOuttaken; // Count of how many balls have been outtaken from red goal (so we can calculate score)
     std::unique_ptr<PhysicsEngineLidar> _lidar;
 };
-
-
-#endif //ROBOT_SIM_PHYSICSENGINE_H

@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_VISUALIZER_H
-#define ROBOT_SIM_VISUALIZER_H
+#pragma once
 
 
 #include <osgViewer/Viewer>
@@ -46,6 +45,3 @@ private:
     Scene& _scene;
     Hud& _hud;
 };
-
-
-#endif //ROBOT_SIM_VISUALIZER_H

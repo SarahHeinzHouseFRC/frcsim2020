@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_UDPNODE_H
-#define ROBOT_SIM_UDPNODE_H
+#pragma once
 
 #include <iostream>
 #include <stdio.h>
@@ -44,6 +43,3 @@ private:
     int _sockfd;
     struct sockaddr_in _rxAddr, _txAddr;
 };
-
-
-#endif //ROBOT_SIM_UDPNODE_H

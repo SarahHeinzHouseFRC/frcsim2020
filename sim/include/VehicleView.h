@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_VEHICLEVIEW_H
-#define ROBOT_SIM_VEHICLEVIEW_H
+#pragma once
 
 #include <osg/PositionAttitudeTransform>
 #include "ConfigReader.h"
@@ -80,6 +79,3 @@ private:
     float _gamePieceRadius;
     float _bodyZ;
 };
-
-
-#endif //ROBOT_SIM_VEHICLEVIEW_H

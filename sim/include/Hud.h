@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_HUD_H
-#define ROBOT_SIM_HUD_H
+#pragma once
 
 
 #include <vector>
@@ -80,6 +79,3 @@ private:
     osg::ref_ptr<HudLabel> _vehicleDrivetrainState;
     float _padding = 15;
 };
-
-
-#endif //ROBOT_SIM_HUD_H

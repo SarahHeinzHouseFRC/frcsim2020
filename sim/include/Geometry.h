@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_GEOMETRY_H
-#define ROBOT_SIM_GEOMETRY_H
+#pragma once
 
 #include <vector>
 #include <cmath>
@@ -168,6 +167,3 @@ struct Matrix3d
 };
 
 }
-
-
-#endif //ROBOT_SIM_GEOMETRY_H

@@ -2,8 +2,8 @@
  * Copyright (c) 2019 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_ARGUMENTPARSER_H
-#define ROBOT_SIM_ARGUMENTPARSER_H
+#pragma once
+
 
 #include <map>
 #include <vector>
@@ -52,6 +52,3 @@ private:
 
     std::map<std::string, std::string> _parsedArgs; // Pairs of flags and values
 };
-
-
-#endif //ROBOT_SIM_ARGUMENTPARSER_H

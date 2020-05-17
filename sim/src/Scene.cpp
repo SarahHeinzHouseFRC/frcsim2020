@@ -25,6 +25,9 @@ Scene::Scene(const ConfigReader& config) : _showLidar(true)
         _root->addChild(gamePieceView);
         _gamePieceViews.push_back(gamePieceView);
     }
+
+    _drawings = new osg::Geode;
+    _root->addChild(_drawings);
 }
 
 
@@ -44,5 +47,14 @@ void Scene::update(const SimState& simState, bool showLidar)
     for (int i=0; i<simState.gamePieces.size(); i++)
     {
         _gamePieceViews.at(i)->update(simState.gamePieces.at(i));
+    }
+
+    // Call drawers
+    _drawings->removeDrawables(0, _drawings->getNumDrawables());
+    for (const auto& drawer : _drawers)
+    {
+        auto [shape, text] = drawer->draw();
+        _drawings->addDrawable(shape);
+        _drawings->addDrawable(text);
     }
 }

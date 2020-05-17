@@ -88,12 +88,18 @@ int main(int argc, char** argv)
     osg::ref_ptr<KeyHandler> k = new KeyHandler;
     vis.addEventHandler(k);
 
+    std::mutex m1; // Prevent simultaneous changes to the scene
+    std::mutex m2; // Prevent reading params from the world model while they're being written to
+
     // Launch rx comms in background thread
     bool reset = false;
     std::thread rxThread([&]()
     {
         while (!vis.done())
         {
+            m1.lock();
+            scene.clearDrawers();
+
             for (int i=0; i<coreAgents.size(); i++)
             {
                 CoreAgent& coreAgent = coreAgents.at(i);
@@ -118,12 +124,12 @@ int main(int argc, char** argv)
 
                 // Update the vehicle's control surfaces based on the commands from core
                 wm.vehicleModel(i).processCommands(rxCommands);
+                scene.addDrawers(rxCommands.drawers);
             }
+            m1.unlock();
             usleep(100);
         }
     });
-
-    std::mutex m; // Prevent reading params from the world model while they're being written to
 
     // Launch tx comms in background thread
     std::thread txThread([&]()
@@ -133,16 +139,16 @@ int main(int argc, char** argv)
             for (int i=0; i<coreAgents.size(); i++)
             {
                 CoreAgent& coreAgent = coreAgents.at(i);
-                m.lock();
+                m2.lock();
                 SensorState s = wm.vehicleModel(i).getSensorState();
                 coreAgent.setSensorState(s);
-                m.unlock();
+                m2.unlock();
                 coreAgent.txSensorState();
             }
 
-            m.lock();
+            m2.lock();
             SimState s = wm.getSimState();
-            m.unlock();
+            m2.unlock();
             s.isTimerRunning = timer.isRunning();
             s.timer = timer.getValue();
 
@@ -155,9 +161,9 @@ int main(int argc, char** argv)
 
             for (int i=0; i<config.players.size(); i++)
             {
-                m.lock();
+                m2.lock();
                 wm.vehicleModel(i).clearLidarPoints();
-                m.unlock();
+                m2.unlock();
             }
 
             usleep(1e4);
@@ -172,14 +178,16 @@ int main(int argc, char** argv)
 
             reset |= k->reset();
 
-            m.lock();
+            m2.lock();
             SimState s = wm.getSimState();
-            m.unlock();
+            m2.unlock();
             s.isTimerRunning = timer.isRunning();
             s.timer = timer.getValue();
 
             // Update the vehicle and field visualizations based on their models
+            m1.lock();
             scene.update(s, k->showLidar());
+            m1.unlock();
 
             // Update the hud
             std::vector<bool> connected;
@@ -206,9 +214,9 @@ int main(int argc, char** argv)
         timer.update(t);
 
         // Update the world to reflect the current time
-        m.lock();
+        m2.lock();
         wm.update(t);
-        m.unlock();
+        m2.unlock();
 
         if (reset)
         {

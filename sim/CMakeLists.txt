@@ -38,6 +38,7 @@ set(SIM_SRCS
         src/ArgumentParser.cpp
         src/PhysicsEngineLidar.cpp
         src/KeyHandler.cpp
+        src/AbstractDrawer.cpp
         )
 
 add_executable(sim ${SIM_SRCS})
@@ -67,6 +68,7 @@ set(SIM_VIEW_SRCS
         src/Geometry.cpp
         src/ArgumentParser.cpp
         src/KeyHandler.cpp
+        src/AbstractDrawer.cpp
         )
 
 add_executable(simView ${SIM_VIEW_SRCS})

@@ -67,7 +67,27 @@ message sent to the vehicle has the following form:
     "tubeMotorSpeed": 0,         // Tube motor speed (-512 - 512)
     "timerStartStop": 0,         // Timer start/stop (0 or 1)
     "reset": 0,                  // Reset (0 or 1)
-    "outtake": 0                 // Outtake (0 or 1)
+    "outtake": 0,                // Outtake (0 or 1)
+    "draw": [
+        {
+            "shape": "box",
+            "text": "obstacle1",
+            "color": "blue",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 0.0,
+            "height": 0.0,
+        },
+        {
+            "shape": "line",
+            "text": "path1",
+            "color": "green",
+            "vertices": [
+                [0.0, 0,0],
+                // Etc.
+            ]
+        }
+    ]
 }
 ```
 

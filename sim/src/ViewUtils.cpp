@@ -59,6 +59,13 @@ osg::ref_ptr<osg::Geometry> ViewUtils::drawLines(osg::ref_ptr<osg::Vec3Array> ve
 
 
 
+osg::ref_ptr<osg::Geometry> ViewUtils::drawLineStrip(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color)
+{
+    return drawGeometry(vertices, color, osg::PrimitiveSet::LINE_STRIP);
+}
+
+
+
 osg::ref_ptr<osg::Geometry> ViewUtils::drawLineLoop(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color)
 {
     return drawGeometry(vertices, color, osg::PrimitiveSet::LINE_LOOP);
@@ -96,6 +103,18 @@ osg::ref_ptr<osg::ShapeDrawable> ViewUtils::drawBox(const osg::Vec3& pos, float 
     osg::ref_ptr<osg::ShapeDrawable> shape = new osg::ShapeDrawable(new osg::Box(pos, lengthX, lengthY, lengthZ));
     shape->setColor(color);
     return shape;
+}
+
+
+
+osg::ref_ptr<osg::Drawable> ViewUtils::drawBox2d(float x, float y, float z, float lengthX, float lengthY, const osg::Vec4& color)
+{
+    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+    vertices->push_back({ x - lengthX/2, y - lengthY/2, z });
+    vertices->push_back({ x + lengthX/2, y - lengthY/2, z });
+    vertices->push_back({ x + lengthX/2, y + lengthY/2, z });
+    vertices->push_back({ x - lengthX/2, y + lengthY/2, z });
+    return drawLineLoop(vertices, color);
 }
 
 

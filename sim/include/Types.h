@@ -5,6 +5,7 @@
 #pragma once
 
 #include <string>
+#include "AbstractDrawer.h"
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
@@ -82,15 +83,16 @@ struct SensorState
 
 struct CoreCommands
 {
-    int leftDriveMotorSpeed;    // -512 - 512
-    int rightDriveMotorSpeed;   // -512 - 512
-    int intakeCenterMotorSpeed; // -512 - 512
-    int intakeLeftMotorSpeed;   // -512 - 512
-    int intakeRightMotorSpeed;  // -512 - 512
-    int tubeMotorSpeed;         // -512 - 512
-    int timerStartStop;         // 0 or 1
-    int reset;                  // 0 or 1
-    int outtake;                // 0 or 1
+    int leftDriveMotorSpeed;                              // -512 - 512
+    int rightDriveMotorSpeed;                             // -512 - 512
+    int intakeCenterMotorSpeed;                           // -512 - 512
+    int intakeLeftMotorSpeed;                             // -512 - 512
+    int intakeRightMotorSpeed;                            // -512 - 512
+    int tubeMotorSpeed;                                   // -512 - 512
+    int timerStartStop;                                   // 0 or 1
+    int reset;                                            // 0 or 1
+    int outtake;                                          // 0 or 1
+    std::vector<std::shared_ptr<AbstractDrawer>> drawers; // Shapes to draw
 
     /**
      * Default constructor
@@ -105,6 +107,8 @@ struct CoreCommands
      */
     void fromJson(const std::string& json)
     {
+        using namespace rapidjson;
+
         rapidjson::Document d;
         d.Parse(json.c_str());
         leftDriveMotorSpeed    = d["leftDriveMotorSpeed"].GetInt();
@@ -116,6 +120,37 @@ struct CoreCommands
         timerStartStop         = d["timerStartStop"].GetInt();
         reset                  = d["reset"].GetInt();
         outtake                = d["outtake"].GetInt();
+
+        const Value& draw = d["draw"];
+        for (auto itr = draw.Begin(); itr != draw.End(); itr++)
+        {
+            if (std::string((*itr)["shape"].GetString()) == "box")
+            {
+                auto text = (*itr)["text"].GetString();
+                auto color = (*itr)["color"].GetString();
+                auto x = (*itr)["x"].GetFloat();
+                auto y = (*itr)["y"].GetFloat();
+                auto width = (*itr)["width"].GetFloat();
+                auto height = (*itr)["height"].GetFloat();
+                std::shared_ptr<AbstractDrawer> box = std::make_shared<BoxDrawer>(text, color, x, y, width, height);
+                drawers.push_back(box);
+            }
+            else if (std::string((*itr)["shape"].GetString()) == "line")
+            {
+                std::vector<std::pair<float, float>> vertices;
+                const Value& v = (*itr)["vertices"];
+                for (auto itr2 = v.Begin(); itr2 != v.End(); itr2++)
+                {
+                    float x = (*itr2)[0].GetFloat();
+                    float y = (*itr2)[1].GetFloat();
+                    vertices.emplace_back(x, y);
+                }
+                auto text = (*itr)["text"].GetString();
+                auto color = (*itr)["color"].GetString();
+                std::shared_ptr<AbstractDrawer> line = std::make_shared<LineDrawer>(text, color, vertices);
+                drawers.push_back(line);
+            }
+        }
     }
 
     /**
@@ -132,6 +167,7 @@ struct CoreCommands
         timerStartStop = 0;
         reset = 0;
         outtake = 0;
+        drawers.clear();
     }
 };
 

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <osg/Group>
+#include <osg/Geode>
 #include <osg/ShapeDrawable>
 #include <osg/PositionAttitudeTransform>
 #include "ConfigReader.h"
@@ -12,6 +13,7 @@
 #include "VehicleView.h"
 #include "FieldView.h"
 #include "GamePieceView.h"
+#include "AbstractDrawer.h"
 
 
 /**
@@ -46,6 +48,16 @@ public:
     osg::Vec3d getVehiclePosition(int playerId) const { return _vehicleViews.at(playerId)->getPosition(); }
 
     /**
+     * Clears the list of drawers
+     */
+    void clearDrawers() { _drawers.clear(); }
+
+    /**
+     * Appends more drawers to the list
+     */
+    void addDrawers(const std::vector<std::shared_ptr<AbstractDrawer>> drawers) { _drawers.insert(_drawers.end(), drawers.begin(), drawers.end()); }
+
+    /**
      * Sets whether or not to show the LIDAR rays
      */
     void showLidar(bool show) { _showLidar = show; }
@@ -56,4 +68,6 @@ private:
     osg::ref_ptr<FieldView> _fieldView;
     std::vector<osg::ref_ptr<GamePieceView>> _gamePieceViews;
     bool _showLidar;
+    std::vector<std::shared_ptr<AbstractDrawer>> _drawers;
+    osg::ref_ptr<osg::Geode> _drawings;
 };

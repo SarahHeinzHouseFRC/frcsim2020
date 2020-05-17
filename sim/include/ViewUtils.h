@@ -27,7 +27,13 @@ public:
     static osg::ref_ptr<osg::Geometry> drawLines(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);
 
     /**
-     * Utility method for quickly drawing lines. Pairs of vertices are interpreted as single lines
+     * Utility method for quickly drawing a line strip. Each vertex is connected to the previous by a line.
+     */
+    static osg::ref_ptr<osg::Geometry> drawLineStrip(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);
+
+    /**
+     * Utility method for quickly drawing a line loop. Same as line strip but first and last vertices are also connected
+     * with a line.
      */
     static osg::ref_ptr<osg::Geometry> drawLineLoop(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);
 
@@ -40,6 +46,11 @@ public:
      * Utility method for quickly drawing a box
      */
     static osg::ref_ptr<osg::ShapeDrawable> drawBox(const osg::Vec3& pos, float lengthX, float lengthY, float lengthZ, const osg::Vec4& color);
+
+    /**
+     * Utility method for quickly drawing a 2D box
+     */
+    static osg::ref_ptr<osg::Drawable> drawBox2d(float x, float y, float z, float lengthX, float lengthY, const osg::Vec4& color);
 
     /**
      * Utility method for quickly drawing quads

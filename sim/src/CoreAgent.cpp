@@ -49,6 +49,7 @@ CoreCommands CoreAgent::rxCoreCommands()
         }
 
         // Translate received commands from JSON and store into _coreCommands
+        _coreCommands.clear();
         _coreCommands.fromJson(msg);
 
         // Save time of last rx

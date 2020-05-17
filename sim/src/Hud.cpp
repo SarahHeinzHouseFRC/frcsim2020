@@ -58,7 +58,7 @@ Hud::Hud(const ConfigReader& config, int playerId) : _width(225)
     float y = 0;
 
     y -= 34;
-    auto title = new HudTopLabel("FRC Sim 2020", _padding, y, H1_FONT_SIZE, config.sim.assets.fontFile);
+    auto title = new HudTopLabel("FRC 2020 Sim", _padding, y, H1_FONT_SIZE, config.sim.assets.fontFile);
     _labelsGeode->addChild(title);
 
     y -= 20;

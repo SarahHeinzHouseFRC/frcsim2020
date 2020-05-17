@@ -10,6 +10,7 @@
 #include "Scene.h"
 #include "Hud.h"
 #include "Visualizer.h"
+#include "KeyHandler.h"
 #include "SimAgent.h"
 
 #define DEFAULT_CONFIG_FILE "../../config/robotConfig.yml"
@@ -67,6 +68,8 @@ int main(int argc, char** argv)
 
     // Visualize the scene
     Visualizer vis(scene, hud, playerId);
+    osg::ref_ptr<KeyHandler> k = new KeyHandler;
+    vis.addEventHandler(k);
 
     std::mutex m;
     SimState state;
@@ -100,7 +103,7 @@ int main(int argc, char** argv)
         {
             m.lock();
             // Update the vehicle and field visualizations based on their models
-            scene.update(state);
+            scene.update(state, k->showLidar());
 
             // Update the hud
             hud.displayConnectionStatus(simAgent.isConnected(), playerId);

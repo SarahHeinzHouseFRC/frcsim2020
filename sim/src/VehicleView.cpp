@@ -57,7 +57,7 @@ VehicleView::VehicleView(const ConfigReader& config, int playerId) :
 
 
 
-void VehicleView::update(const SimState::VehicleState& state)
+void VehicleView::update(const SimState::VehicleState& state, bool showLidar)
 {
     // Update the position
     double x = state.x;
@@ -84,7 +84,7 @@ void VehicleView::update(const SimState::VehicleState& state)
     }
 
     // Update LIDAR sweep
-    if (!state.lidarSweep.empty())
+    if (showLidar && !state.lidarSweep.empty())
     {
         osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
         double nearRange = _lidarNearRange;
@@ -105,6 +105,11 @@ void VehicleView::update(const SimState::VehicleState& state)
         osg::ref_ptr<osg::Geometry> geom = ViewUtils::drawLines(vertices, Color::Orange);
         _sweep->removeDrawables(0);
         _sweep->addDrawable(geom);
+    }
+    else
+    {
+        _sweep->removeDrawables(0);
+        _sweep->addDrawable(new osg::Geometry); // Empty drawable
     }
 }
 

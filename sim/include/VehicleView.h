@@ -20,7 +20,7 @@ public:
     /**
      * Updates the vehicle view based on the vehicle model
      */
-    void update(const SimState::VehicleState& state);
+    void update(const SimState::VehicleState& state, bool showLidar);
 
     /**
      * Returns vehicle node (for Visualizer to center view on)

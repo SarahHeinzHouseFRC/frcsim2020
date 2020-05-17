@@ -28,7 +28,7 @@ public:
     /**
      * Updates the scene given the robot's current state
      */
-    void update(const SimState& simState);
+    void update(const SimState& simState, bool showLidar);
 
     /**
      * Returns the root node of the scene
@@ -45,9 +45,15 @@ public:
      */
     osg::Vec3d getVehiclePosition(int playerId) const { return _vehicleViews.at(playerId)->getPosition(); }
 
+    /**
+     * Sets whether or not to show the LIDAR rays
+     */
+    void showLidar(bool show) { _showLidar = show; }
+
 private:
     osg::ref_ptr<osg::Group> _root;
     std::vector<osg::ref_ptr<VehicleView>> _vehicleViews;
     osg::ref_ptr<FieldView> _fieldView;
     std::vector<osg::ref_ptr<GamePieceView>> _gamePieceViews;
+    bool _showLidar;
 };

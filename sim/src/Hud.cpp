@@ -123,6 +123,7 @@ Hud::Hud(const ConfigReader& config, int playerId) : _width(225)
     _labelsGeode->addChild(_vehicleDrivetrainState);
 
     std::vector<std::string> hotKeys = {
+            "[L] Toggle LIDAR rays",
             "[F] Toggle full screen",
             "[S] Toggle stats",
             "[Space] Reset view"

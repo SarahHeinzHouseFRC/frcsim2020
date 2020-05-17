@@ -10,6 +10,7 @@
 #include "Scene.h"
 #include "Hud.h"
 #include "Visualizer.h"
+#include "KeyHandler.h"
 #include "Time.h"
 #include "Timer.h"
 #include "CoreAgent.h"
@@ -84,6 +85,8 @@ int main(int argc, char** argv)
 
     // Visualize the scene
     Visualizer vis(scene, hud, headless);
+    osg::ref_ptr<KeyHandler> k = new KeyHandler;
+    vis.addEventHandler(k);
 
     // Launch rx comms in background thread
     bool reset = false;
@@ -168,7 +171,7 @@ int main(int argc, char** argv)
             s.timer = timer.getValue();
 
             // Update the vehicle and field visualizations based on their models
-            scene.update(s);
+            scene.update(s, k->showLidar());
 
             // Update the hud
             std::vector<bool> connected;

@@ -5,6 +5,7 @@
 #include <osg/Geode>
 #include <osg/Geometry>
 #include <osg/ShapeDrawable>
+#include <osg/Point>
 #include "ViewUtils.h"
 
 
@@ -35,6 +36,18 @@ osg::ref_ptr<osg::Geometry> ViewUtils::drawArrow(const osg::Vec3d& center, float
         vertices->push_back(center + osg::Vec3(-headFrontDist/4, -headSidesDist, 0) * A);
     }
     return drawTriangleFan(vertices, color);
+}
+
+
+
+osg::ref_ptr<osg::Geometry> ViewUtils::drawPoints(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color)
+{
+    osg::ref_ptr<osg::Geometry> geom = drawGeometry(vertices, color, osg::PrimitiveSet::POINTS);
+    constexpr float pointSize = 20.0;
+    osg::ref_ptr<osg::Point> p = new osg::Point(pointSize);
+    p->setDistanceAttenuation(osg::Vec3(0.0, 0.0000, 0.05f));
+    geom->getOrCreateStateSet()->setAttribute(p, osg::StateAttribute::ON);
+    return geom;
 }
 
 

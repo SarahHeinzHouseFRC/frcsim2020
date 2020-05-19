@@ -13,6 +13,7 @@
 
 VehicleView::VehicleView(const ConfigReader& config, int playerId) :
         _wheelRadius(config.sim.vehicle.drivetrain.wheelRadius),
+        _ballRadius(config.sim.gamePiece.radius),
         _bodyZ(-config.sim.vehicle.drivetrain.wheelRadius + config.sim.gamePiece.radius),
         _gamePieceRadius(config.sim.gamePiece.radius),
         _centerIngestibleRegionCenter(config.sim.vehicle.ingestibleRegionCenter.center()),
@@ -88,10 +89,9 @@ void VehicleView::update(const SimState::VehicleState& state, bool showLidar)
     {
         osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
         double nearRange = _lidarNearRange;
-        double z = -_wheelRadius + 0.089;
-        for (int i=0; i<_laserFrequency/_motorFrequency; i++)
+        double z = -_wheelRadius + _ballRadius;
+        for (const auto& p : state.lidarSweep)
         {
-            LidarPoint p = state.lidarSweep.at(i);
             if (p.range > 0)
             {
                 double farRange = p.range;

@@ -73,6 +73,7 @@ private:
     osg::ref_ptr<osg::Geometry> _ingestibleRegionRightArrow;
     osg::ref_ptr<osg::Geometry> _tubeRegionArrow;
     float _wheelRadius;
+    float _ballRadius;
     float _lidarNearRange;
     float _laserFrequency;
     float _motorFrequency;

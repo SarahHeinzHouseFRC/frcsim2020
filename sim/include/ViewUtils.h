@@ -17,6 +17,11 @@ public:
     static osg::ref_ptr<osg::Geometry> drawArrow(const osg::Vec3d& center, float theta, float tailLength, const osg::Vec4& color);
 
     /**
+     * Utility method for drawing points
+     */
+    static osg::ref_ptr<osg::Geometry> drawPoints(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);
+
+    /**
      * Utility method for quickly drawing lines. Pairs of vertices are interpreted as single lines
      */
     static osg::ref_ptr<osg::Geometry> drawLines(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);

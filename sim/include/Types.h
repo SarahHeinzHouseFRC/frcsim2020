@@ -24,6 +24,7 @@ struct SensorState
     float theta;                        // Radians
     int leftDriveEncoder;               // 0-1023
     int rightDriveEncoder;              // 0-1023
+    int numIngestedBalls;               // 0+
     std::vector<LidarPoint> lidarSweep; // LIDAR points
 
     /**
@@ -45,6 +46,8 @@ struct SensorState
         writer.Int(leftDriveEncoder);
         writer.Key("rightDriveEncoder");
         writer.Int(rightDriveEncoder);
+        writer.Key("numIngestedBalls");
+        writer.Int(numIngestedBalls);
         writer.Key("lidarSweep");
         writer.StartArray();
         for (const auto& p : lidarSweep)
@@ -68,8 +71,12 @@ struct SensorState
      */
     void clear()
     {
+        x = 0;
+        y = 0;
+        theta = 0;
         leftDriveEncoder = 0;
         rightDriveEncoder = 0;
+        numIngestedBalls = 0;
         lidarSweep.clear();
     }
 };

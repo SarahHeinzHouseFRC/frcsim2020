@@ -76,8 +76,12 @@ The vehicle continuously sends vehicle and sensor state information back to the 
 following form:
 ```json5
 {
+    "x": 0,                   // Meters relative to field origin
+    "y": 0,                   // Meters relative to field origin
+    "theta": 0,               // Radians relative to field origin
     "leftDriveEncoder": 0,    // Left drive encoder ticks (0 - 1024)
     "rightDriveEncoder": 0,   // Right drive encoder ticks (0 - 1024)
+    "numIngestedBalls": 0,    // Number of ingested balls (0+)
     "lidarSweep": [           // LIDAR sweep
         {
             "azimuth": 0.0,   // Point in sensor frame azimuth (rads 0 - 2pi)

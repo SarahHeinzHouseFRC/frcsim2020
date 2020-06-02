@@ -127,6 +127,7 @@ private:
         double vx;                          // Meters/sec
         double vy;                          // Meters/sec
         double omega;                       // Rads/sec
+        int numIngestedBalls;               // Number of balls in tube
         std::vector<LidarPoint> lidarSweep; // Current LIDAR sweep
     } _state;
 };

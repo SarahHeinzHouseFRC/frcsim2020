@@ -131,6 +131,7 @@ SensorState VehicleModel::getSensorState()
     state.theta = _state.theta;
     state.leftDriveEncoder = 0; // TODO: Assign real values
     state.rightDriveEncoder = 0; // TODO: Assign real values
+    state.numIngestedBalls = _state.numIngestedBalls;
     state.lidarSweep = _state.lidarSweep;
     return state;
 }

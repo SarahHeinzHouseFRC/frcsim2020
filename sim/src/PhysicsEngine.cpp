@@ -240,6 +240,9 @@ void PhysicsEngine::update(FieldModel& fieldModel, std::vector<VehicleModel>& ve
                 float dist = -b2Dot(rearEdgePerp, vecToGamePiece);
                 gamePieceModel->_state.pose.z = dist * (0.45 / 0.51);
             }
+
+            // Assign number of ingested balls
+            vehicleModel._state.numIngestedBalls = vehiclePhysicsModel.tubeGamePieceBodies.size() + vehiclePhysicsModel.ingestibleCenterGamePieceBodies.size();
         }
 
         b2Transform fieldTf({ 0, 0 }, b2Rot(0));

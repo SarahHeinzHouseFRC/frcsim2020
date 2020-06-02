@@ -103,14 +103,13 @@ private:
     bool _outtake; // Whether or not this vehicle has requested the field to outtake
     bool _prevOuttakeButtonState; // Whether or not the controller was previously requesting an outtake
     bool _hasLidar; // Whether or not this vehicle has a LIDAR sensor
-    std::vector<LidarPoint> _lidarSweep;
 
     struct
     {
         double x, y, theta;
     } _initialState;
 
-    struct VehicleState
+    struct VehicleControls
     {
         double leftDriveMotorSpeed; // Rads/sec, 0-leftDriveMotorMaxSpeed
         double rightDriveMotorSpeed; // Rads/sec, 0-rightDriveMotorMaxSpeed
@@ -118,14 +117,16 @@ private:
         double intakeLeftMotorSpeed; // Rads/sec, 0-intakeLeftMotorMaxSpeed
         double intakeRightMotorSpeed; // Rads/sec, 0-intakeRightMotorMaxSpeed
         double tubeMotorSpeed; // Rads/sec, 0-tubeMotorMaxSpeed
-        struct
-        {
-            double x;     // Meters
-            double y;     // Meters
-            double vx;    // Meters/sec
-            double vy;    // Meters/sec
-            double omega; // Rads/sec
-            double theta; // Rads
-        } pose;
+    } _controls;
+
+    struct VehicleState
+    {
+        double x;                           // Meters
+        double y;                           // Meters
+        double theta;                       // Rads
+        double vx;                          // Meters/sec
+        double vy;                          // Meters/sec
+        double omega;                       // Rads/sec
+        std::vector<LidarPoint> lidarSweep; // Current LIDAR sweep
     } _state;
 };

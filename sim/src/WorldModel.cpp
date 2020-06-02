@@ -79,16 +79,16 @@ SimState WorldModel::getSimState()
         SimState::VehicleState v{};
         v.team = vehicle._team;
         v.alliance = vehicle._alliance;
-        v.x = (float) vehicle._state.pose.x;
-        v.y = (float) vehicle._state.pose.y;
-        v.theta = (float) vehicle._state.pose.theta;
-        v.intakeCenterMotorSpeed = (float) vehicle._state.intakeCenterMotorSpeed;
-        v.intakeLeftMotorSpeed = (float) vehicle._state.intakeLeftMotorSpeed;
-        v.intakeRightMotorSpeed = (float) vehicle._state.intakeRightMotorSpeed;
-        v.tubeMotorSpeed = (float) vehicle._state.tubeMotorSpeed;
-        v.leftDriveMotorSpeed = (float) vehicle._state.leftDriveMotorSpeed;
-        v.rightDriveMotorSpeed = (float) vehicle._state.rightDriveMotorSpeed;
-        v.lidarSweep = vehicle._lidarSweep;
+        v.x = (float) vehicle._state.x;
+        v.y = (float) vehicle._state.y;
+        v.theta = (float) vehicle._state.theta;
+        v.intakeCenterMotorSpeed = (float) vehicle._controls.intakeCenterMotorSpeed;
+        v.intakeLeftMotorSpeed = (float) vehicle._controls.intakeLeftMotorSpeed;
+        v.intakeRightMotorSpeed = (float) vehicle._controls.intakeRightMotorSpeed;
+        v.tubeMotorSpeed = (float) vehicle._controls.tubeMotorSpeed;
+        v.leftDriveMotorSpeed = (float) vehicle._controls.leftDriveMotorSpeed;
+        v.rightDriveMotorSpeed = (float) vehicle._controls.rightDriveMotorSpeed;
+        v.lidarSweep = vehicle._state.lidarSweep;
         s.vehicles.push_back(v);
     }
 

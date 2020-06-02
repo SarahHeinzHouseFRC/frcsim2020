@@ -31,8 +31,6 @@ struct SensorState
      */
     std::string toJson()
     {
-//        printf("Pose = (%f, %f, %f)\n", x, y, theta);
-
         rapidjson::StringBuffer s;
         rapidjson::Writer<rapidjson::StringBuffer> writer(s);
 

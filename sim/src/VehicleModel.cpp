@@ -48,9 +48,9 @@ VehicleModel::VehicleModel(const ConfigReader& config, double startTimestamp, in
     }
 
     // Set pose
-    _state.pose.x = _initialState.x;
-    _state.pose.y = _initialState.y;
-    _state.pose.theta = _initialState.theta;
+    _state.x = _initialState.x;
+    _state.y = _initialState.y;
+    _state.theta = _initialState.theta;
 }
 
 
@@ -68,29 +68,29 @@ void VehicleModel::update(double currTimestamp)
     //
 
     // Increment pose
-    double vLeft = _state.leftDriveMotorSpeed * _wheelRadius;
-    double vRight = _state.rightDriveMotorSpeed * _wheelRadius;
+    double vLeft = _controls.leftDriveMotorSpeed * _wheelRadius;
+    double vRight = _controls.rightDriveMotorSpeed * _wheelRadius;
     if (vLeft == vRight)
     {
         double d = vRight * elapsedTime;
-        double deltaX = d * cos(_state.pose.theta);
-        double deltaY = d * sin(_state.pose.theta);
-        _state.pose.vx = deltaX / elapsedTime;
-        _state.pose.vy = deltaY / elapsedTime;
-        _state.pose.omega = 0;
+        double deltaX = d * cos(_state.theta);
+        double deltaY = d * sin(_state.theta);
+        _state.vx = deltaX / elapsedTime;
+        _state.vy = deltaY / elapsedTime;
+        _state.omega = 0;
     }
     else
     {
         double r = (_wheelTrack * (vRight + vLeft)) / (2 * (vRight - vLeft));
         double dLeft = vLeft * elapsedTime;
         double dRight = vRight * elapsedTime;
-        double prevTheta = _state.pose.theta;
+        double prevTheta = _state.theta;
         double currTheta = prevTheta + (dRight - dLeft) / _wheelTrack;
         double deltaX = r * sin(currTheta) - r * sin(prevTheta);
         double deltaY = -r * cos(currTheta) + r * cos(prevTheta);
-        _state.pose.vx = deltaX / elapsedTime;
-        _state.pose.vy = deltaY / elapsedTime;
-        _state.pose.omega = (currTheta - prevTheta) / elapsedTime;
+        _state.vx = deltaX / elapsedTime;
+        _state.vy = deltaY / elapsedTime;
+        _state.omega = (currTheta - prevTheta) / elapsedTime;
     }
 
     // Update the last timestamp
@@ -102,14 +102,14 @@ void VehicleModel::update(double currTimestamp)
 void VehicleModel::processCommands(const CoreCommands& commands)
 {
     // Update drivetrain
-    _state.leftDriveMotorSpeed = (commands.leftDriveMotorSpeed / 512.0) * _leftDriveMotorMaxSpeed;
-    _state.rightDriveMotorSpeed = (commands.rightDriveMotorSpeed / 512.0) * _rightDriveMotorMaxSpeed;
+    _controls.leftDriveMotorSpeed = (commands.leftDriveMotorSpeed / 512.0) * _leftDriveMotorMaxSpeed;
+    _controls.rightDriveMotorSpeed = (commands.rightDriveMotorSpeed / 512.0) * _rightDriveMotorMaxSpeed;
 
     // Update intake motors
-    _state.intakeCenterMotorSpeed = (commands.intakeCenterMotorSpeed / 512.0) * _intakeCenterMotorMaxSpeed;
-    _state.intakeLeftMotorSpeed = (commands.intakeLeftMotorSpeed / 512.0) * _intakeLeftMotorMaxSpeed;
-    _state.intakeRightMotorSpeed = (commands.intakeRightMotorSpeed / 512.0) * _intakeRightMotorMaxSpeed;
-    _state.tubeMotorSpeed = (commands.tubeMotorSpeed / 512.0) * _tubeMotorMaxSpeed;
+    _controls.intakeCenterMotorSpeed = (commands.intakeCenterMotorSpeed / 512.0) * _intakeCenterMotorMaxSpeed;
+    _controls.intakeLeftMotorSpeed = (commands.intakeLeftMotorSpeed / 512.0) * _intakeLeftMotorMaxSpeed;
+    _controls.intakeRightMotorSpeed = (commands.intakeRightMotorSpeed / 512.0) * _intakeRightMotorMaxSpeed;
+    _controls.tubeMotorSpeed = (commands.tubeMotorSpeed / 512.0) * _tubeMotorMaxSpeed;
 
     // Request the world to outtake a ball when outtake button switches from high to low
     int currOuttakeButtonState = commands.outtake;
@@ -126,12 +126,12 @@ void VehicleModel::processCommands(const CoreCommands& commands)
 SensorState VehicleModel::getSensorState()
 {
     SensorState state{0};
-    state.x = _state.pose.x;
-    state.y = _state.pose.y;
-    state.theta = _state.pose.theta;
+    state.x = _state.x;
+    state.y = _state.y;
+    state.theta = _state.theta;
     state.leftDriveEncoder = 0; // TODO: Assign real values
     state.rightDriveEncoder = 0; // TODO: Assign real values
-    state.lidarSweep = _lidarSweep;
+    state.lidarSweep = _state.lidarSweep;
     return state;
 }
 
@@ -140,7 +140,7 @@ SensorState VehicleModel::getSensorState()
 void VehicleModel::reset()
 {
     _state = {0};
-    _state.pose.x = _initialState.x;
-    _state.pose.y = _initialState.y;
-    _state.pose.theta = _initialState.theta;
+    _state.x = _initialState.x;
+    _state.y = _initialState.y;
+    _state.theta = _initialState.theta;
 }

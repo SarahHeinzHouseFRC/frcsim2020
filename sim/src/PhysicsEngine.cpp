@@ -82,8 +82,8 @@ void PhysicsEngine::update(FieldModel& fieldModel, std::vector<VehicleModel>& ve
     // Update the vehicle velocities
     for (int i=0; i<_vehiclePhysicsModels.size(); i++)
     {
-        _vehiclePhysicsModels.at(i).body->SetLinearVelocity(b2Vec2(vehicleModels.at(i)._state.pose.vx, vehicleModels.at(i)._state.pose.vy));
-        _vehiclePhysicsModels.at(i).body->SetAngularVelocity(vehicleModels.at(i)._state.pose.omega);
+        _vehiclePhysicsModels.at(i).body->SetLinearVelocity(b2Vec2(vehicleModels.at(i)._state.vx, vehicleModels.at(i)._state.vy));
+        _vehiclePhysicsModels.at(i).body->SetAngularVelocity(vehicleModels.at(i)._state.omega);
     }
 
     // Outtake balls if the vehicles call for it
@@ -134,10 +134,10 @@ void PhysicsEngine::update(FieldModel& fieldModel, std::vector<VehicleModel>& ve
         auto& vehiclePhysicsModel = _vehiclePhysicsModels.at(i);
 
         std::vector<std::tuple<std::vector<b2Body*>, float, b2Vec2, float>> regions {
-                { vehiclePhysicsModel.ingestibleCenterGamePieceBodies, vehicleModel._state.intakeCenterMotorSpeed, vehiclePhysicsModel.body->GetWorldVector(b2Vec2(-1, 0)), 0.5f },
-                { vehiclePhysicsModel.ingestibleLeftGamePieceBodies, vehicleModel._state.intakeLeftMotorSpeed, vehiclePhysicsModel.body->GetWorldVector(b2Vec2(0, -1)), 0.5f },
-                { vehiclePhysicsModel.ingestibleRightGamePieceBodies, vehicleModel._state.intakeRightMotorSpeed, vehiclePhysicsModel.body->GetWorldVector(b2Vec2(0, 1)), 0.5f },
-                { vehiclePhysicsModel.tubeGamePieceBodies, vehicleModel._state.tubeMotorSpeed, vehiclePhysicsModel.body->GetWorldVector(b2Vec2(-1, 0)), 1.0f },
+                { vehiclePhysicsModel.ingestibleCenterGamePieceBodies, vehicleModel._controls.intakeCenterMotorSpeed, vehiclePhysicsModel.body->GetWorldVector(b2Vec2(-1, 0)), 0.5f },
+                { vehiclePhysicsModel.ingestibleLeftGamePieceBodies, vehicleModel._controls.intakeLeftMotorSpeed, vehiclePhysicsModel.body->GetWorldVector(b2Vec2(0, -1)), 0.5f },
+                { vehiclePhysicsModel.ingestibleRightGamePieceBodies, vehicleModel._controls.intakeRightMotorSpeed, vehiclePhysicsModel.body->GetWorldVector(b2Vec2(0, 1)), 0.5f },
+                { vehiclePhysicsModel.tubeGamePieceBodies, vehicleModel._controls.tubeMotorSpeed, vehiclePhysicsModel.body->GetWorldVector(b2Vec2(-1, 0)), 1.0f },
         };
 
         // Enter a slave state, move according to intake motor and half the vehicle speed
@@ -157,9 +157,9 @@ void PhysicsEngine::update(FieldModel& fieldModel, std::vector<VehicleModel>& ve
             float angle = vehiclePhysicsModel.body->GetAngle();
             b2Vec2 velocity = vehiclePhysicsModel.body->GetLinearVelocity();
 
-            vehicleModel._state.pose.x = position.x;
-            vehicleModel._state.pose.y = position.y;
-            vehicleModel._state.pose.theta = angle;
+            vehicleModel._state.x = position.x;
+            vehicleModel._state.y = position.y;
+            vehicleModel._state.theta = angle;
         }
     }
 
@@ -306,7 +306,7 @@ void PhysicsEngine::update(FieldModel& fieldModel, std::vector<VehicleModel>& ve
         if (vehicleModels.at(i)._hasLidar)
         {
             b2Transform vehicleTf = _vehiclePhysicsModels.at(i).body->GetTransform();
-            vehicleModels.at(i)._lidarSweep = _lidar->sweep(vehicleTf);
+            vehicleModels.at(i)._state.lidarSweep = _lidar->sweep(vehicleTf);
         }
     }
 
@@ -320,7 +320,7 @@ void PhysicsEngine::reset(const FieldModel& fieldModel, std::vector<VehicleModel
     // Reset vehicle
     for (int i=0; i<vehicleModels.size(); i++)
     {
-        _vehiclePhysicsModels.at(i).body->SetTransform(b2Vec2(vehicleModels.at(i)._state.pose.x, vehicleModels.at(i)._state.pose.y), vehicleModels.at(i)._state.pose.theta);
+        _vehiclePhysicsModels.at(i).body->SetTransform(b2Vec2(vehicleModels.at(i)._state.x, vehicleModels.at(i)._state.y), vehicleModels.at(i)._state.theta);
     }
 
     // Reset game pieces
@@ -419,8 +419,8 @@ std::vector<VehiclePhysicsModel> PhysicsEngine::initVehiclePhysicsModels(b2World
         // Define the dynamic body. We set its position and call the body factory.
         b2BodyDef vehicleBodyDef;
         vehicleBodyDef.type = b2_dynamicBody;
-        vehicleBodyDef.position.Set(vehicleModel._state.pose.x, vehicleModel._state.pose.y);
-        vehicleBodyDef.angle = vehicleModel._state.pose.theta;
+        vehicleBodyDef.position.Set(vehicleModel._state.x, vehicleModel._state.y);
+        vehicleBodyDef.angle = vehicleModel._state.theta;
         vehiclePhysicsModel.body = world->CreateBody(&vehicleBodyDef);
 
         std::vector<std::tuple<Polygon2d, float, int, int>> boundingPolygons {

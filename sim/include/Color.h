@@ -34,6 +34,7 @@ public:
     static Color Brown;
     static Color Pink;
     static Color Gray;
+    static Color DarkGray;
     static Color Olive;
     static Color Cyan;
     static Color Black;

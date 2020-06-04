@@ -62,6 +62,11 @@ public:
      */
     static osg::ref_ptr<osg::Geometry> drawTriangleFan(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);
 
+    /**
+     * Utility method for quickly drawing a grid
+     */
+    static osg::ref_ptr<osg::Geometry> drawGrid(int numCols, int numRows, float cellSize, float z, const osg::Vec4& color);
+
 private:
     /**
      * Common helper method for quickly drawing geometries

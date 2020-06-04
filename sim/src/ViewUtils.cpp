@@ -80,6 +80,41 @@ osg::ref_ptr<osg::Geometry> ViewUtils::drawTriangleFan(osg::ref_ptr<osg::Vec3Arr
 
 
 
+osg::ref_ptr<osg::Geometry> ViewUtils::drawGrid(int numCols, int numRows, float cellSize, float z, const osg::Vec4& color)
+{
+    float width = numCols * cellSize;
+    float height = numRows * cellSize;
+    float minX = (-width/2);
+    float maxX = (width/2);
+    float minY = (-height/2);
+    float maxY = (height/2);
+    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+
+    // Columns
+    for (int i=0; i<numCols+1; i++)
+    {
+        float x = minX + (i*cellSize);
+        float y1 = minY;
+        float y2 = maxY;
+        vertices->push_back({ x, y1, z });
+        vertices->push_back({ x, y2, z });
+    }
+
+    // Rows
+    for (int j=0; j<numRows+1; j++)
+    {
+        float x1 = minX;
+        float x2 = maxX;
+        float y = minY + (j*cellSize);
+        vertices->push_back({ x1, y, z });
+        vertices->push_back({ x2, y, z });
+    }
+
+    return drawGeometry(vertices, color, osg::PrimitiveSet::LINES);
+}
+
+
+
 osg::ref_ptr<osg::Geometry> ViewUtils::drawQuads(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color)
 {
     return drawGeometry(vertices, color, osg::PrimitiveSet::QUADS);

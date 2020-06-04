@@ -9,7 +9,8 @@ std::map<std::string, Color> AbstractDrawer::_colors = {
     { "red", Color::Red },
     { "green", Color::Green },
     { "blue", Color::Blue },
-    { "yellow", Color::Yellow }
+    { "yellow", Color::Yellow },
+    { "darkgray", Color::DarkGray }
 };
 
 
@@ -72,4 +73,49 @@ std::tuple<osg::ref_ptr<osg::Drawable>, osg::ref_ptr<osg::Drawable>> LineDrawer:
     }
 
     return { ViewUtils::drawLineStrip(vertices, _color), text };
+}
+
+
+
+GridDrawer::GridDrawer(const std::string& text, const std::string& color, int numCols, int numRows, float cellSize, const std::vector<bool>& occupancy) :
+        AbstractDrawer(text, color),
+        _numCols(numCols),
+        _numRows(numRows),
+        _cellSize(cellSize),
+        _occupancy(occupancy)
+{
+}
+
+
+
+std::tuple<osg::ref_ptr<osg::Drawable>, osg::ref_ptr<osg::Drawable>> GridDrawer::draw()
+{
+    osg::ref_ptr<osgText::Text> text = new osgText::Text;
+    text->setCharacterSize(0.1);
+    text->setPosition({0, 0, 0.1});
+    text->setText(_text);
+    text->setColor(_color);
+    text->setAutoRotateToScreen(true);
+    text->setFont("/data/fonts/helvetica.ttf");
+
+    osg::ref_ptr<osg::Geometry> grid = ViewUtils::drawGrid(_numCols, _numRows, _cellSize, 0.1, _color);
+
+    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+    for (int i=0; i<_occupancy.size(); i++)
+    {
+        if (_occupancy.at(i))
+        {
+            int col = i / _numRows;
+            int row = i % _numRows;
+            float x = (col - _numCols/2.0) * _cellSize + _cellSize/2;
+            float y = (row - _numRows/2.0) * _cellSize + _cellSize/2;
+            vertices->push_back({ x - _cellSize/2, y - _cellSize/2, 0.1 });
+            vertices->push_back({ x + _cellSize/2, y - _cellSize/2, 0.1 });
+            vertices->push_back({ x + _cellSize/2, y + _cellSize/2, 0.1 });
+            vertices->push_back({ x - _cellSize/2, y + _cellSize/2, 0.1 });
+        }
+    }
+    osg::ref_ptr<osg::Geometry> occupied = ViewUtils::drawQuads(vertices, _color);
+
+    return { grid, occupied };
 }

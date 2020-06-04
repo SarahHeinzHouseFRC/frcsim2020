@@ -14,6 +14,7 @@ Color Color::Purple(148, 103, 189);
 Color Color::Brown(140, 86, 75);
 Color Color::Pink(227, 119, 194);
 Color Color::Gray(127, 127, 127);
+Color Color::DarkGray(40, 40, 40);
 Color Color::Olive(188, 189, 34);
 Color Color::Cyan(23, 190, 207);
 Color Color::Black(0, 0, 0);

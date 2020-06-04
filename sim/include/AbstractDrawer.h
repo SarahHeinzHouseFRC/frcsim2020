@@ -69,6 +69,28 @@ public:
      */
     virtual std::tuple<osg::ref_ptr<osg::Drawable>, osg::ref_ptr<osg::Drawable>> draw();
 
-public:
+private:
     std::vector<std::pair<float, float>> _vertices;
+};
+
+
+
+class GridDrawer : public AbstractDrawer
+{
+public:
+    /**
+     * Constructor
+     */
+     GridDrawer(const std::string& text, const std::string& color, int numCols, int numRows, float cellSize, const std::vector<bool>& occupancy);
+
+    /**
+    * Draw
+    */
+    virtual std::tuple<osg::ref_ptr<osg::Drawable>, osg::ref_ptr<osg::Drawable>> draw();
+
+private:
+    int _numCols;
+    int _numRows;
+    float _cellSize;
+    std::vector<bool> _occupancy;
 };

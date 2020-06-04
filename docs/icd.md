@@ -86,6 +86,15 @@ message sent to the vehicle has the following form:
                 [0.0, 0,0],
                 // Etc.
             ]
+        },
+        {
+            "shape": "grid",
+            "text": "grid1",
+            "color": "yellow",
+            "cols": 20,
+            "rows": 20,
+            "cellSize": 10,
+            "occupancy": [1, 0, 1, 1]
         }
     ]
 }

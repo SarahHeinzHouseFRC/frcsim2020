@@ -124,7 +124,8 @@ struct CoreCommands
         const Value& draw = d["draw"];
         for (auto itr = draw.Begin(); itr != draw.End(); itr++)
         {
-            if (std::string((*itr)["shape"].GetString()) == "box")
+            std::string shape = (*itr)["shape"].GetString();
+            if (shape == "box")
             {
                 auto text = (*itr)["text"].GetString();
                 auto color = (*itr)["color"].GetString();
@@ -135,8 +136,10 @@ struct CoreCommands
                 std::shared_ptr<AbstractDrawer> box = std::make_shared<BoxDrawer>(text, color, x, y, width, height);
                 drawers.push_back(box);
             }
-            else if (std::string((*itr)["shape"].GetString()) == "line")
+            else if (shape == "line")
             {
+                auto text = (*itr)["text"].GetString();
+                auto color = (*itr)["color"].GetString();
                 std::vector<std::pair<float, float>> vertices;
                 const Value& v = (*itr)["vertices"];
                 for (auto itr2 = v.Begin(); itr2 != v.End(); itr2++)
@@ -145,10 +148,25 @@ struct CoreCommands
                     float y = (*itr2)[1].GetFloat();
                     vertices.emplace_back(x, y);
                 }
-                auto text = (*itr)["text"].GetString();
-                auto color = (*itr)["color"].GetString();
                 std::shared_ptr<AbstractDrawer> line = std::make_shared<LineDrawer>(text, color, vertices);
                 drawers.push_back(line);
+            }
+            else if (shape == "grid")
+            {
+                auto text = (*itr)["text"].GetString();
+                auto color = (*itr)["color"].GetString();
+                auto cols = (*itr)["cols"].GetFloat();
+                auto rows = (*itr)["rows"].GetFloat();
+                auto cellSize = (*itr)["cellSize"].GetFloat();
+                const Value& v = (*itr)["occupancy"];
+                std::vector<bool> occupancy;
+                for (auto it = v.Begin(); it != v.End(); it++)
+                {
+                    int o = it->GetInt();
+                    occupancy.push_back(o);
+                }
+                std::shared_ptr<AbstractDrawer> grid = std::make_shared<GridDrawer>(text, color, cols, rows, cellSize, occupancy);
+                drawers.push_back(grid);
             }
         }
     }

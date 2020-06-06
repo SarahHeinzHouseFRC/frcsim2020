@@ -484,6 +484,12 @@ std::vector<VehiclePhysicsModel> PhysicsEngine::initVehiclePhysicsModels(b2World
             vehiclePhysicsModel.body->CreateFixture(&vehicleFixtureDef);
         }
 
+        // Set center of mass to (0, 0) so vehicles rotate about center
+        b2MassData d;
+        vehiclePhysicsModel.body->GetMassData(&d);
+        d.center = { 0, 0 };
+        vehiclePhysicsModel.body->SetMassData(&d);
+
         // Add user data
         vehiclePhysicsModel.body->SetUserData((void*) &vehicleModel);
 

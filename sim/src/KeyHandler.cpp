@@ -5,7 +5,7 @@
 #include "KeyHandler.h"
 
 
-KeyHandler::KeyHandler() : _showLidar(true)
+KeyHandler::KeyHandler() : _showLidar(true), _reset(false)
 {
 
 }
@@ -20,6 +20,10 @@ bool KeyHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapte
         {
             case osgGA::GUIEventAdapter::KEY_L:
                 _showLidar = !_showLidar;
+                return true;
+
+            case osgGA::GUIEventAdapter::KEY_R:
+                _reset = true;
                 return true;
 
             default:

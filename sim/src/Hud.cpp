@@ -125,6 +125,7 @@ Hud::Hud(const ConfigReader& config, int playerId) : _width(225)
     std::vector<std::string> hotKeys = {
             "[L] Toggle LIDAR rays",
             "[F] Toggle full screen",
+            "[R] Reset",
             "[S] Toggle stats",
             "[Space] Reset view"
     };

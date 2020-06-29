@@ -24,6 +24,17 @@ public:
      */
     bool showLidar() { return _showLidar; }
 
+    /**
+     * Whether or not to reset the world
+     */
+    bool reset() { return _reset; }
+
+    /**
+     * Resets all flags to initial values
+     */
+    void resetFlags() { _reset = false; }
+
 private:
     bool _showLidar;
+    bool _reset;
 };

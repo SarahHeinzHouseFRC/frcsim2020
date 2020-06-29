@@ -164,6 +164,8 @@ int main(int argc, char** argv)
         {
             if (headless) { break; }
 
+            reset |= k->reset();
+
             m2.lock();
             SimState s = wm.getSimState();
             m2.unlock();
@@ -209,6 +211,7 @@ int main(int argc, char** argv)
             wm.reset();
             timer.reset();
             reset = false;
+            k->resetFlags();
         }
     }
 

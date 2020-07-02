@@ -52,14 +52,11 @@ struct SensorState
         writer.StartArray();
         for (const auto& p : lidarPoints)
         {
-            writer.StartObject();
-            writer.Key("azimuth");
+            writer.StartArray();
             writer.Double(p.azimuth);
-            writer.Key("elevation");
             writer.Double(p.elevation);
-            writer.Key("range");
             writer.Double(p.range);
-            writer.EndObject();
+            writer.EndArray();
         }
         writer.EndArray();
         writer.EndObject();
@@ -240,14 +237,11 @@ struct SimState
             writer.StartArray();
             for (const auto& p : v.lidarPoints)
             {
-                writer.StartObject();
-                writer.Key("azimuth");
+                writer.StartArray();
                 writer.Double(p.azimuth);
-                writer.Key("elevation");
                 writer.Double(p.elevation);
-                writer.Key("range");
                 writer.Double(p.range);
-                writer.EndObject();
+                writer.EndArray();
             }
             writer.EndArray();
             writer.EndObject();
@@ -258,12 +252,12 @@ struct SimState
         for (const auto& g : gamePieces)
         {
             writer.StartObject();
-            writer.Key("x");
+            writer.Key("position");
+            writer.StartArray();
             writer.Double(g.x);
-            writer.Key("y");
             writer.Double(g.y);
-            writer.Key("z");
             writer.Double(g.z);
+            writer.EndArray();
             writer.Key("ingestionState");
             writer.Int(g.ingestionState);
             writer.EndObject();
@@ -311,9 +305,9 @@ struct SimState
             for (auto itr2 = s.Begin(); itr2 != s.End(); itr2++)
             {
                 LidarPoint p{};
-                p.azimuth = (*itr2)["azimuth"].GetFloat();
-                p.elevation = (*itr2)["elevation"].GetFloat();
-                p.range = (*itr2)["range"].GetFloat();
+                p.azimuth = (*itr2)[0].GetFloat();
+                p.elevation = (*itr2)[1].GetFloat();
+                p.range = (*itr2)[2].GetFloat();
                 lidarPoints.push_back(p);
             }
             vehicle.lidarPoints = lidarPoints;
@@ -324,9 +318,9 @@ struct SimState
         for (auto itr = g.Begin(); itr != g.End(); ++itr)
         {
             GamePieceState gamePiece{};
-            gamePiece.x = (*itr)["x"].GetFloat();
-            gamePiece.y = (*itr)["y"].GetFloat();
-            gamePiece.z = (*itr)["z"].GetFloat();
+            gamePiece.x = (*itr)["position"][0].GetFloat();
+            gamePiece.y = (*itr)["position"][1].GetFloat();
+            gamePiece.z = (*itr)["position"][2].GetFloat();
             gamePiece.ingestionState = (*itr)["ingestionState"].GetFloat();
             gamePieces.push_back(gamePiece);
         }

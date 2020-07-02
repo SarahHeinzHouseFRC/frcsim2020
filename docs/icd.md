@@ -83,11 +83,11 @@ following form:
     "rightDriveEncoder": 0,   // Right drive encoder ticks (0 - 1024)
     "numIngestedBalls": 0,    // Number of ingested balls (0+)
     "lidarPoints": [          // LIDAR points
-        {
-            "azimuth": 0.0,   // Point in sensor frame azimuth (rads 0 - 2pi)
-            "elevation": 0.0, // Point in sensor frame elevation (rads 0)
-            "range": 0.0      // Point in sensor frame range (meters)
-        },
+        [
+            0.0,              // Point in sensor frame azimuth (rads 0 - 2pi)
+            0.0,              // Point in sensor frame elevation (rads 0)
+            0.0               // Point in sensor frame range (meters)
+        ],
         // Etc.
     ]
 }
@@ -116,22 +116,20 @@ following form:
             "tubeMotorSpeed": 0.0,         // Tube motor speed (rads/sec)
             "leftDriveMotorSpeed": 0.0,    // Left drive motor speed (rads/sec)
             "rightDriveMotorSpeed": 0.0,   // Right drive motor speed (rads/sec)
-            "lidarSweep": [
-                {
-                    "azimuth": 0.0,        // Azimuth (0 - 2pi rads)
-                    "elevation": 0.0,      // Elevation (0)
-                    "range": 0.0           // Range (meters)
-                },
+            "lidarPoints": [
+                [
+                    0.0,                   // Point in sensor frame azimuth (rads 0 - 2pi)
+                    0.0,                   // Point in sensor frame elevation (rads 0)
+                    0.0                    // Point in sensor frame range (meters)
+                ],
                 // Etc.
             ]
         }
     ],
     "gamePieces": [
         {
-            "x": 0.0,                      // Game piece position (meters)
-            "y": 0.0,                      // Game piece position (meters)
-            "z": 0.0,                      // Game piece position (meters)
-            "ingestionState": 0            // 0,1,2,3
+            "position": [0.0, 0.0, 0.0],   // [x, y, z] (meters)
+            "ingestionState": 0            // 0, 1, 2, or 3
         },
         // Etc.
     ]

@@ -10,7 +10,11 @@ package com.sharprobotics.core;
  */
 public class SimState
 {
-    public int leftDriveEncoder; // Integer from 0-1024
-    public int rightDriveEncoder; // Integer from 0-1024
-    public LidarPoint[] lidarSweep; // LIDAR sweep
+    public float x; // Position (meters)
+    public float y; // Position (meters)
+    public float theta; // Position (radians)
+    public int leftDriveEncoder; // Ticks (0-1023)
+    public int rightDriveEncoder; // Ticks (0-1023)
+    public int numIngestedBalls; // 0+
+    public float[][] lidarPoints; // LIDAR points
 }

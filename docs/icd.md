@@ -82,7 +82,7 @@ following form:
     "leftDriveEncoder": 0,    // Left drive encoder ticks (0 - 1024)
     "rightDriveEncoder": 0,   // Right drive encoder ticks (0 - 1024)
     "numIngestedBalls": 0,    // Number of ingested balls (0+)
-    "lidarSweep": [           // LIDAR sweep
+    "lidarPoints": [          // LIDAR points
         {
             "azimuth": 0.0,   // Point in sensor frame azimuth (rads 0 - 2pi)
             "elevation": 0.0, // Point in sensor frame elevation (rads 0)

@@ -53,14 +53,11 @@ PhysicsEngine::PhysicsEngine(const ConfigReader& config,
     // Add collision listener
     _world->SetContactListener(new CollisionListener);
 
-    // Create LIDAR with ray casts
-    _lidar = std::make_unique<PhysicsEngineLidar>(_world.get(), config);
-
     // Field static bodies
     initFieldBodies(_world.get(), config, fieldModel);
 
     // Vehicle dynamic bodies
-    _vehiclePhysicsModels = initVehiclePhysicsModels(_world.get(), config, vehicleModels);
+    _vehiclePhysicsModels = initVehiclePhysicsModels(_world.get(), config, timestamp, vehicleModels);
 
     // Game piece dynamic bodies
     _gamePieceBodies = initGamePieceBodies(_world.get(), gamePieceModels);
@@ -309,7 +306,8 @@ void PhysicsEngine::update(FieldModel& fieldModel, std::vector<VehicleModel>& ve
         if (vehicleModels.at(i)._hasLidar)
         {
             b2Transform vehicleTf = _vehiclePhysicsModels.at(i).body->GetTransform();
-            vehicleModels.at(i)._state.lidarSweep = _lidar->sweep(vehicleTf);
+            auto newSweep = _vehiclePhysicsModels.at(i).lidar->sweep(vehicleTf, currTimestamp);
+            vehicleModels.at(i)._state.lidarPoints.insert(vehicleModels.at(i)._state.lidarPoints.end(), newSweep.begin(), newSweep.end());
         }
     }
 
@@ -411,13 +409,15 @@ void PhysicsEngine::initFieldBodies(b2World* world, const ConfigReader& config, 
 
 
 
-std::vector<VehiclePhysicsModel> PhysicsEngine::initVehiclePhysicsModels(b2World* world, const ConfigReader& config, const std::vector<VehicleModel>& vehicleModels)
+std::vector<VehiclePhysicsModel> PhysicsEngine::initVehiclePhysicsModels(b2World* world, const ConfigReader& config, double timestamp, const std::vector<VehicleModel>& vehicleModels)
 {
-    std::vector<VehiclePhysicsModel> vehiclePhysicsModels;
+    std::vector<VehiclePhysicsModel> vehiclePhysicsModels{};
 
     for (const auto& vehicleModel : vehicleModels)
     {
+        // Create LIDAR with ray casts
         VehiclePhysicsModel vehiclePhysicsModel;
+        vehiclePhysicsModel.lidar = std::make_unique<PhysicsEngineLidar>(world, timestamp, config);
 
         // Define the dynamic body. We set its position and call the body factory.
         b2BodyDef vehicleBodyDef;
@@ -496,7 +496,7 @@ std::vector<VehiclePhysicsModel> PhysicsEngine::initVehiclePhysicsModels(b2World
         // Add user data
         vehiclePhysicsModel.body->SetUserData((void*) &vehicleModel);
 
-        vehiclePhysicsModels.push_back(vehiclePhysicsModel);
+        vehiclePhysicsModels.push_back(std::move(vehiclePhysicsModel));
     }
 
     return vehiclePhysicsModels;

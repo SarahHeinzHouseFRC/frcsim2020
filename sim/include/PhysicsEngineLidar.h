@@ -21,12 +21,12 @@ public:
     /**
      * Constructor
      */
-    PhysicsEngineLidar(b2World* world, const ConfigReader& config);
+    PhysicsEngineLidar(b2World* world, double timestamp, const ConfigReader& config);
 
     /**
      * Performs one sweep of the LIDAR from the given vehicle pose
      */
-    std::vector<LidarPoint> sweep(const b2Transform &pose);
+    std::vector<LidarPoint> sweep(const b2Transform &pose, double timestamp);
 
 private:
     class LidarRayCastCallback : public b2RayCastCallback
@@ -60,8 +60,11 @@ private:
         float _fraction;
     };
 
+    double _prevTimestamp;
+    double _azimuth; // Rads
+    float _laserFrequency; // Hz
+    float _motorFrequency; // Hz
     b2World* _world; // Non-owning pointer to world
     float _minRange;
     float _maxRange;
-    float _numRaysPerSweep;
 };

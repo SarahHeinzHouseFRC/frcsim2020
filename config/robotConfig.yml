@@ -3,7 +3,7 @@
 
 players:
   - { team: "3260", alliance: "Blue", initialPosition: { x: 0.0, y: -197.0, theta: 90.0 }, hasLidar: true }  # Player 1
-  - { team: "1234", alliance: "Red", initialPosition: { x: 0.0, y: 197.0, theta: -90.0 }, hasLidar: false }  # Player 2
+  - { team: "1234", alliance: "Red", initialPosition: { x: 0.0, y: 197.0, theta: -90.0 }, hasLidar: true }  # Player 2
   - { team: "234", alliance: "Blue", initialPosition: { x: 60.0, y: -197.0, theta: 90.0 }, hasLidar: false } # Player 3
   - { team: "34", alliance: "Red", initialPosition: { x: -60.0, y: 197.0, theta: -90.0 }, hasLidar: false }  # Player 4
   - { team: "41", alliance: "Blue", initialPosition: { x: -60.0, y: -197.0, theta: 90.0 }, hasLidar: false } # Player 5

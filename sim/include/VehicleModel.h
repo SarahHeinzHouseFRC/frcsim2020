@@ -54,6 +54,11 @@ public:
     void reset();
 
     /**
+     * Clears all LIDAR points. Called once all points have been tx'd
+     */
+    void clearLidarPoints() { _state.lidarPoints.clear(); }
+
+    /**
      * Returns the model type
      */
     virtual ModelType modelType() { return VEHICLE_MODEL; }
@@ -121,13 +126,13 @@ private:
 
     struct VehicleState
     {
-        double x;                           // Meters
-        double y;                           // Meters
-        double theta;                       // Rads
-        double vx;                          // Meters/sec
-        double vy;                          // Meters/sec
-        double omega;                       // Rads/sec
-        int numIngestedBalls;               // Number of balls in tube
-        std::vector<LidarPoint> lidarSweep; // Current LIDAR sweep
+        double x;                            // Meters
+        double y;                            // Meters
+        double theta;                        // Rads
+        double vx;                           // Meters/sec
+        double vy;                           // Meters/sec
+        double omega;                        // Rads/sec
+        int numIngestedBalls;                // Number of balls in tube
+        std::vector<LidarPoint> lidarPoints; // LIDAR points
     } _state;
 };

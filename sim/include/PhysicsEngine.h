@@ -8,6 +8,7 @@
 #include "FieldModel.h"
 #include "VehicleModel.h"
 #include "GamePieceModel.h"
+#include "ConfigReader.h"
 #include "PhysicsEngineLidar.h"
 
 
@@ -22,6 +23,7 @@ struct VehiclePhysicsModel
     std::vector<b2Body*> ingestibleLeftGamePieceBodies; // Game pieces in the left ingestible region
     std::vector<b2Body*> ingestibleRightGamePieceBodies; // Game pieces in the right ingestible region
     std::vector<b2Body*> tubeGamePieceBodies; // Game pieces in the tube region
+    std::unique_ptr<PhysicsEngineLidar> lidar; // Lidar sensor
 };
 
 
@@ -109,7 +111,7 @@ private:
     /**
      * Initializes vehicle body from vehicle model
      */
-    std::vector<VehiclePhysicsModel> initVehiclePhysicsModels(b2World* world, const ConfigReader& config, const std::vector<VehicleModel>& vehicleModels);
+    std::vector<VehiclePhysicsModel> initVehiclePhysicsModels(b2World* world, const ConfigReader& config, double timestamp, const std::vector<VehicleModel>& vehicleModels);
 
     /**
      * Initializes all game pieces from their models
@@ -131,5 +133,4 @@ private:
     float _muGamePiece;
     int _blueOuttaken; // Count of how many balls have been outtaken from blue goal (so we can calculate score)
     int _redOuttaken; // Count of how many balls have been outtaken from red goal (so we can calculate score)
-    std::unique_ptr<PhysicsEngineLidar> _lidar;
 };

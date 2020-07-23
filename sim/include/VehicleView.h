@@ -79,4 +79,5 @@ private:
     float _motorFrequency;
     float _gamePieceRadius;
     float _bodyZ;
+    double _prevAzimuth;
 };

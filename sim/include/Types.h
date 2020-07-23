@@ -19,13 +19,13 @@ struct LidarPoint
 
 struct SensorState
 {
-    float x;                            // Meters
-    float y;                            // Meters
-    float theta;                        // Radians
-    int leftDriveEncoder;               // 0-1023
-    int rightDriveEncoder;              // 0-1023
-    int numIngestedBalls;               // 0+
-    std::vector<LidarPoint> lidarSweep; // LIDAR points
+    float x;                             // Meters
+    float y;                             // Meters
+    float theta;                         // Radians
+    int leftDriveEncoder;                // 0-1023
+    int rightDriveEncoder;               // 0-1023
+    int numIngestedBalls;                // 0+
+    std::vector<LidarPoint> lidarPoints; // LIDAR points
 
     /**
      * Returns the sensor state as a JSON string
@@ -48,9 +48,9 @@ struct SensorState
         writer.Int(rightDriveEncoder);
         writer.Key("numIngestedBalls");
         writer.Int(numIngestedBalls);
-        writer.Key("lidarSweep");
+        writer.Key("lidarPoints");
         writer.StartArray();
-        for (const auto& p : lidarSweep)
+        for (const auto& p : lidarPoints)
         {
             writer.StartObject();
             writer.Key("azimuth");
@@ -77,7 +77,7 @@ struct SensorState
         leftDriveEncoder = 0;
         rightDriveEncoder = 0;
         numIngestedBalls = 0;
-        lidarSweep.clear();
+        lidarPoints.clear();
     }
 };
 
@@ -144,18 +144,18 @@ struct SimState
 {
     struct VehicleState
     {
-        std::string team;                   // Team number
-        std::string alliance;               // "Blue" or "Red"
-        float x;                            // Meters
-        float y;                            // Meters
-        float theta;                        // Radians
-        float intakeCenterMotorSpeed;       // Meters/sec
-        float intakeLeftMotorSpeed;         // Meters/sec
-        float intakeRightMotorSpeed;        // Meters/sec
-        float tubeMotorSpeed;               // Meters/sec
-        float leftDriveMotorSpeed;          // Rads/sec
-        float rightDriveMotorSpeed;         // Rads/sec
-        std::vector<LidarPoint> lidarSweep; // LIDAR points
+        std::string team;                    // Team number
+        std::string alliance;                // "Blue" or "Red"
+        float x;                             // Meters
+        float y;                             // Meters
+        float theta;                         // Radians
+        float intakeCenterMotorSpeed;        // Meters/sec
+        float intakeLeftMotorSpeed;          // Meters/sec
+        float intakeRightMotorSpeed;         // Meters/sec
+        float tubeMotorSpeed;                // Meters/sec
+        float leftDriveMotorSpeed;           // Rads/sec
+        float rightDriveMotorSpeed;          // Rads/sec
+        std::vector<LidarPoint> lidarPoints; // LIDAR points
     };
 
     struct FieldState
@@ -236,9 +236,9 @@ struct SimState
             writer.Double(v.leftDriveMotorSpeed);
             writer.Key("rightDriveMotorSpeed");
             writer.Double(v.rightDriveMotorSpeed);
-            writer.Key("lidarSweep");
+            writer.Key("lidarPoints");
             writer.StartArray();
-            for (const auto& p : v.lidarSweep)
+            for (const auto& p : v.lidarPoints)
             {
                 writer.StartObject();
                 writer.Key("azimuth");
@@ -306,17 +306,17 @@ struct SimState
             vehicle.tubeMotorSpeed = (*itr)["tubeMotorSpeed"].GetFloat();
             vehicle.leftDriveMotorSpeed = (*itr)["leftDriveMotorSpeed"].GetFloat();
             vehicle.rightDriveMotorSpeed = (*itr)["rightDriveMotorSpeed"].GetFloat();
-            const Value& s = (*itr)["lidarSweep"];
-            std::vector<LidarPoint> lidarSweep;
+            const Value& s = (*itr)["lidarPoints"];
+            std::vector<LidarPoint> lidarPoints;
             for (auto itr2 = s.Begin(); itr2 != s.End(); itr2++)
             {
                 LidarPoint p{};
                 p.azimuth = (*itr2)["azimuth"].GetFloat();
                 p.elevation = (*itr2)["elevation"].GetFloat();
                 p.range = (*itr2)["range"].GetFloat();
-                lidarSweep.push_back(p);
+                lidarPoints.push_back(p);
             }
-            vehicle.lidarSweep = lidarSweep;
+            vehicle.lidarPoints = lidarPoints;
             vehicles.push_back(vehicle);
         }
 

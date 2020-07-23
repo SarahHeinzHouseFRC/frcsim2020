@@ -123,8 +123,7 @@ int main(int argc, char** argv)
         }
     });
 
-    std::mutex m1;
-    std::mutex m2;
+    std::mutex m; // Prevent reading params from the world model while they're being written to
 
     // Launch tx comms in background thread
     std::thread txThread([&]()
@@ -134,16 +133,16 @@ int main(int argc, char** argv)
             for (int i=0; i<coreAgents.size(); i++)
             {
                 CoreAgent& coreAgent = coreAgents.at(i);
-                m1.lock();
+                m.lock();
                 SensorState s = wm.vehicleModel(i).getSensorState();
                 coreAgent.setSensorState(s);
-                m1.unlock();
+                m.unlock();
                 coreAgent.txSensorState();
             }
 
-            m2.lock();
+            m.lock();
             SimState s = wm.getSimState();
-            m2.unlock();
+            m.unlock();
             s.isTimerRunning = timer.isRunning();
             s.timer = timer.getValue();
 
@@ -152,6 +151,13 @@ int main(int argc, char** argv)
                 SimViewAgent& simViewAgent = simViewAgents.at(i);
                 simViewAgent.setSimState(s);
                 simViewAgent.txSimState();
+            }
+
+            for (int i=0; i<config.players.size(); i++)
+            {
+                m.lock();
+                wm.vehicleModel(i).clearLidarPoints();
+                m.unlock();
             }
 
             usleep(1e4);
@@ -166,9 +172,9 @@ int main(int argc, char** argv)
 
             reset |= k->reset();
 
-            m2.lock();
+            m.lock();
             SimState s = wm.getSimState();
-            m2.unlock();
+            m.unlock();
             s.isTimerRunning = timer.isRunning();
             s.timer = timer.getValue();
 
@@ -200,11 +206,9 @@ int main(int argc, char** argv)
         timer.update(t);
 
         // Update the world to reflect the current time
-        m1.lock();
-        m2.lock();
+        m.lock();
         wm.update(t);
-        m1.unlock();
-        m2.unlock();
+        m.unlock();
 
         if (reset)
         {
@@ -213,6 +217,8 @@ int main(int argc, char** argv)
             reset = false;
             k->resetFlags();
         }
+
+        usleep(1e4);
     }
 
     rxThread.join();

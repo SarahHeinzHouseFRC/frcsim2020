@@ -5,13 +5,13 @@
 #include <osgDB/ReadFile>
 #include <osgText/Text>
 #include <iostream>
-#include <ConfigReader.h>
 #include "VehicleView.h"
 #include "ViewUtils.h"
 #include "Color.h"
 
 
 VehicleView::VehicleView(const ConfigReader& config, int playerId) :
+        _prevAzimuth(0),
         _wheelRadius(config.sim.vehicle.drivetrain.wheelRadius),
         _ballRadius(config.sim.gamePiece.radius),
         _bodyZ(-config.sim.vehicle.drivetrain.wheelRadius + config.sim.gamePiece.radius),
@@ -85,12 +85,12 @@ void VehicleView::update(const SimState::VehicleState& state, bool showLidar)
     }
 
     // Update LIDAR sweep
-    if (showLidar && !state.lidarSweep.empty())
+    if (showLidar && !state.lidarPoints.empty())
     {
         osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
         double nearRange = _lidarNearRange;
         double z = -_wheelRadius + _ballRadius;
-        for (const auto& p : state.lidarSweep)
+        for (const auto& p : state.lidarPoints)
         {
             if (p.range > 0)
             {

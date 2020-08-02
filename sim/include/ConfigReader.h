@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_CONFIGREADER_H
-#define ROBOT_SIM_CONFIGREADER_H
+#pragma once
 
 #include <string>
 #include <yaml-cpp/yaml.h>
@@ -41,6 +40,7 @@ public:
         std::string team;     // Team number
         std::string alliance; // "Blue" or "Red"
         Pose initialPosition; // Initial pose
+        bool hasLidar;        // Has LIDAR or not
     };
 
     std::vector<Player> players; // List of all possible players
@@ -60,17 +60,25 @@ public:
         } comms;
         struct
         {
-            std::string fieldModelFile;     // Path
-            std::string vehicleModelFile;   // Path
-            std::string gamePieceModelFile; // Path
-            std::string fontFile;           // Path
+            std::string fieldModelFile;       // Path
+            std::string vehicleBlueModelFile; // Path
+            std::string vehicleRedModelFile;  // Path
+            std::string gamePieceModelFile;   // Path
+            std::string fontFile;             // Path
         } assets;
         struct
         {
-            Geometry::Polygon2d exteriorPolygon;
-            std::vector<Geometry::Polygon2d> interiorPolygons;
-            Geometry::Polygon2d blueGoalPolygon;
-            Geometry::Polygon2d redGoalPolygon;
+            Geometry::Polygon2d exteriorWall;
+            Geometry::Polygon2d rightTrenchRightWall;
+            Geometry::Polygon2d rightTrenchLeftWall;
+            Geometry::Polygon2d leftTrenchRightWall;
+            Geometry::Polygon2d leftTrenchLeftWall;
+            Geometry::Polygon2d rightColumn;
+            Geometry::Polygon2d topColumn;
+            Geometry::Polygon2d leftColumn;
+            Geometry::Polygon2d bottomColumn;
+            Geometry::Polygon2d blueGoalRegion;
+            Geometry::Polygon2d redGoalRegion;
             Geometry::Vertex2d blueOuttake;
             Geometry::Vertex2d redOuttake;
         } field;
@@ -93,14 +101,10 @@ public:
             float mass;                                                      // Kilograms
             struct
             {
-                float width;              // Meters
-                float depth;              // Meters
-                float widthChannel;       // Meters
-                float heightChannel;      // Meters
+                float wheelBase;          // Meters
+                float wheelTrack;         // Meters
                 float wheelRadius;        // Meters
                 float wheelWidth;         // Meters
-                float wheelBase;          // Meters
-                float wheelTrack;         // Meters (derived value)
                 float leftMotorMaxSpeed;  // Rads/sec
                 float rightMotorMaxSpeed; // Rads/sec
             } drivetrain;
@@ -111,6 +115,13 @@ public:
                 float rightMotorMaxSpeed;  // Rads/sec
                 float tubeMotorMaxSpeed;   // Rads/sec
             } intake;
+            struct
+            {
+                float minRange;       // Meters
+                float maxRange;       // Meters
+                float laserFrequency; // Hertz
+                float motorFrequency; // Hertz
+            } lidar;
         } vehicle;
         struct
         {
@@ -183,6 +194,3 @@ private:
      */
     static Geometry::Vertex2d parseVertex(const YAML::Node& node);
 };
-
-
-#endif //ROBOT_SIM_CONFIGREADER_H

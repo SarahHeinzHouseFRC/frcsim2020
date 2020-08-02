@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_VISUALIZER_H
-#define ROBOT_SIM_VISUALIZER_H
+#pragma once
 
 
 #include <osgViewer/Viewer>
@@ -38,6 +37,11 @@ public:
      */
     bool done() const { return _viewer.done(); }
 
+    /**
+     * Adds an event handler
+     */
+    void addEventHandler(osg::ref_ptr<osgGA::EventHandler> e) { _viewer.addEventHandler(e); }
+
 private:
     osgViewer::Viewer _viewer;
     osg::ref_ptr<osgGA::KeySwitchMatrixManipulator> _keySwitchManipulator;
@@ -46,6 +50,3 @@ private:
     Scene& _scene;
     Hud& _hud;
 };
-
-
-#endif //ROBOT_SIM_VISUALIZER_H

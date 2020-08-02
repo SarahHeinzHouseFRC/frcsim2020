@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_GAMEPIECEVIEW_H
-#define ROBOT_SIM_GAMEPIECEVIEW_H
+#pragma once
 
 #include <osg/PositionAttitudeTransform>
 #include "ConfigReader.h"
@@ -33,6 +32,3 @@ private:
     osg::ref_ptr<osg::ShapeDrawable> _shape;
     float _radius;
 };
-
-
-#endif //ROBOT_SIM_GAMEPIECEVIEW_H

@@ -5,14 +5,16 @@
 #include <string>
 #include "SimAgent.h"
 
-#define NUM_ALLOWABLE_DROPPED_PACKETS 50000
+/** Connection timeout in seconds */
+#define CONNECTED_TIMEOUT 0.5
 
 
 SimAgent::SimAgent(const ConfigReader& config) :
-        _numDroppedPackets(0), _verbose(config.verbose)
-{
-    _comms = std::make_unique<UdpNode>(config.simView.port, config.sim.comms.ip, config.sim.comms.simViewPort);
+        AbstractAgent(config.simView.port, config.sim.comms.ip, config.sim.comms.simViewPort),
+        _simState{},
+        _verbose(config.verbose)
 
+{
     std::cout << "Rx from sim at " << config.simView.ip << ":" << config.simView.port << std::endl;
     std::cout << "Tx to sim at " << config.sim.comms.ip << ":" << config.sim.comms.simViewPort << std::endl;
 }
@@ -34,36 +36,32 @@ void SimAgent::txHeartbeat()
 
 
 
-bool SimAgent::rxSimState()
+SimState SimAgent::rxSimState()
 {
     std::string msg = _comms->receive();
     if (msg.length() > 0 && msg[0] == '{')
     {
+        _connected = true;
+
         if (_verbose)
         {
             printf("SimAgent: Received command %s\n", msg.c_str());
         }
 
         // Translate received commands from JSON and store into _simState
-        std::lock_guard<std::mutex> lockGuard(_m);
         _simState.fromJson(msg);
 
-        // Reset dropped packets count
-        _numDroppedPackets = 0;
-
-        return true;
+        // Save time of last rx
+        _prevRxTime = getCurrentTime();
     }
     else
     {
-        _numDroppedPackets++;
-        return false;
+        if (getCurrentTime() - _prevRxTime > CONNECTED_TIMEOUT)
+        {
+            _connected = false;
+            _simState.clear();
+        }
     }
-}
 
-
-
-bool SimAgent::isConnected() const
-{
-    // As long as we've heard from the controls <= 100 packets ago, we're still connected
-    return _numDroppedPackets < NUM_ALLOWABLE_DROPPED_PACKETS;
+    return _simState;
 }

@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_TIMER_H
-#define ROBOT_SIM_TIMER_H
+#pragma once
 
 
 class Timer
@@ -66,6 +65,3 @@ private:
     double _countdownTime;
     double _countdownFrom;
 };
-
-
-#endif //ROBOT_SIM_TIMER_H

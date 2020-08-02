@@ -4,11 +4,13 @@
 
 #include <iostream>
 #include <thread>
+#include <mutex>
 #include "ArgumentParser.h"
 #include "ConfigReader.h"
 #include "Scene.h"
 #include "Hud.h"
 #include "Visualizer.h"
+#include "KeyHandler.h"
 #include "SimAgent.h"
 
 #define DEFAULT_CONFIG_FILE "../../config/robotConfig.yml"
@@ -66,6 +68,11 @@ int main(int argc, char** argv)
 
     // Visualize the scene
     Visualizer vis(scene, hud, playerId);
+    osg::ref_ptr<KeyHandler> k = new KeyHandler;
+    vis.addEventHandler(k);
+
+    std::mutex m;
+    SimState state;
 
     // Launch rx comms in background thread
     std::thread rxThread([&]()
@@ -73,7 +80,8 @@ int main(int argc, char** argv)
         while (!vis.done())
         {
             // Receive commands
-            bool rx = simAgent.rxSimState();
+            std::lock_guard<std::mutex> lock(m);
+            state = simAgent.rxSimState();
         }
     });
 
@@ -93,15 +101,16 @@ int main(int argc, char** argv)
     {
         while (!vis.done())
         {
+            m.lock();
             // Update the vehicle and field visualizations based on their models
-            SimState state = simAgent.getSimState();
-            scene.update(state);
+            scene.update(state, k->showLidar());
 
             // Update the hud
             hud.displayConnectionStatus(simAgent.isConnected(), playerId);
             hud.displayTimerStatus(state.isTimerRunning, state.timer);
             hud.displayFieldScore(state.blueScore, state.redScore);
             hud.displayVehicleState(state, playerId);
+            m.unlock();
 
             // Step the visualizer
             vis.step();

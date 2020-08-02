@@ -2,37 +2,65 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_TYPES_H
-#define ROBOT_SIM_TYPES_H
+#pragma once
 
 #include <string>
 #include "rapidjson/document.h"
-#include "rapidjson/prettywriter.h"
+#include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+
+
+struct LidarPoint
+{
+    double azimuth, elevation, range;
+};
+
 
 
 struct SensorState
 {
-    int leftDriveEncoder;  // 0-1023
-    int rightDriveEncoder; // 0-1023
-    int elevatorEncoder;   // 0-1023
+    float x;                             // Meters
+    float y;                             // Meters
+    float theta;                         // Radians
+    int leftDriveEncoder;                // 0-1023
+    int rightDriveEncoder;               // 0-1023
+    int numIngestedBalls;                // 0+
+    std::vector<LidarPoint> lidarPoints; // LIDAR points
 
     /**
      * Returns the sensor state as a JSON string
      */
     std::string toJson()
     {
-        const char msg[] = R"({ "leftDriveEncoder": 0, "rightDriveEncoder": 0, "elevatorEncoder": 0 })";
-        rapidjson::Document d;
-        d.Parse(msg);
-        d["leftDriveEncoder"] = leftDriveEncoder;
-        d["rightDriveEncoder"] = rightDriveEncoder;
-        d["elevatorEncoder"] = elevatorEncoder;
+        rapidjson::StringBuffer s;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(s);
 
-        rapidjson::StringBuffer sb;
-        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-        d.Accept(writer);
-        return sb.GetString();
+        writer.StartObject();
+        writer.Key("x");
+        writer.Double(x);
+        writer.Key("y");
+        writer.Double(y);
+        writer.Key("theta");
+        writer.Double(theta);
+        writer.Key("leftDriveEncoder");
+        writer.Int(leftDriveEncoder);
+        writer.Key("rightDriveEncoder");
+        writer.Int(rightDriveEncoder);
+        writer.Key("numIngestedBalls");
+        writer.Int(numIngestedBalls);
+        writer.Key("lidarPoints");
+        writer.StartArray();
+        for (const auto& p : lidarPoints)
+        {
+            writer.StartArray();
+            writer.Double(p.azimuth);
+            writer.Double(p.elevation);
+            writer.Double(p.range);
+            writer.EndArray();
+        }
+        writer.EndArray();
+        writer.EndObject();
+        return s.GetString();
     }
 
     /**
@@ -40,9 +68,13 @@ struct SensorState
      */
     void clear()
     {
+        x = 0;
+        y = 0;
+        theta = 0;
         leftDriveEncoder = 0;
         rightDriveEncoder = 0;
-        elevatorEncoder = 0;
+        numIngestedBalls = 0;
+        lidarPoints.clear();
     }
 };
 
@@ -109,17 +141,18 @@ struct SimState
 {
     struct VehicleState
     {
-        std::string team;             // Team number
-        std::string alliance;         // "Blue" or "Red"
-        float x;                      // Meters
-        float y;                      // Meters
-        float theta;                  // Radians
-        float intakeCenterMotorSpeed; // Meters/sec
-        float intakeLeftMotorSpeed;   // Meters/sec
-        float intakeRightMotorSpeed;  // Meters/sec
-        float tubeMotorSpeed;         // Meters/sec
-        float leftDriveMotorSpeed;    // Rads/sec
-        float rightDriveMotorSpeed;   // Rads/sec
+        std::string team;                    // Team number
+        std::string alliance;                // "Blue" or "Red"
+        float x;                             // Meters
+        float y;                             // Meters
+        float theta;                         // Radians
+        float intakeCenterMotorSpeed;        // Meters/sec
+        float intakeLeftMotorSpeed;          // Meters/sec
+        float intakeRightMotorSpeed;         // Meters/sec
+        float tubeMotorSpeed;                // Meters/sec
+        float leftDriveMotorSpeed;           // Rads/sec
+        float rightDriveMotorSpeed;          // Rads/sec
+        std::vector<LidarPoint> lidarPoints; // LIDAR points
     };
 
     struct FieldState
@@ -157,7 +190,7 @@ struct SimState
     std::string toJson()
     {
         rapidjson::StringBuffer s;
-        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+        rapidjson::Writer<rapidjson::StringBuffer> writer(s);
 
         writer.StartObject();
         writer.Key("blueScore");
@@ -200,6 +233,17 @@ struct SimState
             writer.Double(v.leftDriveMotorSpeed);
             writer.Key("rightDriveMotorSpeed");
             writer.Double(v.rightDriveMotorSpeed);
+            writer.Key("lidarPoints");
+            writer.StartArray();
+            for (const auto& p : v.lidarPoints)
+            {
+                writer.StartArray();
+                writer.Double(p.azimuth);
+                writer.Double(p.elevation);
+                writer.Double(p.range);
+                writer.EndArray();
+            }
+            writer.EndArray();
             writer.EndObject();
         }
         writer.EndArray();
@@ -208,12 +252,12 @@ struct SimState
         for (const auto& g : gamePieces)
         {
             writer.StartObject();
-            writer.Key("x");
+            writer.Key("position");
+            writer.StartArray();
             writer.Double(g.x);
-            writer.Key("y");
             writer.Double(g.y);
-            writer.Key("z");
             writer.Double(g.z);
+            writer.EndArray();
             writer.Key("ingestionState");
             writer.Int(g.ingestionState);
             writer.EndObject();
@@ -256,6 +300,17 @@ struct SimState
             vehicle.tubeMotorSpeed = (*itr)["tubeMotorSpeed"].GetFloat();
             vehicle.leftDriveMotorSpeed = (*itr)["leftDriveMotorSpeed"].GetFloat();
             vehicle.rightDriveMotorSpeed = (*itr)["rightDriveMotorSpeed"].GetFloat();
+            const Value& s = (*itr)["lidarPoints"];
+            std::vector<LidarPoint> lidarPoints;
+            for (auto itr2 = s.Begin(); itr2 != s.End(); itr2++)
+            {
+                LidarPoint p{};
+                p.azimuth = (*itr2)[0].GetFloat();
+                p.elevation = (*itr2)[1].GetFloat();
+                p.range = (*itr2)[2].GetFloat();
+                lidarPoints.push_back(p);
+            }
+            vehicle.lidarPoints = lidarPoints;
             vehicles.push_back(vehicle);
         }
 
@@ -263,9 +318,9 @@ struct SimState
         for (auto itr = g.Begin(); itr != g.End(); ++itr)
         {
             GamePieceState gamePiece{};
-            gamePiece.x = (*itr)["x"].GetFloat();
-            gamePiece.y = (*itr)["y"].GetFloat();
-            gamePiece.z = (*itr)["z"].GetFloat();
+            gamePiece.x = (*itr)["position"][0].GetFloat();
+            gamePiece.y = (*itr)["position"][1].GetFloat();
+            gamePiece.z = (*itr)["position"][2].GetFloat();
             gamePiece.ingestionState = (*itr)["ingestionState"].GetFloat();
             gamePieces.push_back(gamePiece);
         }
@@ -280,6 +335,3 @@ struct SimState
         gamePieces.clear();
     }
 };
-
-
-#endif //ROBOT_SIM_TYPES_H

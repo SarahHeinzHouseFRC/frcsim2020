@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_VEHICLEMODEL_H
-#define ROBOT_SIM_VEHICLEMODEL_H
+#pragma once
 
 #include "ConfigReader.h"
 #include "Types.h"
@@ -55,6 +54,11 @@ public:
     void reset();
 
     /**
+     * Clears all LIDAR points. Called once all points have been tx'd
+     */
+    void clearLidarPoints() { _state.lidarPoints.clear(); }
+
+    /**
      * Returns the model type
      */
     virtual ModelType modelType() { return VEHICLE_MODEL; }
@@ -99,18 +103,18 @@ private:
     double _tubeMotorMaxSpeed; // Need to enforce the motor speed to stay bw 0 and this max speed (rads/sec)
     double _wheelRadius; // Needed to calculate travel of robot per unit time
     double _wheelTrack; // Needed to calculate arced turns
-    double _drivetrainWidth; // Needed to calculate turning radius
     double _mass; // Needed to calculate density for collision checker
     double _prevTimestamp; // Needed to calculate how much time has passed since last update()
     bool _outtake; // Whether or not this vehicle has requested the field to outtake
     bool _prevOuttakeButtonState; // Whether or not the controller was previously requesting an outtake
+    bool _hasLidar; // Whether or not this vehicle has a LIDAR sensor
 
     struct
     {
         double x, y, theta;
     } _initialState;
 
-    struct VehicleState
+    struct VehicleControls
     {
         double leftDriveMotorSpeed; // Rads/sec, 0-leftDriveMotorMaxSpeed
         double rightDriveMotorSpeed; // Rads/sec, 0-rightDriveMotorMaxSpeed
@@ -118,17 +122,17 @@ private:
         double intakeLeftMotorSpeed; // Rads/sec, 0-intakeLeftMotorMaxSpeed
         double intakeRightMotorSpeed; // Rads/sec, 0-intakeRightMotorMaxSpeed
         double tubeMotorSpeed; // Rads/sec, 0-tubeMotorMaxSpeed
-        struct
-        {
-            double x;     // Meters
-            double y;     // Meters
-            double vx;    // Meters/sec
-            double vy;    // Meters/sec
-            double omega; // Rads/sec
-            double theta; // Rads
-        } pose;
+    } _controls;
+
+    struct VehicleState
+    {
+        double x;                            // Meters
+        double y;                            // Meters
+        double theta;                        // Rads
+        double vx;                           // Meters/sec
+        double vy;                           // Meters/sec
+        double omega;                        // Rads/sec
+        int numIngestedBalls;                // Number of balls in tube
+        std::vector<LidarPoint> lidarPoints; // LIDAR points
     } _state;
 };
-
-
-#endif //ROBOT_SIM_VEHICLEMODEL_H

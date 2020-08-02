@@ -4,7 +4,7 @@
 
 #include "UdpNode.h"
 
-#define MAXLINE 8192
+#define MAXLINE 65536
 
 
 UdpNode::UdpNode(uint16_t rxPort, const std::string& txIp, uint16_t txPort) : _rxAddr{0}, _txAddr{0}
@@ -46,7 +46,7 @@ UdpNode::~UdpNode()
 
 
 
-void UdpNode::send(std::string msg)
+void UdpNode::send(const std::string& msg)
 {
     const char *msg_c = msg.c_str();
     sendto(_sockfd, (const char *)msg_c, strlen(msg_c),

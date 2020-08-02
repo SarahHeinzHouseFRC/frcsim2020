@@ -2,19 +2,17 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef SHARP2019_COREAGENT_H
-#define SHARP2019_COREAGENT_H
+#pragma once
 
-#include <mutex>
 #include "ConfigReader.h"
 #include "Types.h"
-#include "UdpNode.h"
+#include "AbstractAgent.h"
 
 
 /**
- * Receives commands and transmits robot state over comms.enc
+ * Receives world state from and transmits heartbeat to sim over comms
  */
-class SimAgent
+class SimAgent : public AbstractAgent
 {
 public:
     /**
@@ -28,28 +26,12 @@ public:
     void txHeartbeat();
 
     /**
-     * Receives state of sim
-     * @return True if successful rx, false otherwise
+     * Receives sim state
+     * @return Latest sim state or empty state if connection lost
      */
-    bool rxSimState();
-
-    /**
-     * Get the last command received
-     */
-    SimState getSimState() { std::lock_guard<std::mutex> lockGuard(_m); return _simState; }
-
-    /**
-     * Whether or not we're connected to the controls
-     */
-    bool isConnected() const;
+    SimState rxSimState();
 
 private:
     SimState _simState;
-    std::unique_ptr<UdpNode> _comms;
     bool _verbose;
-    int _numDroppedPackets; ///< Count of how many packets have been missed
-    std::mutex _m;
 };
-
-
-#endif //SHARP2019_COREAGENT_H

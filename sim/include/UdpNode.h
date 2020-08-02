@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_UDPNODE_H
-#define ROBOT_SIM_UDPNODE_H
+#pragma once
 
 #include <iostream>
 #include <stdio.h>
@@ -32,7 +31,7 @@ public:
     /**
      * Send over UDP
      */
-    void send(std::string msg);
+    void send(const std::string &msg);
 
     /**
      * Receive over UDP (max 1024 bytes)
@@ -44,6 +43,3 @@ private:
     int _sockfd;
     struct sockaddr_in _rxAddr, _txAddr;
 };
-
-
-#endif //ROBOT_SIM_UDPNODE_H

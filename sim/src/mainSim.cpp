@@ -3,12 +3,14 @@
  */
 
 #include <iostream>
+#include <mutex>
 #include <thread>
 #include "ArgumentParser.h"
 #include "ConfigReader.h"
 #include "Scene.h"
 #include "Hud.h"
 #include "Visualizer.h"
+#include "KeyHandler.h"
 #include "Time.h"
 #include "Timer.h"
 #include "CoreAgent.h"
@@ -83,6 +85,8 @@ int main(int argc, char** argv)
 
     // Visualize the scene
     Visualizer vis(scene, hud, headless);
+    osg::ref_ptr<KeyHandler> k = new KeyHandler;
+    vis.addEventHandler(k);
 
     // Launch rx comms in background thread
     bool reset = false;
@@ -95,33 +99,31 @@ int main(int argc, char** argv)
                 CoreAgent& coreAgent = coreAgents.at(i);
 
                 // Receive commands
-                bool rx = coreAgent.rxCoreCommands();
+                auto rxCommands = coreAgent.rxCoreCommands();
 
-                if (rx)
+                // If the user hit "start" on the joystick, then start/stop the countdown timer
+                timer.processCommand(rxCommands.timerStartStop, Time::now());
+
+                // If the user hit "guide" on the joystick, then reset the world
+                if (rxCommands.reset)
                 {
-                    // Update the vehicle's control surfaces based on the commands from core
-                    auto rxCommands = coreAgent.getCoreCommands();
-
-                    // If the user hits "start" on the joystick, then start/stop the countdown timer
-                    timer.processCommand(rxCommands.timerStartStop, Time::now());
-
-                    // If the user hits "guide" on the joystick, then reset the world
-                    if (rxCommands.reset)
-                    {
-                        reset = true;
-                    }
-
-                    // If the timer hits zero, stop allowing the controllers to update the vehicle
-                    if (timer.getValue() <= 0)
-                    {
-                        rxCommands.clear();
-                    }
-                    wm.vehicleModel(i).processCommands(rxCommands);
+                    reset = true;
                 }
+
+                // If the timer hits zero, stop allowing the controllers to update the vehicle
+                if (timer.getValue() == 0)
+                {
+                    rxCommands.clear();
+                }
+
+                // Update the vehicle's control surfaces based on the commands from core
+                wm.vehicleModel(i).processCommands(rxCommands);
             }
             usleep(100);
         }
     });
+
+    std::mutex m; // Prevent reading params from the world model while they're being written to
 
     // Launch tx comms in background thread
     std::thread txThread([&]()
@@ -131,11 +133,16 @@ int main(int argc, char** argv)
             for (int i=0; i<coreAgents.size(); i++)
             {
                 CoreAgent& coreAgent = coreAgents.at(i);
-                coreAgent.setSensorState(wm.vehicleModel(i).getSensorState());
+                m.lock();
+                SensorState s = wm.vehicleModel(i).getSensorState();
+                coreAgent.setSensorState(s);
+                m.unlock();
                 coreAgent.txSensorState();
             }
 
+            m.lock();
             SimState s = wm.getSimState();
+            m.unlock();
             s.isTimerRunning = timer.isRunning();
             s.timer = timer.getValue();
 
@@ -144,6 +151,13 @@ int main(int argc, char** argv)
                 SimViewAgent& simViewAgent = simViewAgents.at(i);
                 simViewAgent.setSimState(s);
                 simViewAgent.txSimState();
+            }
+
+            for (int i=0; i<config.players.size(); i++)
+            {
+                m.lock();
+                wm.vehicleModel(i).clearLidarPoints();
+                m.unlock();
             }
 
             usleep(1e4);
@@ -156,12 +170,16 @@ int main(int argc, char** argv)
         {
             if (headless) { break; }
 
+            reset |= k->reset();
+
+            m.lock();
             SimState s = wm.getSimState();
+            m.unlock();
             s.isTimerRunning = timer.isRunning();
             s.timer = timer.getValue();
 
             // Update the vehicle and field visualizations based on their models
-            scene.update(s);
+            scene.update(s, k->showLidar());
 
             // Update the hud
             std::vector<bool> connected;
@@ -188,14 +206,19 @@ int main(int argc, char** argv)
         timer.update(t);
 
         // Update the world to reflect the current time
+        m.lock();
         wm.update(t);
+        m.unlock();
 
         if (reset)
         {
             wm.reset();
             timer.reset();
             reset = false;
+            k->resetFlags();
         }
+
+        usleep(1e4);
     }
 
     rxThread.join();

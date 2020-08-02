@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_VEHICLEVIEW_H
-#define ROBOT_SIM_VEHICLEVIEW_H
+#pragma once
 
 #include <osg/PositionAttitudeTransform>
 #include "ConfigReader.h"
@@ -21,7 +20,7 @@ public:
     /**
      * Updates the vehicle view based on the vehicle model
      */
-    void update(const SimState::VehicleState& state);
+    void update(const SimState::VehicleState& state, bool showLidar);
 
     /**
      * Returns vehicle node (for Visualizer to center view on)
@@ -30,15 +29,14 @@ public:
 
 private:
     /**
-     * Helper method for creating a default robot out of basic geometry
+     * Draws wheels
      */
-
-    osg::ref_ptr<osg::Geode> drawVehicle(const ConfigReader& config);
+    osg::ref_ptr<osg::Geode> drawWheels(const ConfigReader& config);
 
     /**
      * Draws the collision boundary of the vehicle
      */
-    osg::ref_ptr<osg::Geode> drawCollisionBoundary(const ConfigReader& config);
+    osg::ref_ptr<osg::Geode> drawBody(const ConfigReader& config);
 
     /**
      * Draws the bumpers around the vehicle
@@ -55,8 +53,13 @@ private:
      */
     osg::ref_ptr<osg::Geode> drawInfo(const ConfigReader& config, int playerId, const std::string& fontFile);
 
+    /**
+     * Draws LIDAR rays
+     */
+    osg::ref_ptr<osg::Geode> drawRays(const ConfigReader&config);
+
     osg::ref_ptr<osg::Node> _vehicleNode;
-    osg::ref_ptr<osg::Geode> _vehicleBounds;
+    osg::ref_ptr<osg::Geode> _sweep;
     osg::ref_ptr<osg::Geometry> _ingestibleRegionCenterArrow;
     Geometry::Vertex2d _centerIngestibleRegionCenter;
     Geometry::Vertex2d _centerIngestibleRegionLeft;
@@ -70,7 +73,11 @@ private:
     osg::ref_ptr<osg::Geometry> _ingestibleRegionRightArrow;
     osg::ref_ptr<osg::Geometry> _tubeRegionArrow;
     float _wheelRadius;
+    float _ballRadius;
+    float _lidarNearRange;
+    float _laserFrequency;
+    float _motorFrequency;
+    float _gamePieceRadius;
+    float _bodyZ;
+    double _prevAzimuth;
 };
-
-
-#endif //ROBOT_SIM_VEHICLEVIEW_H

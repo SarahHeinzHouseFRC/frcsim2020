@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_BASEMODEL_H
-#define ROBOT_SIM_BASEMODEL_H
+#pragma once
 
 
 class BaseModel
@@ -27,6 +26,3 @@ public:
      */
     virtual void isInCollision(bool c) = 0;
 };
-
-
-#endif //ROBOT_SIM_BASEMODEL_H

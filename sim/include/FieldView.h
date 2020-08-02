@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_FIELDVIEW_H
-#define ROBOT_SIM_FIELDVIEW_H
+#pragma once
 
 #include <osg/PositionAttitudeTransform>
 #include "ConfigReader.h"
@@ -48,6 +47,3 @@ private:
     osg::ref_ptr<osg::Node> _fieldNode;
     osg::ref_ptr<osg::Geode> _fieldBounds;
 };
-
-
-#endif //ROBOT_SIM_FIELDVIEW_H

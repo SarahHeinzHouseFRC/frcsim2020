@@ -4,6 +4,8 @@ project(sim)
 find_package(OpenSceneGraph REQUIRED COMPONENTS osgViewer osgDB osgGA osgText)
 find_package(Box2D)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+
 include_directories(
         include
         ${OPENSCENEGRAPH_INCLUDE_DIRS}
@@ -20,6 +22,7 @@ set(SIM_SRCS
         src/VehicleView.cpp
         src/GamePieceView.cpp
         src/ViewUtils.cpp
+        src/AbstractAgent.cpp
         src/CoreAgent.cpp
         src/SimViewAgent.cpp
         src/ConfigReader.cpp
@@ -33,7 +36,9 @@ set(SIM_SRCS
         src/PhysicsEngine.cpp
         src/Geometry.cpp
         src/ArgumentParser.cpp
-)
+        src/PhysicsEngineLidar.cpp
+        src/KeyHandler.cpp
+        )
 
 add_executable(sim ${SIM_SRCS})
 
@@ -50,6 +55,7 @@ set(SIM_VIEW_SRCS
         src/VehicleView.cpp
         src/GamePieceView.cpp
         src/ViewUtils.cpp
+        src/AbstractAgent.cpp
         src/SimAgent.cpp
         src/ConfigReader.cpp
         src/Scene.cpp
@@ -60,6 +66,7 @@ set(SIM_VIEW_SRCS
         src/UdpNode.cpp
         src/Geometry.cpp
         src/ArgumentParser.cpp
+        src/KeyHandler.cpp
         )
 
 add_executable(simView ${SIM_VIEW_SRCS})

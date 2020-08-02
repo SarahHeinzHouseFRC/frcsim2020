@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_GAMEPIECEMODEL_H
-#define ROBOT_SIM_GAMEPIECEMODEL_H
+#pragma once
 
 #include "ConfigReader.h"
 #include "BaseModel.h"
@@ -65,6 +64,3 @@ private:
         IngestionState ingestion;
     } _state;
 };
-
-
-#endif //ROBOT_SIM_GAMEPIECEMODEL_H

@@ -25,7 +25,7 @@ Visualizer::Visualizer(Scene &scene, Hud& hud, bool headless) : _scene(scene), _
     _viewer.setUpViewInWindow(0, 0, _windowWidth, _windowHeight);
     osgViewer::Viewer::Windows windows;
     _viewer.getWindows(windows);
-    windows.at(0)->setWindowName("FRC Simulator 2020");
+    windows.at(0)->setWindowName("FRC 2020 Simulator");
     _viewer.setSceneData(_scene.getRoot());
 
     _viewer.addEventHandler(new osgViewer::StatsHandler);

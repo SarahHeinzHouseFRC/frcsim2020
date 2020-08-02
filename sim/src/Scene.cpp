@@ -5,7 +5,7 @@
 #include "Scene.h"
 
 
-Scene::Scene(const ConfigReader& config)
+Scene::Scene(const ConfigReader& config) : _showLidar(true)
 {
     _root = new osg::Group;
 
@@ -29,7 +29,7 @@ Scene::Scene(const ConfigReader& config)
 
 
 
-void Scene::update(const SimState& simState)
+void Scene::update(const SimState& simState, bool showLidar)
 {
     // Update field
     _fieldView->update(simState.field);
@@ -37,7 +37,7 @@ void Scene::update(const SimState& simState)
     // Update vehicles
     for (int i=0; i<simState.vehicles.size(); i++)
     {
-        _vehicleViews.at(i)->update(simState.vehicles.at(i));
+        _vehicleViews.at(i)->update(simState.vehicles.at(i), showLidar);
     }
 
     // Update game pieces

@@ -5,12 +5,15 @@
 #include <string>
 #include "SimViewAgent.h"
 
+/** Connection timeout in seconds */
+#define CONNECTED_TIMEOUT 0.5
+
 
 SimViewAgent::SimViewAgent(const ConfigReader& config) :
-        _numDroppedPackets(0), _verbose(config.verbose)
+        AbstractAgent(config.sim.comms.simViewPort, config.simView.ip, config.simView.port),
+        _simState{},
+        _verbose(config.verbose)
 {
-    _comms = std::make_unique<UdpNode>(config.sim.comms.simViewPort, config.simView.ip, config.simView.port);
-
     std::cout << "Rx from simview at " << config.sim.comms.ip << ":" << config.sim.comms.simViewPort << std::endl;
     std::cout << "Tx to simview at " << config.simView.ip << ":" << config.simView.port << std::endl;
 }
@@ -32,8 +35,21 @@ void SimViewAgent::txSimState()
 
 
 
-bool SimViewAgent::isConnected() const
+void SimViewAgent::rxHeartbeat()
 {
-    // As long as we've heard from the controls <= 100 packets ago, we're still connected
-    return _numDroppedPackets < 100;
+    std::string msg = _comms->receive();
+    if (msg.length() > 0 && msg == "{}")
+    {
+        _connected = true;
+
+        // Save time of last rx
+        _prevRxTime = getCurrentTime();
+    }
+    else
+    {
+        if (getCurrentTime() - _prevRxTime > CONNECTED_TIMEOUT)
+        {
+            _connected = false;
+        }
+    }
 }

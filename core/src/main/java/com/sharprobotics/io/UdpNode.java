@@ -16,11 +16,12 @@ public class UdpNode
     private DatagramSocket socket;
     private String txIp;
     private int txPort;
+    private int maxMsgLength = 65536;
 
-    public UdpNode(int rxPort, String txIp, int txPort) throws SocketException, UnknownHostException
+    public UdpNode(int rxPort, String txIp, int txPort) throws SocketException
     {
-        socket = new DatagramSocket(rxPort);
-        socket.setSoTimeout(10);
+        this.socket = new DatagramSocket(rxPort);
+        this.socket.setSoTimeout(10);
         this.txIp = txIp;
         this.txPort = txPort;
     }
@@ -35,9 +36,13 @@ public class UdpNode
 
     public String receive() throws IOException
     {
-        byte[] buf = new byte[1024];
+        byte[] buf = new byte[maxMsgLength];
         DatagramPacket rxPacket = new DatagramPacket(buf, buf.length);
         socket.receive(rxPacket);
+        if (rxPacket.getLength() == maxMsgLength)
+        {
+            System.out.println("UdpNode: Message may have been truncated, consider increasing max length from " + rxPacket.getLength());
+        }
         String msg = new String(rxPacket.getData(), 0, rxPacket.getLength());
         return msg;
     }

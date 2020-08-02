@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_VIEWUTILS_H
-#define ROBOT_SIM_VIEWUTILS_H
+#pragma once
 
 #include <osg/ShapeDrawable>
 #include <osg/Geometry>
@@ -16,6 +15,11 @@ public:
      * Utility method for quickly drawing arrows
      */
     static osg::ref_ptr<osg::Geometry> drawArrow(const osg::Vec3d& center, float theta, float tailLength, const osg::Vec4& color);
+
+    /**
+     * Utility method for drawing points
+     */
+    static osg::ref_ptr<osg::Geometry> drawPoints(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);
 
     /**
      * Utility method for quickly drawing lines. Pairs of vertices are interpreted as single lines
@@ -53,6 +57,3 @@ private:
      */
     static osg::ref_ptr<osg::Geometry> drawGeometry(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color, GLenum primitive);
 };
-
-
-#endif //ROBOT_SIM_VIEWUTILS_H

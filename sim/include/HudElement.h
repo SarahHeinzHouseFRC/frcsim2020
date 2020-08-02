@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_LABEL_H
-#define ROBOT_SIM_LABEL_H
+#pragma once
 
 #include <osgText/Text>
 #include "Color.h"
@@ -117,8 +116,6 @@ public:
 
     /**
      * Repositions itself according to x, y from the top left of the window
-     * @param windowWidth
-     * @param windowHeight
      */
     virtual void onWindowResize(int windowWidth, int windowHeight);
 
@@ -127,5 +124,3 @@ private:
     osg::ref_ptr<osg::Vec3Array> _vertices;
     osg::ref_ptr<osg::Vec4Array> _colors;
 };
-
-#endif //ROBOT_SIM_LABEL_H

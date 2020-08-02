@@ -3,6 +3,7 @@
  */
 
 #include <iostream>
+#include <ConfigReader.h>
 #include "ConfigReader.h"
 
 #define RPM_TO_RADS_PER_SEC 0.1047f
@@ -62,6 +63,7 @@ void ConfigReader::parsePlayersConfig(const YAML::Node& playersConfig)
         p.initialPosition.x = playerConfig["initialPosition"]["x"].as<float>() * IN_TO_M;
         p.initialPosition.y = playerConfig["initialPosition"]["y"].as<float>() * IN_TO_M;
         p.initialPosition.theta = playerConfig["initialPosition"]["theta"].as<float>() * DEG_TO_RAD;
+        p.hasLidar = playerConfig["hasLidar"].as<bool>();
         players.push_back(p);
     }
 }
@@ -100,7 +102,8 @@ void ConfigReader::parseSimCommsConfig(const YAML::Node& commsConfig)
 void ConfigReader::parseSimAssetsConfig(const YAML::Node &assetsConfig)
 {
     sim.assets.fieldModelFile = assetsConfig["fieldModelFile"].as<std::string>();
-    sim.assets.vehicleModelFile = assetsConfig["vehicleModelFile"].as<std::string>();
+    sim.assets.vehicleBlueModelFile = assetsConfig["vehicleBlueModelFile"].as<std::string>();
+    sim.assets.vehicleRedModelFile = assetsConfig["vehicleRedModelFile"].as<std::string>();
     sim.assets.gamePieceModelFile = assetsConfig["gamePieceModelFile"].as<std::string>();
     sim.assets.fontFile = assetsConfig["fontFile"].as<std::string>();
 }
@@ -109,13 +112,17 @@ void ConfigReader::parseSimAssetsConfig(const YAML::Node &assetsConfig)
 
 void ConfigReader::parseSimFieldConfig(const YAML::Node& fieldConfig)
 {
-    sim.field.exteriorPolygon = parsePolygon(fieldConfig["exteriorPolygon"]);
-    for (const auto& interiorPolygon : fieldConfig["interiorPolygons"])
-    {
-        sim.field.interiorPolygons.emplace_back(parsePolygon(interiorPolygon));
-    }
-    sim.field.blueGoalPolygon = parsePolygon(fieldConfig["blueGoalPolygon"]);
-    sim.field.redGoalPolygon = parsePolygon(fieldConfig["redGoalPolygon"]);
+    sim.field.exteriorWall = parsePolygon(fieldConfig["exteriorWall"]);
+    sim.field.rightTrenchRightWall = parsePolygon(fieldConfig["rightTrenchRightWall"]);
+    sim.field.rightTrenchLeftWall = parsePolygon(fieldConfig["rightTrenchLeftWall"]);
+    sim.field.leftTrenchRightWall = parsePolygon(fieldConfig["leftTrenchRightWall"]);
+    sim.field.leftTrenchLeftWall = parsePolygon(fieldConfig["leftTrenchLeftWall"]);
+    sim.field.rightColumn = parsePolygon(fieldConfig["rightColumn"]);
+    sim.field.topColumn = parsePolygon(fieldConfig["topColumn"]);
+    sim.field.leftColumn = parsePolygon(fieldConfig["leftColumn"]);
+    sim.field.bottomColumn = parsePolygon(fieldConfig["bottomColumn"]);
+    sim.field.blueGoalRegion = parsePolygon(fieldConfig["blueGoalRegion"]);
+    sim.field.redGoalRegion = parsePolygon(fieldConfig["redGoalRegion"]);
     sim.field.blueOuttake = parseVertex(fieldConfig["blueOuttake"]);
     sim.field.redOuttake = parseVertex(fieldConfig["redOuttake"]);
 }
@@ -152,14 +159,10 @@ void ConfigReader::parseSimVehicleConfig(const YAML::Node& vehicleConfig)
 
     if (drivetrainConfig)
     {
-        sim.vehicle.drivetrain.width = drivetrainConfig["width"].as<float>() * IN_TO_M;
-        sim.vehicle.drivetrain.depth = drivetrainConfig["depth"].as<float>() * IN_TO_M;
-        sim.vehicle.drivetrain.widthChannel = drivetrainConfig["widthChannel"].as<float>() * IN_TO_M;
-        sim.vehicle.drivetrain.heightChannel = drivetrainConfig["heightChannel"].as<float>() * IN_TO_M;
+        sim.vehicle.drivetrain.wheelBase = drivetrainConfig["wheelBase"].as<float>() * IN_TO_M;
+        sim.vehicle.drivetrain.wheelTrack = drivetrainConfig["wheelTrack"].as<float>() * IN_TO_M;
         sim.vehicle.drivetrain.wheelRadius = drivetrainConfig["wheelRadius"].as<float>() * IN_TO_M;
         sim.vehicle.drivetrain.wheelWidth = drivetrainConfig["wheelWidth"].as<float>() * IN_TO_M;
-        sim.vehicle.drivetrain.wheelBase = drivetrainConfig["wheelBase"].as<float>() * IN_TO_M;
-        sim.vehicle.drivetrain.wheelTrack = sim.vehicle.drivetrain.width - 2*sim.vehicle.drivetrain.widthChannel - sim.vehicle.drivetrain.wheelWidth;
         sim.vehicle.drivetrain.leftMotorMaxSpeed = drivetrainConfig["leftMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
         sim.vehicle.drivetrain.rightMotorMaxSpeed = drivetrainConfig["rightMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
     }
@@ -176,6 +179,20 @@ void ConfigReader::parseSimVehicleConfig(const YAML::Node& vehicleConfig)
         sim.vehicle.intake.leftMotorMaxSpeed = intakeConfig["leftMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
         sim.vehicle.intake.rightMotorMaxSpeed = intakeConfig["rightMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
         sim.vehicle.intake.tubeMotorMaxSpeed = intakeConfig["tubeMotorMaxSpeed"].as<float>() * RPM_TO_RADS_PER_SEC;
+    }
+
+    //
+    // Load vehicle LIDAR params
+    //
+
+    YAML::Node lidarConfig = vehicleConfig["lidar"];
+
+    if (lidarConfig)
+    {
+        sim.vehicle.lidar.minRange = lidarConfig["minRange"].as<float>();
+        sim.vehicle.lidar.maxRange = lidarConfig["maxRange"].as<float>();
+        sim.vehicle.lidar.laserFrequency = lidarConfig["laserFrequency"].as<float>();
+        sim.vehicle.lidar.motorFrequency = lidarConfig["motorFrequency"].as<float>();
     }
 }
 

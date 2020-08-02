@@ -2,8 +2,7 @@
  * Copyright (c) 2020 FRC Team 3260
  */
 
-#ifndef ROBOT_SIM_COLOR_H
-#define ROBOT_SIM_COLOR_H
+#pragma once
 
 #include <osg/Vec4>
 
@@ -40,6 +39,3 @@ public:
     static Color Black;
     static Color White;
 };
-
-
-#endif //ROBOT_SIM_COLOR_H

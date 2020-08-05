@@ -159,7 +159,7 @@ struct CoreCommands
                 auto rows = (*itr)["rows"].GetFloat();
                 auto cellSize = (*itr)["cellSize"].GetFloat();
                 const Value& v = (*itr)["occupancy"];
-                std::vector<bool> occupancy;
+                std::vector<uint8_t> occupancy;
                 for (auto it = v.Begin(); it != v.End(); it++)
                 {
                     int o = it->GetInt();

@@ -122,6 +122,13 @@ osg::ref_ptr<osg::Geometry> ViewUtils::drawQuads(osg::ref_ptr<osg::Vec3Array> ve
 
 
 
+osg::ref_ptr<osg::Geometry> ViewUtils::drawQuads(osg::ref_ptr<osg::Vec3Array> vertices, osg::ref_ptr<osg::Vec4Array> colors)
+{
+    return drawGeometry(vertices, colors, osg::PrimitiveSet::QUADS);
+}
+
+
+
 osg::ref_ptr<osg::ShapeDrawable> ViewUtils::drawCylinder(const osg::Vec3& pos, float radius, float height, const osg::Vec4& color)
 {
     osg::ref_ptr<osg::Cylinder> cylinder = new osg::Cylinder(pos, radius, height);
@@ -156,13 +163,25 @@ osg::ref_ptr<osg::Drawable> ViewUtils::drawBox2d(float x, float y, float z, floa
 
 osg::ref_ptr<osg::Geometry> ViewUtils::drawGeometry(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color, GLenum primitive)
 {
-    osg::ref_ptr<osg::Geometry> geom = new osg::Geometry;
     osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
     colors->push_back(color);
 
+    osg::ref_ptr<osg::Geometry> geom = drawGeometry(vertices, colors, primitive);
+    geom->setColorBinding(osg::Geometry::BIND_OVERALL);
+
+    return geom;
+}
+
+
+
+
+osg::ref_ptr<osg::Geometry> ViewUtils::drawGeometry(osg::ref_ptr<osg::Vec3Array> vertices, osg::ref_ptr<osg::Vec4Array> colors, GLenum primitive)
+{
+    osg::ref_ptr<osg::Geometry> geom = new osg::Geometry;
+
     geom->setVertexArray(vertices);
     geom->setColorArray(colors);
-    geom->setColorBinding(osg::Geometry::BIND_OVERALL);
+    geom->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
     geom->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF); // Turn off lighting
     geom->getOrCreateStateSet()->setMode(GL_BLEND, osg::StateAttribute::ON); // Turn on blending
     geom->addPrimitiveSet(new osg::DrawArrays(primitive, 0, vertices->size())); // Set geometry type

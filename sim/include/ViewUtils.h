@@ -58,6 +58,11 @@ public:
     static osg::ref_ptr<osg::Geometry> drawQuads(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);
 
     /**
+     * Utility method for quickly drawing quads of different colors
+     */
+    static osg::ref_ptr<osg::Geometry> drawQuads(osg::ref_ptr<osg::Vec3Array> vertices, osg::ref_ptr<osg::Vec4Array> colors);
+
+    /**
      * Utility method for quickly drawing quads
      */
     static osg::ref_ptr<osg::Geometry> drawTriangleFan(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color);
@@ -72,4 +77,9 @@ private:
      * Common helper method for quickly drawing geometries
      */
     static osg::ref_ptr<osg::Geometry> drawGeometry(osg::ref_ptr<osg::Vec3Array> vertices, const osg::Vec4& color, GLenum primitive);
+
+    /**
+     * Common helper method for quickly drawing geometries
+     */
+    static osg::ref_ptr<osg::Geometry> drawGeometry(osg::ref_ptr<osg::Vec3Array> vertices, osg::ref_ptr<osg::Vec4Array> colors, GLenum primitive);
 };

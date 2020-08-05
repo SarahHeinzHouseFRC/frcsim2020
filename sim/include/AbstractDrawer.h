@@ -81,7 +81,7 @@ public:
     /**
      * Constructor
      */
-     GridDrawer(const std::string& text, const std::string& color, int numCols, int numRows, float cellSize, const std::vector<bool>& occupancy);
+     GridDrawer(const std::string& text, const std::string& color, int numCols, int numRows, float cellSize, const std::vector<uint8_t>& occupancy);
 
     /**
     * Draw
@@ -92,5 +92,5 @@ private:
     int _numCols;
     int _numRows;
     float _cellSize;
-    std::vector<bool> _occupancy;
+    std::vector<uint8_t> _occupancy;
 };

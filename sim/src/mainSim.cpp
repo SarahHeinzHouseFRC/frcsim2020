@@ -60,8 +60,8 @@ int main(int argc, char** argv)
     double t = Time::now();
     WorldModel wm(config, t);
 
-    // Initialize a timer to countdown 2m 15s
-    Timer timer(t, 135);
+    // Initialize a timer to countdown 2m 30s
+    Timer timer(t, 150);
 
     // Initialize comms with core and simviews
     std::vector<CoreAgent> coreAgents;
